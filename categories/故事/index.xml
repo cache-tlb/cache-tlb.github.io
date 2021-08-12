@@ -1,15 +1,15 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
         <title>故事 - 分类 - Praise the Sun!</title>
-        <link>cache-tlb.github.io/categories/%E6%95%85%E4%BA%8B/</link>
+        <link>https://cache-tlb.github.io/categories/%E6%95%85%E4%BA%8B/</link>
         <description>故事 - 分类 - Praise the Sun!</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
-            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Wed, 30 Jun 2021 20:04:29 &#43;0800</lastBuildDate><atom:link href="cache-tlb.github.io/categories/%E6%95%85%E4%BA%8B/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Wed, 30 Jun 2021 20:04:29 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E6%95%85%E4%BA%8B/" rel="self" type="application/rss+xml" /><item>
     <title>[小说] 永远的红盘</title>
-    <link>cache-tlb.github.io/untouchable-houses/</link>
+    <link>https://cache-tlb.github.io/untouchable-houses/</link>
     <pubDate>Wed, 30 Jun 2021 20:04:29 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/untouchable-houses/</guid>
+    <guid>https://cache-tlb.github.io/untouchable-houses/</guid>
     <description><![CDATA[“老实交代，你们这个窝点存在多久了？” 会所包厢内，暧昧的灯光下蹲着十来名男男女女，男的衣着光鲜，女的衣着暴露。这些在朋友圈里扮着绅士名媛的年]]></description>
 </item></channel>
 </rss>

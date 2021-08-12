@@ -1,45 +1,45 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
         <title>Praise the Sun!</title>
-        <link>cache-tlb.github.io/</link>
+        <link>https://cache-tlb.github.io/</link>
         <description>A Graphics Programmer&#39;s Log</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
             <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Wed, 11 Aug 2021 18:37:11 &#43;0800</lastBuildDate>
-            <atom:link href="cache-tlb.github.io/index.xml" rel="self" type="application/rss+xml" />
+            <atom:link href="https://cache-tlb.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
     <title>[游戏评论] 迷雾侦探</title>
-    <link>cache-tlb.github.io/mr.mist-game-review/</link>
+    <link>https://cache-tlb.github.io/mr.mist-game-review/</link>
     <pubDate>Wed, 11 Aug 2021 18:37:11 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/mr.mist-game-review/</guid>
+    <guid>https://cache-tlb.github.io/mr.mist-game-review/</guid>
     <description><![CDATA[笔者最早是 2017 年在微博上看到还在开发中的 “迷雾侦探” 的介绍，然后立刻就被它的世界观所吸引。 那时它的英文名还是 Mr. Mist，现在已经改成叫 Tales of the Neon]]></description>
 </item><item>
     <title>[游戏评论] Hocus</title>
-    <link>cache-tlb.github.io/hocus-game-review/</link>
+    <link>https://cache-tlb.github.io/hocus-game-review/</link>
     <pubDate>Sat, 24 Jul 2021 18:11:25 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/hocus-game-review/</guid>
+    <guid>https://cache-tlb.github.io/hocus-game-review/</guid>
     <description><![CDATA[偶然发现一个小游戏，叫 Hocus，中文翻译叫“迷惑”或“错觉”。 是一个利用视错觉的解谜类游戏。不禁让人联想到“纪念碑谷”。可谓是一提到视错觉]]></description>
 </item><item>
     <title>[小说] 永远的红盘</title>
-    <link>cache-tlb.github.io/untouchable-houses/</link>
+    <link>https://cache-tlb.github.io/untouchable-houses/</link>
     <pubDate>Wed, 30 Jun 2021 20:04:29 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/untouchable-houses/</guid>
+    <guid>https://cache-tlb.github.io/untouchable-houses/</guid>
     <description><![CDATA[“老实交代，你们这个窝点存在多久了？” 会所包厢内，暧昧的灯光下蹲着十来名男男女女，男的衣着光鲜，女的衣着暴露。这些在朋友圈里扮着绅士名媛的年]]></description>
 </item><item>
     <title>GameBoy 模拟器开发记录</title>
-    <link>cache-tlb.github.io/gameboy-simulator-dev-log/</link>
+    <link>https://cache-tlb.github.io/gameboy-simulator-dev-log/</link>
     <pubDate>Tue, 18 May 2021 20:32:44 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/gameboy-simulator-dev-log/</guid>
+    <guid>https://cache-tlb.github.io/gameboy-simulator-dev-log/</guid>
     <description><![CDATA[前言 如果问一个模拟器的作者为什么要编写模拟器，不同人的回答可能不尽相同。就比如你问一个 MineCraft 玩家为什么要在游戏里造一个 CPU，有的人会说，想给自]]></description>
 </item><item>
     <title>How to Become an Advanced Graphics Programmer</title>
-    <link>cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</link>
+    <link>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</link>
     <pubDate>Thu, 13 May 2021 20:02:42 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</guid>
+    <guid>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</guid>
     <description><![CDATA[本文翻译自 Eric Arnebäck 的一条 推文，作者提出了图形程序员进阶的一些中肯的建议。我觉得其中有不少值得借鉴的点。 如果你已经可以无碍地听懂 GDC 和]]></description>
 </item></channel>
 </rss>

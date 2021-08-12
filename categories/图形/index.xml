@@ -1,15 +1,15 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
         <title>图形 - 分类 - Praise the Sun!</title>
-        <link>cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/</link>
+        <link>https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/</link>
         <description>图形 - 分类 - Praise the Sun!</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
-            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Thu, 13 May 2021 20:02:42 &#43;0800</lastBuildDate><atom:link href="cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Thu, 13 May 2021 20:02:42 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/" rel="self" type="application/rss+xml" /><item>
     <title>How to Become an Advanced Graphics Programmer</title>
-    <link>cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</link>
+    <link>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</link>
     <pubDate>Thu, 13 May 2021 20:02:42 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</guid>
+    <guid>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</guid>
     <description><![CDATA[本文翻译自 Eric Arnebäck 的一条 推文，作者提出了图形程序员进阶的一些中肯的建议。我觉得其中有不少值得借鉴的点。 如果你已经可以无碍地听懂 GDC 和]]></description>
 </item></channel>
 </rss>
