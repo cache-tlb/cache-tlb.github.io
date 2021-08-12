@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>编程 - 分类 - Praise the Sun!</title>
+        <link>cache-tlb.github.io/categories/%E7%BC%96%E7%A8%8B/</link>
+        <description>编程 - 分类 - Praise the Sun!</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Tue, 18 May 2021 20:32:44 &#43;0800</lastBuildDate><atom:link href="cache-tlb.github.io/categories/%E7%BC%96%E7%A8%8B/" rel="self" type="application/rss+xml" /><item>
+    <title>GameBoy 模拟器开发记录</title>
+    <link>cache-tlb.github.io/gameboy-simulator-dev-log/</link>
+    <pubDate>Tue, 18 May 2021 20:32:44 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>cache-tlb.github.io/gameboy-simulator-dev-log/</guid>
+    <description><![CDATA[前言 如果问一个模拟器的作者为什么要编写模拟器，不同人的回答可能不尽相同。就比如你问一个 MineCraft 玩家为什么要在游戏里造一个 CPU，有的人会说，想给自]]></description>
+</item></channel>
+</rss>

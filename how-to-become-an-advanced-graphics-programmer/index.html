@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>How to Become an Advanced Graphics Programmer - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="How to Become an Advanced Graphics Programmer" />
+<meta property="og:description" content="本文翻译自 Eric Arnebäck 的一条 推文，作者提出了图形程序员进阶的一些中肯的建议。我觉得其中有不少值得借鉴的点。 如果你已经可以无碍地听懂 GDC 和" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/" /><meta property="og:image" content="/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-05-13T20:02:42&#43;08:00" />
+<meta property="article:modified_time" content="2021-05-13T20:02:42&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="/logo.png"/>
+
+<meta name="twitter:title" content="How to Become an Advanced Graphics Programmer"/>
+<meta name="twitter:description" content="本文翻译自 Eric Arnebäck 的一条 推文，作者提出了图形程序员进阶的一些中肯的建议。我觉得其中有不少值得借鉴的点。 如果你已经可以无碍地听懂 GDC 和"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/" /><link rel="next" href="cache-tlb.github.io/gameboy-simulator-dev-log/" /><link rel="stylesheet" href="/cache-tlb.github.io/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/cache-tlb.github.io/css/style.min.css"><link rel="stylesheet" href="/cache-tlb.github.io/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/cache-tlb.github.io/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "How to Become an Advanced Graphics Programmer",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "cache-tlb.github.io\/how-to-become-an-advanced-graphics-programmer\/"
+        },"genre": "posts","keywords": "经验","wordcount":  2579 ,
+        "url": "cache-tlb.github.io\/how-to-become-an-advanced-graphics-programmer\/","datePublished": "2021-05-13T20:02:42+08:00","dateModified": "2021-05-13T20:02:42+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="cache-tlb.github.io/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/cache-tlb.github.io/posts/"> 文章 </a><a class="menu-item" href="/cache-tlb.github.io/categories/"> 分类 </a><a class="menu-item" href="/cache-tlb.github.io/tags/"> 标签 </a><a class="menu-item" href="/cache-tlb.github.io/about/"> 关于 </a><a class="menu-item" href="/cache-tlb.github.io/links/"> 链接 </a><a class="menu-item" href="/cache-tlb.github.io/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="cache-tlb.github.io/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/cache-tlb.github.io/posts/" title="">文章</a><a class="menu-item" href="/cache-tlb.github.io/categories/" title="">分类</a><a class="menu-item" href="/cache-tlb.github.io/tags/" title="">标签</a><a class="menu-item" href="/cache-tlb.github.io/about/" title="">关于</a><a class="menu-item" href="/cache-tlb.github.io/links/" title="">链接</a><a class="menu-item" href="/cache-tlb.github.io/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">How to Become an Advanced Graphics Programmer</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="cache-tlb.github.io/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/"><i class="far fa-folder fa-fw"></i>图形</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-05-13">2021-05-13</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2579 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>本文翻译自 Eric Arnebäck 的一条 <a href="https://twitter.com/erkaman2/status/1004031184551206912" target="_blank" rel="noopener noreffer">推文</a>，作者提出了图形程序员进阶的一些中肯的建议。我觉得其中有不少值得借鉴的点。</p>
+<p>如果你已经可以无碍地听懂 GDC 和 siggraph 的最新的报告和论文，并且可以用相对合理的时间实现出来，那么你已经是很资深的图形程序员了，会有大量游戏公司向你抛来橄榄枝。那么我是如何做到的呢？</p>
+<p>我建议每个新手图形程序员都实现一个自己的 mini 渲染引擎，包括以下功能：</p>
+<ul>
+<li>粒子系统</li>
+<li>水和动态反射</li>
+<li>环境光遮蔽</li>
+<li>延迟渲染</li>
+<li>视锥体裁剪</li>
+<li>阴影渲染</li>
+<li>抗锯齿</li>
+</ul>
+<p>等等。实现一个功能齐全的渲染引擎，是从新手到熟手的最好途径。</p>
+<p>每当实现完一个高级的功能，一定要写一篇博客详细介绍。既可以让你更深入地思考自己所实现的东西，也可以提升技术交流的水平，这对于工业界是非常重要的能力。将博客分享给其他人，同行的讨论能给你更多启发。</p>
+<p>对业界的动态保持关注，每周都读一下最新的 paper，和大佬发的最新博客及推文。</p>
+<p>如果没时间从头到尾地读论文，可以跳过某些部分，直到自己能掌握论文背后的主旨。论文里往往包含大量细节内容，这些只在你真的坐下来亲自去实现它的时候有用。于我而言，了解主旨基本就足够了。</p>
+<p>以后在项目中引入一个论文的工作，只要掌握它的大体思路。</p>
+<p>我认为资深图形程序员的一个主要的特点就是可以用相对合理的时间量实现最新的 siggraph / EG 等会议的论文。关于如何实现论文，又有几点看法。</p>
+<p>首先从头到尾读几遍论文，重点关注“方法”部分。从这部分提炼出“最简可行的原型”，也就是抛去各种优化，先不关注性能，而是思考如何用最简单的方式实现它。有了实现方案以后接着思考：将它用自己的引擎实现出来有多困难？它的效果能否达到我想要的水准？</p>
+<p>考虑好之后就可以琢磨如何优化和实现论文的高级部分。</p>
+<p>实现论文一个重要的点是要有能比较的 ground truth。比如实现一个实时间接光算法，你需要同时实现一个 path tracer（基于 Mistuba 或 embree）。又比如实现一个 shadow map 的 filter 算法，肯定也要跟 PCF 进行比较。</p>
+<p>对于一些非常篇数学和抽象的论文，很难立马想到如何将它翻译成代码，以下是一些建议：</p>
+<ul>
+<li>多数情况下，计算积分就是求和</li>
+<li>集合的记号用数组来实现</li>
+<li>经常会遇到的最小化的问题，可以通过找梯度为 0 的点来解</li>
+<li>求解偏微分方程（PDE）可以转化成有限差分（finite difference）</li>
+<li>遇到大矩阵不要怕，它们一般都是用来表示许多小的简单的等式的联立</li>
+<li><strong>永远不要试图自己实现线性系统求解器，而是用 Eigen 库</strong></li>
+<li>简化问题，比如想象输入的 mesh 只有一个或几个三角形，代入公式中看看会变成什么样，这有助于加深理解</li>
+<li>考虑三维情况之前，先考虑二维甚至一维下的情况</li>
+</ul>
+<p>更多建议：</p>
+<ul>
+<li>阅读参考文献中的论文，它们可能对一些概念有更容易理解的解释</li>
+<li>很多人会在硕士论文中实现 siggraph 论文，里面有大量宝贵的实现细节，可供参考</li>
+<li>有些论文其实本身就写的很晦涩，可以给作者发邮件问清楚</li>
+<li>可以询问同事，或者在 twitter 上问专家</li>
+</ul>
+<p>下面是一些优化论文实现的建议：</p>
+<ul>
+<li>学会使用性能分析工具，比如 NVidia Nsight，可以快速定位代码中的 hotspot</li>
+<li>读 <a href="https://developer.nvidia.com/blog/the-peak-performance-analysis-method-for-optimizing-any-gpu-workload/" target="_blank" rel="noopener noreffer">这篇文章</a></li>
+<li>使用版本控制工具，这样可以知道哪些修改会影响性能</li>
+</ul>
+<hr>
+<p>最近读到安柏霖先生的<a href="https://blog.csdn.net/toughbro/article/details/115260139" target="_blank" rel="noopener noreffer">博文</a>，里面提到了各种职级的程序员应该具备的水平，比如 T8 - T9 级别（工作2-3年，正常晋升）应该可以轻松落地单点技术（比如战神的风场），T10 - T11 级别要能负责系统级别技术（没举例子，大概是地形系统、粒子系统、动画系统等吧）。</p>
+<p>离题一句，安柏霖在这里主要是讨论“隐性知识”的重要性。这是书上和论文中不讲，但对于游戏开发至关重要的东西，非常琐碎。比如工具链、兼容性。相比之下，“显性知识”，也就是出现在各种高大上论文里的核心技术，其实是难度最小的部分，属于冰山浮在水面的那一块。更多的时间其实是要花在解决冰山的水下部分。</p>
+<hr>
+<p>再多一些题外话。关于冰山的比喻还可以进一步推广，在整个游戏开发周期中，游戏画质、性能这些高精尖的硬性指标固然需要投入大量的程序、美术、TA的时间，但这些仍然只是冰山看得见的部分。隐藏在冰山下的是游戏节奏、手感、叙事等方面的打磨，因为难以量化，所以几乎很难有指导方向。</p>
+<hr>
+<p>下面是 Eric Arnebäck 推特原文：</p>
+<blockquote>
+<p>How To become an advanced graphics programmer:
+Some general advice and tips from me, an expert graphics programmer
+huge thread below.</p>
+<p>If you are at the level at which you can comfortably
+read e.g. advanced GDC presentations and siggraph papers, and
+then implement them by youself in an reasonable amount of time,
+I consider you an advanced graphics programmer,</p>
+<p>and plenty of game companies would probably be interested in your skills.
+How can we acquire this level of skill? I shall tell you how I did it!</p>
+<p>Something that I think all beginning graphics programmers should do,
+is implement their own little rendering engine. I did this when I was a
+beginner, and implemented things like:</p>
+<ul>
+<li>rendering of particle systems</li>
+<li>water rendering, with dynamic reflections</li>
+<li>ambient occlusion'</li>
+<li>deferred rendering</li>
+<li>view frustum culling</li>
+<li>shadow rendering</li>
+<li>anti aliasing.</li>
+</ul>
+<p>and so on and so forth. working on a rendering engine and implementing
+all kinds of rendering features, is IMO the best way to go from
+beginner to intermediate.</p>
+<ul>
+<li>Whenever you implement something suffienctly advanced, make sure to
+write a blog post about it. Writing blog posts allows you to deepen your understanding
+of what you&rsquo;ve implemented, and improves your communication skills, which
+is very important in this industry.</li>
+</ul>
+<p>and also, sharing your blog posts with people, often results in interesting
+discussions with other graphics programmer, and this deepens your understanding
+even more.</p>
+<ul>
+<li>Make an active effort to keep up with the latest developements
+in the field. Every week, read the latest blog posts, and latest papers that
+people post on twitter.</li>
+</ul>
+<p>Note that there is not always time to read all the new papers from beginning to end.
+in this situation, I think it is enough to skim the paper, and skim until
+you understand the main idea behind the paper.</p>
+<p>Papers can contain lots of nitty gritty details, but I think these are only
+necessary to understand, if you are really gonna sit down and implement the paper
+yourself. But if you&rsquo;re pressed for time, understanding the main idea
+is more than enough in my opinion.</p>
+<p>If you have the main idea of the paper understood, then that is enough when you want to
+incorporate the technique into your future projects</p>
+<p>IMO the main characteristic of an advanced graphics programmer, is being able to implement an advanced siggraph/eurographics/etc paper within a reasonable amount of time.
+How do we implement a paper? Below is my technique.</p>
+<p>read the paper from beginning to end a couple of times. The section I usually
+spend most of my efforts is often called &ldquo;method&rdquo;.</p>
+<p>from this section, extract a minimum viable prototype. That is, strip away
+all possible optimizations, and figure out how to implement the technique
+as simple as possible, disregarding things like performance.</p>
+<p>once we have a prototype on our hands we can already evaluate a couple of things:
+how difficult is it to integrate into our current engine?(very important in the real world)
+is the visual quality of this technique good enough for our purposes?</p>
+<p>once this has been evaluated, we can start looking into implementing optimizations
+and adding the advanced parts of the technique.</p>
+<ul>
+<li>one thing I think is very important when implementing papers, is that we
+have a &ldquo;ground truth&rdquo; to compare with. e.g., if implementing a real-time
+indirect illumination technique,</li>
+</ul>
+<p>then you should also implement a path tracer alongside(e.g. with Mitsuba or embree),
+so that you have a ground truth you can compare your implementation with.</p>
+<p>or if you are implementing a shadow map filtering technique, you should
+certainly compare your technique with PCF filtering.</p>
+<ul>
+<li>
+<p>some papers are very mathematical and abstract, and it can be hard to figure out
+exactly how they should be translated to code. Some small tips when
+translating math to code:</p>
+</li>
+<li>
+<p>An integral is just a big sum, in most cases.</p>
+</li>
+<li>
+<p>set notation is often just used as a fancy way of showing arrays in a paper.</p>
+</li>
+<li>
+<p>minimization problems often occur, and the way you often solve them, is by finding the
+point at which the gradient is zero</p>
+</li>
+<li>
+<p>PDEs can be converted to code with finite difference schemes, e.g. central differences</p>
+</li>
+<li>
+<p>big matrices are NOT scary.  they are often just used to combine many small simple equations,
+into one big equation.  that is, they are just a colletion of many small pieces of information.</p>
+</li>
+<li>
+<p>NEVER EVER WRITE YOUR OWN LINEAR SOLVER(for production purposes). use Eigen instead.</p>
+</li>
+<li>
+<p>simplify, simplify, simplify. consider how the math formulas would look like,
+if the input mesh just consists of a single triangle. walk through the math formulas
+for such a single triangle mesh. this often makes it much easier to understand
+the math formulas</p>
+</li>
+<li>
+<p>examine the two-dimensional, or even one-dimensional case, before even considering the 3D case.</p>
+</li>
+</ul>
+<p>if you still are having trouble understanding the paper, some more tips:</p>
+<ul>
+<li>
+<p>read the papers in the reference list. they might explain some concepts in an easier way</p>
+</li>
+<li>
+<p>people often implement siggraph papers in their master&rsquo;s thesis, and provide many valuable implementation details in their thesis. Try to find such thesis!</p>
+</li>
+<li>
+<p>some papers are, frankly speaking, poorly written, and therefore hard to understand. try mailing the authors for clarifications!</p>
+</li>
+<li>
+<p>try asking your colleagues, or experts on twitter(like me) for help</p>
+</li>
+</ul>
+<p>Now, some general advice for optimizing your implementations, since this is also
+an important part of implementing a paper:</p>
+<ul>
+<li>
+<p>learn how to use performance profiling tools, such as nvidia nsight.
+these tools how you to quickly locate hotspots in your code.</p>
+</li>
+<li>
+<p>read this article: <a href="https://developer.nvidia.com/blog/the-peak-performance-analysis-method-for-optimizing-any-gpu-workload/">https://developer.nvidia.com/blog/the-peak-performance-analysis-method-for-optimizing-any-gpu-workload/</a></p>
+</li>
+<li>
+<p>use version control, so that you can easily locate changes that caused performance
+degradations.</p>
+</li>
+</ul>
+<p>alright! that was all for now. I&rsquo;ll add more, if I come up with it.</p>
+</blockquote>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2021-05-13</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="cache-tlb.github.io/tags/%E7%BB%8F%E9%AA%8C/">经验</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="cache-tlb.github.io/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+            <a href="cache-tlb.github.io/gameboy-simulator-dev-log/" class="next" rel="next" title="GameBoy 模拟器开发记录">GameBoy 模拟器开发记录<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2021</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="cache-tlb.github.io/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/cache-tlb.github.io/lib/katex/katex.min.css"><link rel="stylesheet" href="/cache-tlb.github.io/lib/katex/copy-tex.min.css"><script type="text/javascript" src="/cache-tlb.github.io/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/katex/katex.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/cache-tlb.github.io/lib/katex/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"cache-tlb.github.io/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/cache-tlb.github.io/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/cache-tlb.github.io/js/theme.min.js"></script></body>
+</html>
