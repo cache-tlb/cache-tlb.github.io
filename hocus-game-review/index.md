@@ -15,7 +15,8 @@
 Hocus 还有一个续作 [Hocus 2](https://store.steampowered.com/app/1460610/hocus_2/)，比起前作更有一点游戏的样子。同样有 100 个左右的关卡，机制更丰富。除了视错觉这个核心要素和到达红色格子的目标不变以外，有些关卡增加了阻碍，比如平台的某些格子在走过一次之后会消失，而不能往回走；有些关卡需要躲避随机游走的敌人；有些需要抓住到处乱跑的小球；还有一些关可以控制平台变化成不同的构造。
 
 两作难度上差不多，甚至续作可能更简单一点。每关花费的时间在 1~5 分钟不等，比如下图就是典型的一关。想必聪明的你早已看出了走法 ^_^
-<center>
+<br/>
+<center style="margin-top:1rem">
 {{< tikz >}}  
 \begin{tikzpicture}[scale=1]
 \definecolor{color1}{rgb}{0.9,0.9,0.9}
@@ -96,7 +97,7 @@ Hocus 还有一个续作 [Hocus 2](https://store.steampowered.com/app/1460610/ho
 </center>
 
 如果上一个迷宫可能过于简单，这里再给出一个稍复杂一点的。
-<center>
+<center style="margin-top:1rem">
 {{< tikz >}}
 \begin{tikzpicture}[scale=1]
 \definecolor{color1}{rgb}{0.9,0.9,0.9}
