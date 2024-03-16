@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>游戏图形案例合集 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="游戏图形案例合集" />
+<meta property="og:description" content="游戏名 首发年份 分析作者 链接 Shadow of the Colossus 2005 Léna Piquet(Froyok) [地址] Assassin&rsquo;s Creed II 2009 Léna Piquet(Froyok) [地址] Batman : Arkham City 2011 Léna Piquet(Froyok) [地址] Syndicate 2012 Léna Piquet(Froyok) [地址] Grand Theft Auto V 2013" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/paste/graphics-study-of-real-world-games/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="paste" />
+<meta property="article:published_time" content="2023-01-01T12:00:00&#43;08:00" />
+<meta property="article:modified_time" content="2023-01-01T12:00:00&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="游戏图形案例合集"/>
+<meta name="twitter:description" content="游戏名 首发年份 分析作者 链接 Shadow of the Colossus 2005 Léna Piquet(Froyok) [地址] Assassin&rsquo;s Creed II 2009 Léna Piquet(Froyok) [地址] Batman : Arkham City 2011 Léna Piquet(Froyok) [地址] Syndicate 2012 Léna Piquet(Froyok) [地址] Grand Theft Auto V 2013"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/paste/graphics-study-of-real-world-games/" /><link rel="prev" href="https://cache-tlb.github.io/paste/critical/" /><link rel="next" href="https://cache-tlb.github.io/paste/about-header-files/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "游戏图形案例合集",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/paste\/graphics-study-of-real-world-games\/"
+        },"genre": "paste","wordcount":  526 ,
+        "url": "https:\/\/cache-tlb.github.io\/paste\/graphics-study-of-real-world-games\/","datePublished": "2023-01-01T12:00:00+08:00","dateModified": "2023-01-01T12:00:00+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="page single special"><h1 class="single-title animated pulse faster">游戏图形案例合集</h1><div class="content" id="content"><table>
+<thead>
+<tr>
+<th>游戏名</th>
+<th>首发年份</th>
+<th>分析作者</th>
+<th>链接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shadow of the Colossus</td>
+<td>2005</td>
+<td>Léna Piquet(Froyok)</td>
+<td><a href="https://www.froyok.fr/blog/2012-10-breakdown-shadow-of-the-colossus-pal-ps2/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Assassin&rsquo;s Creed II</td>
+<td>2009</td>
+<td>Léna Piquet(Froyok)</td>
+<td><a href="https://www.froyok.fr/blog/2015-12-breakdown-assassins-creed-ii-2/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Batman : Arkham City</td>
+<td>2011</td>
+<td>Léna Piquet(Froyok)</td>
+<td><a href="https://www.froyok.fr/blog/2012-09-breakdown-batman-arkham-city/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Syndicate</td>
+<td>2012</td>
+<td>Léna Piquet(Froyok)</td>
+<td><a href="https://www.froyok.fr/blog/2024-01-breakdown-syndicate/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Grand Theft Auto V</td>
+<td>2013</td>
+<td>Adrian Courrèges</td>
+<td><a href="https://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study/" target="_blank" rel="noopener noreffer">[地址]</a> <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></td>
+</tr>
+<tr>
+<td>Middle Earth: Shadow of Mordor</td>
+<td>2014</td>
+<td>Emilio López</td>
+<td><a href="https://www.elopezr.com/the-rendering-of-middle-earth-shadow-of-mordor/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Rise of the Tomb Raider</td>
+<td>2015</td>
+<td>Emilio López</td>
+<td><a href="https://www.elopezr.com/the-rendering-of-rise-of-the-tomb-raider/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>The Witcher 3: Wild Hunt</td>
+<td>2015</td>
+<td>Astral Code?</td>
+<td><a href="https://astralcode.blogspot.com/2018/11/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">[地址]</a> <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></td>
+</tr>
+<tr>
+<td>Metal Gear Solid V</td>
+<td>2015</td>
+<td>Adrian Courrèges</td>
+<td><a href="https://www.adriancourreges.com/blog/2017/12/15/mgs-v-graphics-study/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>The Witness</td>
+<td>2016</td>
+<td>Thomas Poulet</td>
+<td><a href="https://blog.thomaspoulet.fr/the-witness-frame-part-1/" target="_blank" rel="noopener noreffer">[地址]</a> <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></td>
+</tr>
+<tr>
+<td>DOOM (2016)</td>
+<td>2016</td>
+<td>Adrian Courrèges</td>
+<td><a href="https://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Jurassic World: Evolution</td>
+<td>2018</td>
+<td>Emilio López</td>
+<td><a href="https://www.elopezr.com/the-rendering-of-jurassic-world-evolution/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Ni No Kuni II(二之国2)</td>
+<td>2018</td>
+<td>Thomas Poulet</td>
+<td><a href="https://blog.thomaspoulet.fr/ninokuni2-frame/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>God of War (PC)</td>
+<td>2018</td>
+<td>M.A.Moniem</td>
+<td><a href="https://www.mamoniem.com/behind-the-pretty-frames-god-of-war/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Death Stranding</td>
+<td>2019</td>
+<td>M.A.Moniem</td>
+<td><a href="https://mamoniem.com/behind-the-pretty-frames-death-stranding/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Mafia: Definitive Edition</td>
+<td>2020</td>
+<td>Emilio López</td>
+<td><a href="https://www.elopezr.com/the-rendering-of-mafia-definitive-edition/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Cyberpunk 2077</td>
+<td>2020</td>
+<td>Angelo Pesce</td>
+<td><a href="https://c0de517e.blogspot.com/2020/12/hallucinations-re-rendering-of.html" target="_blank" rel="noopener noreffer">[之一]</a></td>
+</tr>
+<tr>
+<td>Cyberpunk 2077</td>
+<td>2020</td>
+<td>Hang Zhang</td>
+<td><a href="https://zhangdoa.com/posts/rendering-analysis-cyberpunk-2077" target="_blank" rel="noopener noreffer">[之二]</a></td>
+</tr>
+<tr>
+<td>Knockout City</td>
+<td>2021</td>
+<td>Ashley Taylor</td>
+<td><a href="https://www.velanstudios.com/post/knockout-city-frame-breakdown" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Elden Ring</td>
+<td>2022</td>
+<td>M.A.Moniem</td>
+<td><a href="https://mamoniem.com/behind-the-pretty-frames-elden-ring/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Tear Down</td>
+<td>2022</td>
+<td>Steven Wittens</td>
+<td><a href="https://acko.net/blog/teardown-frame-teardown/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Diablo IV</td>
+<td>2023</td>
+<td>Blizzard Entertainment</td>
+<td><a href="https://news.blizzard.com/en-us/diablo4/23964183/peeling-back-the-varnish-the-graphics-of-diablo-iv" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Diablo IV</td>
+<td>2023</td>
+<td>M.A.Moniem</td>
+<td><a href="https://mamoniem.com/behind-the-pretty-frames-diablo-iv/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+<tr>
+<td>Cities: Skylines 2</td>
+<td>2023</td>
+<td>Paavo Huhtala</td>
+<td><a href="https://blog.paavo.me/cities-skylines-2-performance/" target="_blank" rel="noopener noreffer">[地址]</a></td>
+</tr>
+</tbody>
+</table>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>分 3 部分 
+[<a href="https://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study/" target="_blank" rel="noopener noreffer">Part 1: Dissecting a Frame</a>] | [<a href="https://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study-part-2/" target="_blank" rel="noopener noreffer">Part 2: LOD and Reflections</a>] |  [<a href="https://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study-part-3/" target="_blank" rel="noopener noreffer">Part 3: Post-Effects</a>]&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>分 24 部分 [<a href="https://astralcode.blogspot.com/2018/11/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Overview</a>] | [<a href="https://astralcode.blogspot.com/2017/09/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 1 - tonemapping</a>] | [<a href="https://astralcode.blogspot.com/2017/10/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 2 - eye adaptation</a>] | [<a href="https://astralcode.blogspot.com/2017/10/reverse-engineering-rendering-of_26.html" target="_blank" rel="noopener noreffer">Part 3 - chromatic aberration</a>] | [<a href="https://astralcode.blogspot.com/2018/02/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 4 - vignette</a>] | [<a href="https://astralcode.blogspot.com/2018/08/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 5 - drunk effect</a>] | [<a href="https://astralcode.blogspot.com/2018/11/reverse-engineering-rendering-of_13.html" target="_blank" rel="noopener noreffer">Part 6 - sharpen</a>] | [<a href="https://astralcode.blogspot.com/2018/12/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 7a - average luminance, part 1 (histogram of luminance)</a>] | [<a href="https://astralcode.blogspot.com/2018/12/reverse-engineering-rendering-of_15.html" target="_blank" rel="noopener noreffer">Part 7b - average luminance, part 2 (calculation)</a>] | [<a href="https://astralcode.blogspot.com/2018/12/reverse-engineering-rendering-of_22.html" target="_blank" rel="noopener noreffer">Part 8 - the Moon and lunar phases</a>] | [<a href="https://astralcode.blogspot.com/2018/12/reverse-engineering-rendering-of_28.html" target="_blank" rel="noopener noreffer">Part 9 - GBuffer</a>] | [<a href="https://astralcode.blogspot.com/2019/01/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 10 - distant rain shafts</a>] | [<a href="https://astralcode.blogspot.com/2019/03/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 11 - lightnings</a>] | [<a href="https://astralcode.blogspot.com/2019/03/reverse-engineering-rendering-of_17.html" target="_blank" rel="noopener noreffer">Part 12 - stupid sky tricks</a>] | [<a href="https://astralcode.blogspot.com/2019/04/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 13a - witcher senses, part 1 (objects &amp; intensity map)</a>] | [<a href="https://astralcode.blogspot.com/2019/04/reverse-engineering-rendering-of_74.html" target="_blank" rel="noopener noreffer">Part 13b - witcher senses, part 2 (outline map)</a>] | [<a href="https://astralcode.blogspot.com/2019/04/reverse-engineering-rendering-of_6.html" target="_blank" rel="noopener noreffer">Part 13c - witcher senses, part 3 (fisheye effect &amp; final combining)</a>] | [<a href="https://astralcode.blogspot.com/2019/05/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 14 - cirrus clouds</a>] | [<a href="https://astralcode.blogspot.com/2019/06/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 15 - fog</a>] | [<a href="https://astralcode.blogspot.com/2020/02/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 16 - shooting stars</a>] | [<a href="https://astralcode.blogspot.com/2020/03/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 17 - the Milky Way</a>] | [<a href="https://astralcode.blogspot.com/2020/03/reverse-engineering-rendering-of_11.html" target="_blank" rel="noopener noreffer">Part 18 - color grading</a>] | [<a href="https://astralcode.blogspot.com/2020/05/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 19 - portals</a>] | [<a href="https://astralcode.blogspot.com/2020/01/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 20 - light shafts</a>] | [<a href="https://astralcode.blogspot.com/2020/11/reverse-engineering-rendering-of.html" target="_blank" rel="noopener noreffer">Part 21 - the painted world</a>]&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>分 2 部分 
+[<a href="https://blog.thomaspoulet.fr/the-witness-frame-part-1/" target="_blank" rel="noopener noreffer">Part 1: CSM, GI, Reflection, Water, Clouds, VFX, etc.</a>] | [<a href="https://blog.thomaspoulet.fr/the-witness-frame-part-2/" target="_blank" rel="noopener noreffer">Part 2: Texture Blending, Indoor shadows, LOD, etc.</a>]&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+</div><div id="comments"></div></div></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

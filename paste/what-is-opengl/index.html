@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>译介｜Eddy Luten 什么是 OpenGL？(2014) - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="译介｜Eddy Luten 什么是 OpenGL？(2014)" />
+<meta property="og:description" content="作者: Eddy Luten 译者: 赵晟苏, 叶梓涛 来源: https://www.gcores.com/articles/174138 原文: Link 文章不是直接开始编程教学，而是从计算机图形学的历史开始叙述，并且以 OpenGL，一个图形应用程" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/paste/what-is-opengl/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="paste" />
+<meta property="article:published_time" content="2023-12-19T22:57:39&#43;08:00" />
+<meta property="article:modified_time" content="2023-12-19T22:57:39&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="译介｜Eddy Luten 什么是 OpenGL？(2014)"/>
+<meta name="twitter:description" content="作者: Eddy Luten 译者: 赵晟苏, 叶梓涛 来源: https://www.gcores.com/articles/174138 原文: Link 文章不是直接开始编程教学，而是从计算机图形学的历史开始叙述，并且以 OpenGL，一个图形应用程"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/paste/what-is-opengl/" /><link rel="prev" href="https://cache-tlb.github.io/paste/how-to-ask-questions-the-smart-way/" /><link rel="next" href="https://cache-tlb.github.io/paste/united-we-stand/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "译介｜Eddy Luten 什么是 OpenGL？(2014)",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/paste\/what-is-opengl\/"
+        },"genre": "paste","wordcount":  16081 ,
+        "url": "https:\/\/cache-tlb.github.io\/paste\/what-is-opengl\/","datePublished": "2023-12-19T22:57:39+08:00","dateModified": "2023-12-19T22:57:39+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="page single special"><h1 class="single-title animated pulse faster">译介｜Eddy Luten 什么是 OpenGL？(2014)</h1><div class="content" id="content"><br/>
+
+<div class="noindent">
+    <p>作者: Eddy Luten</p>
+<p>译者: 赵晟苏, 叶梓涛</p>
+<p>来源: <a href="https://www.gcores.com/articles/174138">https://www.gcores.com/articles/174138</a></p>
+<p>原文: <a href="https://openglbook.com/chapter-0-preface-what-is-opengl.html" target="_blank" rel="noopener noreffer">Link</a></p>
+    
+</div>
+<br/>
+<p>文章不是直接开始编程教学，而是从计算机图形学的历史开始叙述，并且以 OpenGL，一个图形应用程序接口（API）的历史作为叙述主线至今。</p>
+<h2 id="编者按">编者按</h2>
+<p>本篇文章来自公开的图形编程学习的电子书 <a href="https://openglbook.com/the-book.html" target="_blank" rel="noopener noreffer">OpenGLBook</a> 的前言部分（一本免费学习 OpenGL 4.0 的编程教程线上书籍，目前已经不再维护），文章不是直接开始编程教学，而是从计算机图形学的历史开始叙述，并且以 OpenGL，一个图形应用程序接口（API）的历史作为叙述主线至今。</p>
+<p>简单地来说，图形应用程序接口是为了使得不同的图形程序（如电子游戏）能够在不同的显卡硬件设备上调用显卡驱动而形成的软件抽象层。听上去似乎是一件不太重要的事，但却是连接显卡硬件发展和游戏软件开发效果之间最关键的中间翻译角色。</p>
+<p>落日间今后会在保持游戏研究和跨界探索的同时，增加独立游戏文化与创作、游戏设计与开发的认识与祛魅工作。我们也正在同新伙伴们进行一项合作内容计划，通过拥抱更加具体化的实践与现实，让围绕游戏的数字人文实践能够贯穿本体论的思考与具体的制作（poiesis）中去。</p>
+<p>叶梓涛</p>
+<p>落日间</p>
+<h2 id="eddy-luten">Eddy Luten</h2>
+<p>艾迪·卢顿<a href="https://luten.dev/" target="_blank" rel="noopener noreffer">个人网站</a>上的简介：大家好，我是 Eddy Luten，是一名拥有二十年专业经验的软件工程师。在我的职业生涯中，我发现了对构建有效解决问题的系统的热情。</p>
+<p>初译：赵晟苏</p>
+<p>校对：叶梓涛</p>
+<p>原文链接：https://openglbook.com/</p>
+<blockquote>
+<p>编辑过程删去了结尾部分关于开始学习 OpenGL 的一些具体要求，包括但不限于 1. 需要 C 语言关于指针、数据结构和函数等基础知识，并知道如何用编译器链接到库，还有基本的数学知识。2.  GPU 需要完全支持 OpenGL 4.0。3. 软件安装 C 编译器，如 Visual Studio，GCC（GNU Compiler Collection），Xcode，并且使用诸如 Eclipse 这样的IDE 或者文本编辑器。 4. 确定编译器的库目录以确保支持 OpenGL 5. 额外需要安装处理上下文的 FreeGLUT，加载扩展的 GLEW 等其他库。</p>
+</blockquote>
+<p>感谢友人白逸、于京平提供的技术角度的编辑建议。</p>
+<h2 id="what-is-opengl-什么是-opengl">What is OpenGL? 什么是 OpenGL？</h2>
+<p>在最基本的层面上，OpenGL 是一个允许程序员与图形硬件通信的软件接口（software interface）。当然，OpenGL 的内涵远不止于此，你会很高兴知道本书将为你讲解 OpenGL 的更多细节。不过，在我们动手开始编码之前，你需要了解一下计算机图形学（Computer Graphics）和 OpenGL 的历史。</p>
+<p>在这篇文章中，我们将探讨以下主题： 计算机和计算机图形学的开端，OpenGL 是什么，它是如何诞生的， 计算机图形学是如何工作的，以及学习本书的硬件和软件要求。</p>
+<p>注意：如果你想直接开始图形编程，而不想读这些冗长的历史，你可以直接跳到下面的「要求」部分，读完它，然后开始阅读下一章。不过，我必须强调，全面了解计算机、计算机图形学和 OpenGL 的历史对于理解未来的开发工作非常重要。</p>
+<h2 id="最初">最初</h2>
+<p>无论是通过文字、绘画还是肢体语言，图像一直是传递信息和记录历史的重要手段。视觉反馈的要求是如此重要，以至于如果你看不到某样东西，就很难肯定它的存在。例如，在十七世纪安东尼·范‧列文虎克（Antonie van Leeuwenhoek）发明显微镜并在视觉上发现细菌之前，细菌的存在纯属猜测，但这后来却成为现代科学不可或缺的一部分。</p>
+<p>计算机数据仅以电脉冲的形式表现，这同样是肉眼无法看到的。所以必须发明一种显示这种数据的方法，因此早期的计算机科学家通过安装在电路板上的一系列灯管或穿孔长纸带（即所谓的「打孔卡‘punch cards’」），从他们的机器上获得视觉反馈。</p>
+<p>可以想象，这些信息的可读性很差，需要大量的转译工作才能将信息转换成人类可读的格式。尽管计算机最终配备了电动打字机，但输出效果却远未达到最佳。</p>
+<h2 id="显示器-阴极射线管">显示器： 阴极射线管</h2>
+<p>1897 年，费迪南德·布劳恩（Ferdinand Braun）在德国发明了 CRT（阴极射线管 Cathode Ray Tube），这是一种真空管，其目的是在屏幕上显示图像。你可能见过或使用过显像管电视和计算机显示器，它们一直是主流，直到最近。</p>
+<p>阴极射线显像管已被用于电视和示波器输出，但没有人想到要将这种技术与计算机结合起来。第一次使用显像管显示计算机输出是 1951 年在麻省理工学院（MIT），当时开发的「旋风（Whirlwind）」计算机是美国海军的飞行模拟器。CRT 使操作人员能够立即看到计算机程序的输出，而无需打孔卡、一排排灯管或整理成卷的打印输出进行转译。</p>
+<p>虽然由于运营成本高昂，「旋风」项目本身并不十分成功，但通过引入显像管作为一种可行的计算机输出设备，它在计算机图形学的发展方向上迈出了重要的一步。显像管在计算机图形学的发展中扮演了重要角色，并在 50 多年的时间里一直是首选的输出设备，直到被更新的平板技术所取代。</p>
+<h2 id="第一次互动">第一次互动</h2>
+<p>尽管 CRT 允许计算机显示其输出，但大部分都是文本，并只是为了读出计算机的当前状态。这种情况持续了一段时间，因为除了作为纯粹的计算用的设备外，没人考虑过计算机的其他功能。直到 1961 年，伊万·萨瑟兰（Ivan Sutherland）在麻省理工学院的毕业论文中开发了一个名为 Sketchpad 的计算机程序，才极大地改变了我们对计算机的看法。</p>
+<p>萨瑟兰的 Sketchpad 程序允许用户使用光笔在阴极射线显像管上实时绘制几何图形，这在当时具有开创性意义，即使在多年后的今天依然引人注目。它不仅定义了计算机图形学，还引入了 GUI（发音为「gooey」，代表图形用户界面 Graphic User Interface）的前身，并为后来的面向对象编程概念奠定了基础。Sketchpad 创造了一种范式转变，即计算机不再是简单的数字运算设备，还可以用来显示几何图形。</p>
+<blockquote>
+<p>参考：实时计算机图形 Real-Time Computer Graphics</p>
+<p>实时计算机图形是即时生成的，通常是根据用户通过鼠标、键盘或任何其他输入设备的输入而生成的。实时图形通常应用于诸如电子游戏和设计程序等应用中。</p>
+</blockquote>
+<p>1968 年，伊万·萨瑟兰（Ivan Sutherland）和鲍勃·斯普劳尔（Bob Sproull）实现了另一项技术壮举，即「达摩克利斯之剑（The Sword of Damocles）」，也就是我们现在所说的虚拟现实技术的前身。这套系统通过头盔向用户显示简单的三维线框模型，由于重量较重，该系统被悬挂在天花板上。这本身就可能是最早之一（如果不是最早的话）的由计算机生成三维图形的形式。</p>
+<h2 id="更小更快更便宜">更小、更快、更便宜</h2>
+<p>当然，技术并不是从打孔卡一跃发展到交互式图形的；计算机也是从庞大的机器逐渐发展到你我每天都在使用的小型设备。</p>
+<p>从 20 世纪 40 年代到 50 年代中期，计算机使用真空管（vacuum tube）进行处理，这占据了整个房间。真空管是一种能以某种方式改变一个电子信号的装置，例如开关（switching），而开关是计算机所必不可少的功能。组装一台计算机所需的部件体积庞大，摸上去滚烫。在这个时代制造的所有机器没有一台是一样的，因此它们的程序无法与其他机器兼容。这个时代通常被称为<strong>计算机的第一世代（first generation）</strong>，代表了现代计算机科学的第一步。第一节中提到的这些机器使用打孔卡和灯作为输出设备，因此它们对计算机图形学的发展贡献甚微。</p>
+<p>20 世纪 50 年代中期，晶体管（transistors）开始取代真空管，创造出更小、更快、更便宜、更节能的<strong>第二代</strong>计算机。晶体管不仅因其体积小而能够制造出更小的计算机，而且还开创了全新一代的消费电子产品。例如，收音机现在可以用电池供电并随身携带，而以前它们都是沉重的固定盒子。</p>
+<p>但晶体管本身并不是计算机的圣杯，20 世纪 60 年代中期，一种名为集成电路（Integrated Circuit）的新技术带来了第三代计算机。集成电路将通常由一系列单个晶体管实现的特定功能微型化到单个芯片上。在<strong>第三代</strong>计算机中，许多计算机都配备了比如键盘、显示器等设备，以及一种名为「操作系统（Operating System）」的新型软件，该软件允许计算机运行多个程序。这个时代的一个重要操作系统被称为 UNIX，它影响了操作系统的许多（如果不是全部）的后续发展。</p>
+<p>1971 年，英特尔公司发明了微处理器（Operating System），实现了计算机领域的重大突破，开创了<strong>第四代</strong>计算机的先河。中央处理器（CPU，Central Processing Units）通常是由许多集成电路焊接而成的电路板，而英特尔公司的 4004 微处理器将所有这些功能都集成在一块芯片上。由于生产工艺更加廉价，计算机从大型公司和政府使用的专用设备慢慢过渡到更容易为大众所接受的设备。我们目前仍处于第四代计算机阶段，因为我们还没有摆脱微处理器。</p>
+<h2 id="个人计算机">个人计算机</h2>
+<p>第一批个人电脑于 20 世纪 70 年代中后期开始出现，但当时被视为业余爱好者的发烧级机器。随着 1977 年苹果电脑公司发布 Apple II 和 Commodore International 发布 PET，这种情况发生了一些变化。这些机器普及了家用计算机的概念，但在计算机图形方面并没有太多优势。</p>
+<p>到了 20 世纪 80 年代，随着图形用户界面等技术被引入个人计算机市场，这种情况发生了一些变化。在这一时期，第一批专用图形附加卡（graphics add-on cards）也开始出现，特别是 IBM 的 CGA（彩色图形适配器，Color Graphics Adapter），它是 IBM 个人计算机平台上的第一块彩色图形卡，通过标准化一种绘制计算机图形方法为未来的发展铺平了道路，但在图形能力方面并没有提供太多的功能。</p>
+<p>在 20 世纪 70 年代和 80 年代，大多数视频游戏都是在专用系统上运行的，电影也很少使用计算机动画，实时三维图形仅用于可视化（visualization）目的，因为当时还没有足够快的消费级硬件。这些年在消费类硬件上出现了许多「第一」，但直到 20 世纪 80 年代末到 90 年代初，电脑游戏才在 个人电脑 PC 平台上占据了一席之地，并开始真正推动更好看、性能更好的实时图形的发展。</p>
+<p>1992年，id Software 发行了第一人称射击游戏《德军总部 3D》，这是当时推动硬件实现的一款电脑游戏。虽然《德军总部》不是真正的 3D 游戏，但它定义了未来 3D 电脑游戏的标准。仅仅一年之后，id Software 发行了他们的第一款真正的 3D 游戏《毁灭战士》。这是第一次，玩家可以通过台阶和电梯探索他们的环境，而不用被固定在某个高度。许多游戏模仿了《毁灭战士》的外观和感觉，并被称为「毁灭战士克隆‘Doom-clones’」。《毁灭战士》使用软件渲染器将它的实时图像渲染到屏幕上，就像 90 年代早期的所有其他游戏一样，但这种情况即将改变。</p>
+<h2 id="opengl最初的十年">OpenGL：最初的十年</h2>
+<p>Silicon Graphics（通常简称为 SGI）是一家成立于 1981 年的公司，专门从事三维计算机制图，并为此开发了专门的软件和硬件。SGI 开发的一个软件库是 IRIS GL（集成光栅成像系统图形库 Integrated Raster Imaging System Graphical Library），用于在 SGI 的高性能工作站上生成 2D 和 3D 图形。这个库即将发展成为 20 世纪 90 年代最重要的计算机图形开发成果之一。</p>
+<p>20 世纪 90 年代初，SGI 因其高性能的硬件和易于使用的软件而成为三维图形工作站市场的引领者。IRIS GL 是事实上的行业标准三维图形库，盖过了所有其他三维图形接口标准化的开发和尝试。但尽管 IRIS GL 广为流行，它却存在一个主要问题：它是一个与 SGI 自己的平台相融合的专利系统（proprietary system），而竞争对手正在利用它们自己的 API（应用程序接口）向 SGI 的优势逼近。</p>
+<p>SGI 公司大胆地对 IRIS GL 进行了清理，删除了所有与计算机图形无关的功能，并于 1992 年将其作为 OpenGL（开放图形库，Open Graphics Library）向公众发布，OpenGL 是用于实时计算机图形的跨平台标准化 API（应用程序接口）。</p>
+<p>软件供应商必须在他们自己的平台上提供 OpenGL 标准的实现（implementation），而硬件供应商则必须提供允许 OpenGL 与被称为「设备驱动程序（device drivers）」的底层图形硬件对话的程序。SGI 公司已经向其客户提供了这一功能以及一些高层 API，而其他供应商也在抓紧时间开发这一新的、易于使用的API。</p>
+<h2 id="灵活性">灵活性</h2>
+<p>由于 SGI 没有提供任何实际的源代码（source-code），而只是说明了 API 应如何工作的规范（specification）。这种抽象的设计使硬件和软件厂商可以自由选择实现 OpenGL 的方式；这种抽象层一直沿用至今。正因为如此，许多平台和设备都支持 OpenGL；事实上，你很难找到一个不支持 OpenGL 的现代平台。</p>
+<p>但是，OpenGL 为实现者提供的最大优势可能是它对扩展的支持。如果 OpenGL 规范没有提供对特定功能的支持，硬件或软件供应商可以决定通过使用扩展的方式自行添加该功能。许多厂商都选择这样做，它们的扩展可以用前缀来区分，如 NVIDIA 的 NV_、Apple 的 AGL_，等等。扩展可以提供强大的功能，但通常只对于厂商的 OpenGL 实现所特有。</p>
+<p>然后你可以通过一个扩展加载机制在程序中加载这些扩展，并检索函数指针，就可以调用这些扩展提供的功能。然而，这种加载机制并没有标准化，因此每个平台都有自己特定的扩展加载函数。这种限制在 Microsoft Windows 平台上最为明显，因为 OpenGL 头文件自 OpenGL 1.1 版以来就没有更新过，即使在最新的 Windows 开发工具包中也是如此。本章稍后将详细介绍这种情况的原因。</p>
+<h2 id="开放的标准">开放的标准</h2>
+<p>之所以选择「OpenGL」这个名字，不仅是因为它听起来像个好听的流行语，它还包含了一些实际的含义。由于 OpenGL 是一个不断发展的规范，因此必须有人来决定其中的内容。因此，1992 年成立了 ARB（OpenGL 架构审查委员会 Architecture Review Board），该委员会由多家知名软件和硬件供应商组成，他们通过投票系统共同决定 OpenGL 标准的未来。除了决定将哪些新功能纳入 OpenGL 规范外，它还决定将哪些扩展功能将被提升为下一个 OpenGL 版本的核心功能。</p>
+<p>尽管任何人都可以自由开发 OpenGL 的实现方案，但要使其被认定为真正的 OpenGL 实现方案，ARB 必须通过一致性测试予以批准。这些测试通过严格的测试程序来验证实现者声称的与特定 OpenGL 版本的兼容性。</p>
+<blockquote>
+<p>参考：样本一致性测试（Sample Conformance Tests）</p>
+<p>要查看部分一致性测试结果，请访问 <a href="https://mesa3d.org/" target="_blank" rel="noopener noreffer">Mesa3D.org</a>，点击一致性测试标题。</p>
+</blockquote>
+<p>OpenGL 很快成为业界领先的实时图形应用程序接口，因为它基本上是唯一能在多个平台上可用的。</p>
+<h2 id="windows-上的-opengl">Windows 上的 OpenGL</h2>
+<p>1993 年，微软公司的工作站操作系统 Windows NT 进入市场时，基于 UNIX 的工作站已经开始使用 OpenGL。Windows NT 是作为 UNIX 的直接竞争对手发布的，它支持联网（NT 首字母缩写的意思是网络技术）和 32 位硬件。Windows NT 引入了至今仍在使用的功能，如用于创建 Windows 应用程序的 Win32 API。但由于系统中没有 3D 图形库，微软承诺在 Windows NT 中添加对 OpenGL 的支持。</p>
+<p>微软公司终于在 1994 年发布的 Windows NT 3.5 中实现了 OpenGL，但实现 OpenGL 的程度仅限于通过实现 SGI 公司当时提供的示例实现来声称其兼容性。该示例实现的目的仅仅是演示如何实现 OpenGL，并为供应商提供参考。不用说，这实现的速度慢得可怕，因为它没有经过优化，并且当时 PC 上几乎不存在图形加速器。事实上，这个性能问题非常明显，以至于微软知识库中有一篇文章 (<a href="https://support.microsoft.com/kb/121282" target="_blank" rel="noopener noreffer">KB121282</a>) 警告说，使用 NT 3.5 的 OpenGL 屏保程序可能会降低机器的运行速度，因为它会占用计算机 CPU 的大量时间。</p>
+<h2 id="directx">DirectX</h2>
+<p>微软看到了视频游戏市场的商机，于是为 Windows 寻找自己的 3D 图形 API，以怂恿游戏开发人员抛开 DOS（微软的第一个操作系统），纯粹为 Windows 开发游戏。他们的首次尝试是 WinG，它只是将命令传递到底层的 GDI（图形设备接口 Graphics Device Interface）接口，不提供 3D 功能。为此，微软不得不在 1995 年收购了一家名为 RenderMorphics 的公司，该公司生产了一种名为 Reality Lab 的 3D 图形 API。该 API 更名为 Direct3D，并在名为 DirectX 的 SDK（软件开发工具包 Software Development Kit）中发布，其中还捆绑了其他一些游戏开发专用的 API：</p>
+<ul>
+<li>DirectDraw 用于快速绘制 2D 图形</li>
+<li>DirectInput 用于捕捉摇杆输入</li>
+<li>DirectPlay 用于联网和通信</li>
+<li>DirectSound 用于声音播放</li>
+</ul>
+<p>Direct3D 的最初版本使用起来很不方便，开发人员采用该 API 的速度也很慢。这使得微软在继续支持 OpenGL 的同时，也在努力使 Direct3D 成为具有竞争力的 API。OpenGL 1.1 规范已在 Windows 95 和 Windows NT 4.0 中实施，它带来了急需的性能提升，但这也是微软最后一次更新 OpenGL ，转而采用自己的 API。</p>
+<h2 id="api-大战的开端">「API 大战」的开端</h2>
+<p>虽然微软一直坚持认为 OpenGL 最适合用于「专业图形」，即工作站上的 CAD（计算机辅助设计 Computer Aided Design），但它已开始在视频游戏中得到应用，而微软正试图通过 DirectX 在 Windows 平台上主导这一行业。OpenGL 最大的突破来自于 id Software 公司颇具影响力的开发人员约翰·卡马克（John Carmack）将其著名的视频游戏《雷神之锤》移植到 Windows 平台上来使用 OpenGL API，并向开发人员展示了使用 OpenGL API 是多么容易。</p>
+<p>1996 年 12 月，卡马克发布了一份文档，概述了他对 Direct3D API 的抱怨。他通过比较两种应用程序接口在屏幕上绘制三角形所需的代码，概述了这两种应用程序接口之间的差异；在他的示例中，OpenGL 只需要四行代码，而 Direct3D 则需要大量的命令和赋值。（校注：2011 年，John Carmack 表示他更喜欢 DirectX 而不是 OpenGL，并且认为微软有勇气继续做出重大的不兼容的改变来改进 API，而 OpenGL 则因兼容性问题而受到阻碍。）</p>
+<p>卡马克直言不讳的解释方式严重损害了 Direct3D 的声誉，以至于 Direct3D 开发人员亚历克斯·圣·约翰（Alex St. John）在 1997 年 2 月发表了一篇后续文章，为他的 API 辩护，而奇怪的是，微软也承认了它的缺陷。他解释说，Direct3D 在设计时考虑的是直接访问硬件而不是软件，由此产生的界面可能并不美观，但它完成了工作。微软再次强调，OpenGL 是一个 CAD 库，不会很快在消费类硬件上得到支持。</p>
+<p>这一回应激怒了 SGI 公司，1997 年 6 月，他们对圣约翰的批评做出了自己的回应。这份冗长的文件概述了「Direct3D 设计和当前实施中一些最显著的缺陷」。它从技术角度而非市场角度指出了两个 API 之间的差异，并通过更多的代码示例详细阐述了卡马克提到的易用性问题。</p>
+<blockquote>
+<p>参考资料：来来回回</p>
+<ol>
+<li><a href="https://rmitz.org/carmack.on.opengl.html" target="_blank" rel="noopener noreffer">John Carmack 关于 OpenGL 的 .plan 文件</a>。</li>
+<li><a href="https://rmitz.org/stjohn.html" target="_blank" rel="noopener noreffer">亚历克斯-圣约翰撰写的关于 Direct3D、OpenGL 和约翰-卡马克的文章</a>。</li>
+<li><a href="http://web.archive.org/web/19970605160658/http://www.sgi.com/Technology/OpenGL/direct-3d.html" target="_blank" rel="noopener noreffer">上述 SGI 文件现在只能通过 Archive.org 获取</a>。</li>
+</ol>
+<p>如果您想了解更多相关信息以及当时的微软文化和亚历克斯·圣·约翰，可以阅读这本很棒的书《帝国的变节者（Renegades of the Empire）》，或者访问他的博客 <a href="http://www.alexstjohn.com/WP/blog/" target="_blank" rel="noopener noreffer">AlexStJohn.com</a>，在那里他偶尔会谈论他在微软的时光，以及仍在进行的 OpenGL 与 Direct3D 之争。</p>
+</blockquote>
+<p>Direct3D 在 5.0 版本中变得更加实用，该版本从 API 中删除了一些令人不舒服的功能。在这一点上，两种应用程序接口都对用户相当友好，功能集也很相似，但这种现状即将改变。</p>
+<h2 id="驱动程序的崩溃">驱动程序的崩溃</h2>
+<p>由于 OpenGL 和 Direct3D 在 Windows NT 上处于胶着状态，微软需要一个优势。在 Windows NT 中，OpenGL 驱动程序是通过使用迷你客户端驱动程序（Mini-Client Driver，MCD）实现的，它是硬件和软件之间性能较低的折衷方案，但却是创建驱动程序最简单的解决方案。MCD 允许供应商挑选他们希望在硬件上加速的部分，而其余部分则在提供的软件实现上运行（反之亦然）。微软通过不允许在 Windows 95 上授权使用 MCD，从而有效地将 OpenGL 限制在微软提供的软件实现上，从而获得了他们所需的优势。</p>
+<p>这一决定对正试图进入消费市场的 OpenGL 来说是一个巨大的打击，更不用说那些几个月来一直在实现这些驱动程序的硬件供应商了。值得庆幸的是，SGI 提供了一种将硬件驱动程序引入 Windows 95 的解决方案，称为「可安装客户端驱动」（ICD，Installable Client Driver）。事实上，这种实现方式比 MCD 驱动程序模式要快上好几倍，它被证明是一种不幸中的万幸。硬件供应商抓住这一机遇，迅速开始提供驱动程序。不久之后，游戏开发商开始在他们的游戏中使用 OpenGL，再次证明它是 Direct3D 的可行替代品。</p>
+<h2 id="硬件的演变">硬件的演变</h2>
+<p>20 世纪 90 年代末，OpenGL 将自己建立为一种三维计算机图形的行业标准，而不仅仅是 CAD 程序的标准，尽管它是该市场的唯一争夺者。诸如《雷神之锤 2》《虚幻》和《半条命》等 PC 视频游戏充分利用了 OpenGL 的优势，充分展示了自己的潜力，广受欢迎。大约在这个时候，第一款消费级专用 3D 图形硬件开始出现，从此改变了视频游戏行业。</p>
+<p>最早的 3D 加速器之一是 3Dfx Interactive 的 Voodoo Graphics，这是一款高性能附加卡，一上市就树立了标准。虽然还有其他附加卡，如 ATI 3D Rage 和 S3 ViRGE，但 3Dfx 显卡在性能和功能上都远远超过了它们。除此之外，3Dfx 还提供了自己的 3D 图形 API，名为 Glide，可以直接访问底层图形硬件。在当时，Glide 是最快的 API，但由于它是针对特定供应商的，几年后就被竞争对手的 API 所淘汰。尽管如此，Glide 还是对整个行业产生了影响，导致其他 API 在相当长的一段时间内处于追赶状态。（校注：3dfx 有非常有趣的一段历史，他们创始人的老东家就是本文主角 SGI，他们使用一个假的用工作站制作的 Demo 拉投资，这段历史可以参考极客湾视频：<a href="https://www.bilibili.com/video/BV1Hb41177JB/" target="_blank" rel="noopener noreffer">20年前的游戏与PC：探秘3D游戏史上最辉煌的岁月（上）</a> 以及纪录访谈 3dfx Interactive (Documentary / Interview)，在 Voodoo 推出之后，卡马克发布了基于 OpenGL 的硬件加速版本的《GLQuake》）</p>
+<p>英伟达（NVIDIA）公司很快就在 1999 年推出了 GeForce 256 附加卡，并称之为 GPU（图形处理单元 Graphics Processing Unit），它支持一种名为变换与照明（通常称为 T&amp;L，Transform &amp; Lighting）的全新技术。T&amp;L 将顶点变换计算和光照计算从计算机的 CPU 转移到了 GPU 上（校注：英伟达将 GPU 概念定义为支持硬件 T&amp;L 的图形芯片）。</p>
+<p>GPU 的主要优势在于它能快速完成浮点运算，因为这种硬件专门用于这项任务，而 CPU 则专门用于整数和更通用目的的运算。更多的软件功能被转移到了 GPU 上，而 3Dfx 从来没有实现过 T&amp;L，这最终导致了他们的败落。（校注：根据极客湾视频，3dfx 的失败还有一系列诸如和世嘉的合作告吹，收回授权，独造显卡，图形 API 等原因，3Dfx 也进行了支持硬件 T&amp;L 的 Rampage 架构的研发，但是并没有成功）</p>
+<p>3Dfx 破产后，英伟达™（NVIDIA®）公司收购了其大部分知识产权（包括著名的 SLI 技术，校注：最早被称作Scan Line Interleave，使用交错渲染方式，主卡副卡渲染单双数行，后来改为 Scalable Link Interface 可拓展链接界面，可以将两张或以上的显卡连在一起使用），但没有继续 Voodoo 产品线，也没有支持 3Dfx 的任何旧产品。到 2000 年，GPU 市场上的竞争对手只剩下英伟达公司的 GeForce 2 和 ATI 公司的镭龙 Radeon 7000 系列 GPU。这两家厂商只提供对 OpenGL 和 Direct3D 的支持，为这些应用程序接口的正面交锋扫清了障碍。</p>
+<blockquote>
+<p>参考：软件与硬件</p>
+<p>当我们说某项功能是软件功能（software functionality）时，这意味着它是在 CPU 而不是 GPU 上执行的。当我们说某项功能是硬件功能时，这意味着该功能是在专用硬件上执行的。例如，软件渲染仅通过 CPU 完成，而硬件渲染仅在 GPU 上完成。</p>
+</blockquote>
+<h2 id="范式转变">范式转变</h2>
+<p>本世纪初，随着 GPU 的性能呈指数级增长，随着越来越多的软件功能被转移到 GPU 上。由于 CPU 无法跟上 GPU 的发展，CPU 在渲染实时 3D 图形方面已经过时。事实上，当前的 3D 图形渲染方法将 CPU 视为主要瓶颈，因此必须发明新的方法来规避 CPU 的使用。</p>
+<h2 id="缓冲区">缓冲区</h2>
+<p>在此之前，为了在屏幕上进行渲染，程序员会从程序中发出一系列命令，由 GPU 进行解释，这就是所谓的即时模式（immediate mode）。这种方法在处理较小的数据集时表现良好，但在处理较大的数据集时，由于所有函数调用都来自程序本身，因此性能会受到 CPU 性能的影响。</p>
+<p>新方法以缓冲对象（buffer objects）的形式出现。缓冲以显示列表（display list）和顶点数组（vertex arrays）的形式出现已有一段时间，但它们各有缺点。显示列表仍然使用即时模式，而顶点数组则存储在系统内存中，因此每次调用都必须将它们传输到 GPU。</p>
+<p>取而代之的是，新的缓冲对象将在初始化后存储在 GPU 的内存中，直到不再需要为止。在 OpenGL 中，这些对象被称为顶点缓冲对象（Vertex Buffer Objects，VBO），而在 Direct3D 中，它们被称为顶点缓冲区（Vertex Buffers）。您将在以后的章节中了解到更多有关 VBO 的信息，该章节将向您介绍 VBO 以及它们为何如此快速的原因。</p>
+<blockquote>
+<p>参考：缓冲区</p>
+<p>在计算机科学中，缓冲区是内存中存储临时数据的地方。当我们用完这些数据后，缓冲区就会被删除，内存就可以重新使用了。</p>
+</blockquote>
+<h2 id="着色器">着色器</h2>
+<p>2000 年，微软发布了 Direct3D 8.0，它支持一种名为着色器的新特性。着色器基本上就是直接在 GPU 上运行的小程序，因此可以充分利用 GPU 的更多能力，并将更多的功能从 CPU 上移开。Direct3D 8.0 发布时，公布了两种类型的着色器，即顶点着色器和像素着色器。（校注：2001年，英伟达发布 GeForce 3，第一款兼容 Direct3D 8.0 的3D卡，使用了可编程着色器架构，能够使用着色器语言，微软提出了 Shader Model，要求显卡厂商生产时提供对应的功能和指令的支持），</p>
+<p>顶点着色器（vertex shaders）是一种 GPU 程序，每个顶点执行一次，像素着色器（pixel shaders）是一种 GPU 程序，每个像素执行一次。着色器在许多任务中无需使用 CPU，从而带来了更好的可编程性和性能，但由于其语法类似于 CPU 的汇编编程语言（Assembly programming language），因此很难编程。</p>
+<p>2003 年，随着 Direct3D 9.0 的发布，高级着色器语言（HLSL，High-Level Shader Language）的形式在着色器方面取得了重大突破。这种新语言允许使用基于 C 语言语法的高级语言来操作着色器。此时，着色器的使用变得更加可行，并得到了广泛采用。你将在之后的章节中了解到更多关于顶点和像素着色器的知识，我们将在这些章节中深入探讨如何实现所有这些功能，以及如何在自己的程序中使用着色器。</p>
+<p>（校注：DirectX 9.0c 带来了 Shader Model 3.0 的支持，加入了例如位移贴图 Displacement Texture、次表面散射 Subsurface Scattering、软阴影 Soft Shadow、全局光照 Global Illumination 等特效））</p>
+<h2 id="opengl-的发展停滞">OpenGL 的发展停滞</h2>
+<p>上段没有提到 OpenGL 是有原因的，那就是 OpenGL 当时不支持任何着色器。OpenGL 直到 2004 年发布了 OpenGL 2.0 并同时发布了 OpenGL 着色语言 （GLSL，OpenGL Shading Language）后才正式支持着色器，当时。尽管使用着色器的扩展功能在 2004 年之前就已广泛存在，但它们并不是官方规范的一部分，需要数年时间才能完全恰当地实现。</p>
+<p>在核心功能方面，OpenGL 已大大落后于 Direct3D。就像 Direct3D 在 90 年代末一直在迎头赶上一样，OpenGL 现在必须赶上 Direct3D，但这并未实现。从 2004 年到 2006 年，Direct3D 9.0 在市场上占据主导地位，只有少数游戏支持 OpenGL。2005 年，支持 Direct3D 9.0 的 Xbox 360 发布后，对 Direct3D 的支持更上一层楼。在此期间，ARB 没有任何消息，OpenGL 似乎真死了一段时间。</p>
+<p>2006 年，OpenGL 2.1 作为原始 2.0 规范的一个小增量发布，只带来了少量新功能。雪上加霜的是，微软在发布新的 Windows Vista 操作系统的同时还发布了 Direct3D 10.0，其中包括对 API 的重大修改和许多新功能。硬件开始向新的方向发展，从即时模式、固定功能方法转向更可编程的方向，而这正是 OpenGL 所缺乏的。</p>
+<p>与此同时，OpenGL 开发者社区开始躁动不安，他们要求 ARB 或 SGI 给出答案，但得到的却是完全不同的结果。</p>
+<h2 id="新版-opengl">新版 OpenGL</h2>
+<p>在 2006 年的 SIGGRAPH 大会上，SGI 宣布 OpenGL 今后将由科纳斯（Khronos）集团，而不是 SGI 管理，SGI 仍拥有 OpenGL 和所有相关版权，但将不再对其进行管理。Khronos 集团是一个由硬件和软件厂商组成的联盟，与 OpenGL 有着千丝万缕的联系，主要致力于创建和维护开放标准的 API，在收购 OpenGL 之前最著名的是用于 3D 内容的 COLLADA 文件格式。最后，在 OpenGL 方面，两年来首次传出 OpenGL API 的全新版本将带来一些重大变化。</p>
+<h2 id="longs-peak-和-mt-evans">Longs Peak 和 Mt. Evans</h2>
+<p>OpenGL 的两个新版本发布了，临时代号为 Longs Peak（朗斯峰）和 Mt. Evans（埃文斯山） ，以科罗拉多州的山脉命名。Longs Peak 将是 2007 年夏天发布的第一个规范，而 Mt. Evans 将在几个月后的同年 10 月发布。</p>
+<p>这些修订承诺了一个全新的 API，能够与 Direct3D 10 的 API 竞争，就像 Direct3D 10 所做的那样，Mt. Evans 将消除即时模式渲染，只依赖缓冲区和着色器。这次 API 重写是一个伟大的事业，需要几个技术小组（Technical Sub-Groups，TSG），他们专注于自己的 OpenGL 规范的专业领域。</p>
+<p>对象模型 TSG （Object Model TSG）就是其中之一，负责处理如何在新的 API 中表示缓冲区和其他类型的对象。拟定的对象模型提出了一种只需调用几个函数就能创建对象的全新方法。最重要的是，通过使用模板（templates），所有类型的对象所使用的方法都将保持一致。这意味着供应商之间将不再存在不符合之处，他们将以五花八门的方式提供他们的对象创建功能。</p>
+<p>Longs Peak 将是一个与当时硬件兼容的 API，并保留与旧版本 OpenGL 的向后兼容性，而 Mt. Evans 将消除向后兼容性，并采取未来的立场。这与对象模型一起成为了被提议的 API 的主要部分，引起了 OpenGL 社区的极大期待。</p>
+<p>但 2007 年夏天过去了，Khronos 没有任何消息，10 月 30 日，又传出新规范被推迟的消息。虽然社区有些不满，但总体上认为新规范值得等待，于是又过了一年。</p>
+<h2 id="opengl-30">OpenGL 3.0</h2>
+<p>OpenGL 2.1 小版本发布至今已有两年，而上一次重大版本 OpenGL 3.0 于 2008 年 7 月发布，距今已有四年。阅读规范后，我们很快就注意到这不是 Longs Peak。事实上，它看起来并没有什么变化：即时模式依然存在，提议的对象模型不见了，也没有计划将其纳入 OpenGL 未来的任何版本中。在引入一些新功能的同时，还引入了一种叫做废弃模式（deprecation model）的东西。</p>
+<p>废弃模式将所有即时模式功能标记为弃用，转而使用更现代的方法。然而，OpenGL 3.0 并没有计划删除任何已废弃的功能，而是将其作为一个完全向后兼容的 API，并保留了过去的所有有缺陷的功能。</p>
+<p>这引起了社区的愤怒，他们在 OpenGL 社区留言板和其他网络上大声抗议。有人无端指责说，OpenGL 保持向后兼容是因为 Khronos 不想失去那些仍在使用即时模式并拒绝变化的 CAD 客户。许多 Windows 开发人员开始放弃 OpenGL，转而使用 Direct3D，其中包括一些被指控的 CAD 软件开发人员。如果说之前 OpenGL 的前景黯淡无光，那么这次的发布无疑让人看到了 OpenGL 在 API 大战中的彻底失败。</p>
+<h2 id="冲击之后">冲击之后</h2>
+<p>但在最初的失望过后，新规范被证明具有一些 Direct3D 所不具备的特性。例如，OpenGL 3.0 包含 Direct3D 10 的许多功能，但可以在 Windows XP 上使用，而 Direct3D 10 由于采用了新的驱动程序模型，需要 Windows Vista 才能运行。</p>
+<p>大约一年后的 2009 年 3 月，OpenGL 3.1 发布，它最终从 OpenGL 规范中删除了 3.0 中所有被标记为过时的即时模式功能，从而使其向 Longs Peak 和 Mt.Evans 中所承诺的 API 踏进了一步。随着这一快速版本的发布，OpenGL 终于回到了正确的道路上，仅仅几个月后，OpenGL 3.2 发布，通过加入几何着色器（Geometry Shaders），使 API 达到了 Direct3D 10 的水平。</p>
+<h2 id="弃用核心和兼容性">弃用、核心和兼容性</h2>
+<p>OpenGL 废弃模式可能有点令人困惑，因此在本节中，我将尝试一次性解释相关的术语。OpenGL 3.0 引入了一项名为废弃（deprecation）的特性，它「标记（marked）」旧的、不需要的 OpenGL 功能，并警告说这些功能可能会在未来的规范中被移除；基本上，在程序中使用弃用的功能不是一个好主意。</p>
+<p>当开发人员想在自己的程序中使用 OpenGL 时，他们需要创建一个所谓的上下文（context），基本上就是一个允许开发人员向 OpenGL 设备传递命令的对象。在过去，无论实现的 OpenGL 版本，这些上下文都是以相同的方式创建的。</p>
+<p>这意味着，当你创建一个使用 OpenGL 1.5 特性的设备时，如果驱动程序返回的是一个 OpenGL 2.0 设备，这并不会造成危害，因为所有上下文都是完全向后兼容的。OpenGL 3.0 引入了一种创建上下文的新方法，要求在创建上下文时提供以下参数：- 主版本号 - 次版本号 - 可选属性。</p>
+<p>如果是一份 OpenGL 3.0 上下文，相应的值将是 3、0 和一些属性组合。这一新功能可确保返回的设备是所请求的 OpenGL 设备，否则就意味着该版本不支持。可传递的属性使选择更加精细，包括以下属性之一：- 核心配置文件上下文标记（A Core Profile context flag） - 兼容性配置文件上下文标记（A Compatibility Profile context flag） - 向前兼容标记 - 调试标记。</p>
+<p>这两个配置文件之间的区别在于，核心配置文件不包含以前版本中删除的任何功能，而兼容性配置文件包含这些功能。OpenGL 实现总是保证包含规范的核心配置文件，但不一定包含兼容性配置文件。向前兼容核心规范是最合理的做法，也是创建这种上下文的初衷。</p>
+<p>如果您设置了「向前兼容」的标记，返回的上下文将不包含您请求的版本中已废弃的任何功能，从而使其与可能已删除这些功能的未来版本兼容。</p>
+<p>如果设置了调试标记，返回的调试上下文将包含额外的检查、验证和其他功能，这些功能在开发周期中非常有用。</p>
+<p>上述标志都可以组合在一起，但核心标志和兼容性标志除外，因为只能返回其中一个标志。组合标志可以使用位操作符 <code>OR</code> （即 C 语言中的管线命令符号 (|) ）。</p>
+<p>如果这些术语对你来说还有点模糊，别担心，我们会在附录中再次讲解，我们将在特定平台上从头开始设置 OpenGL 上下文。现在，请记住有两种 OpenGL 配置文件：Core（核心）和 Compatibility（兼容性），前者是更现代的配置文件，后者是兼容旧版 OpenGL 功能的配置文件。</p>
+<h2 id="opengl-40">OpenGL 4.0</h2>
+<p>OpenGL 3.2 发布一年后，OpenGL 4.0 作为最新一代 GPU 的应用程序接口发布，与 Direct3D 11 类似。与此同时，OpenGL 3.3 也发布了，它在兼容上一代硬件的同时，尽可能多地实现了 OpenGL 4.0 的功能。</p>
+<p>OpenGL 4.0 中的一项重要新功能称为「曲面细分（Tessellation）」，它允许对场景中的表面和自动细节级别进行精细控制。我们将在以后的章节中探讨什么是曲面细分以及如何使用它。（校注：DX 11 同样拥有曲面细分的功能）</p>
+<p>本书使用的是启用了核心配置文件的 OpenGL 4.0 规范，这意味着它与任何以前版本的 OpenGL API 都不兼容。为了尽可能与未来兼容，我们也不会使用任何过时的功能。起初，这似乎有点令人生畏，但请放心，学习起来并没有想象中那么困难，而且从长远来看，不学习旧功能将是有益的。</p>
+<p>如果你已经了解一些即时模式 OpenGL，请注意我们将不介绍这种类型的 OpenGL。在本书中，你将找不到诸如 <code>glBegin</code>、<code>glEnd</code>、<code>glVertex3f</code> 和 <code>glColor3f</code> 等命令（除了这些参考资料），因为 OpenGL 4.0 Core Profile 中没有这些命令。忘掉到目前为止所学到的关于即时模式 OpenGL 的所有知识，也忘掉即时模式 API 曾存在过，因为它再也不会回来了。</p>
+<p>现在是开始学习 OpenGL 的大好时机，因为视频游戏正被大量移植到 Microsoft Windows 以外的平台上，而在 Windows 以外的平台上获得实时计算机图形的唯一途径就是 OpenGL。例如，《半条命》的开发商 Valve 就使用 OpenGL 作为图形库，将他们的许多热门游戏移植到了苹果 Macintosh 上。</p>
+<p>此外，现代智能手机（如 iPhone 和基于 Android 的手机）都使用 <strong>OpenGL ES</strong> 来实现交互式 3D 图形，这是一种基于嵌入式系统（embedded systems）的 API，与 OpenGL 非常相似。这意味着，您的代码可以在 PC、Mac、游戏机以及各种移动设备上运行。</p>
+<p>OpenGL ES 本身催生了另一个名为 WebGL 的 API，这是一个跨浏览器、跨平台兼容的三维图形应用程序接口，适用于网络浏览器。这个库有可能将网络和多用户应用程序提升到一个全新的水平。</p>
+<p>总之，OpenGL 远未消亡，它作为功能齐全的现代 3D 图形 API 正在蓬勃发展。</p>
+<h2 id="软件管线">软件管线</h2>
+<p>在渲染实时计算机图形时，软件管线（software pipeline）的存在是为了描述我们希望在屏幕上看到什么。例如，如果我们想在屏幕上显示一个绿色的正方形，计算机软件就会描述该正方形的尺寸、颜色以及在屏幕的哪个位置绘制。</p>
+<p>软件管线还提供了将几何图形绘制到屏幕上的功能。值得注意的是，软件管线实际上并不进行任何绘制或变换，因为在现代系统中，这些功能完全由硬件实现。</p>
+<p>软件管线由几个不同的层组成，每个层都有自己非常特殊的用途。每一层都可能包含五花八门的功能，但为了简洁明了，我们只讨论每一层的高级功能。</p>
+<p>首先是**应用（Application）**层，也就是你调用绘制命令的程序。应用程序是整个进程的控制器，负责监督所有用户层级的操作，如创建窗口、线程、内存分配、复杂的用户数据类型，以及通过各自的接口调用 OpenGL 或 Direct3D 等外部库。</p>
+<p>下一层是**抽象（Abstraction）**层，包含 OpenGL 或 Direct3D API 实现。重要的是要区分应用层中的 API 与抽象层中的 OpenGL 和 Direct3D 实现。用 C 语言来说：您可以将应用层视为只包含定义的头文件，而抽象层则是包含实际功能的源文件。抽象层来进行发送至下一层，通过以可用的和标准化格式实现硬件层级的功能。</p>
+<p>抽象层将其命令传递给<strong>设备驱动（Device Driver）</strong>，这是一个与硬件通信的软件层。这层对于开发人员来说是不可见的，因为其无法通过程序进行交互。就像许多不可见的东西一样（还记得细菌吗），设备驱动是软件管线中最重要的部分之一，因为它将所有单独的部分连接在一起。由于设备驱动中包含大量专业功能，其文件大小可能相当庞大。</p>
+<p>设备驱动程序解释抽象层传递给它的命令，并以硬件可以理解和轻松处理的格式将这些命令转发给底层设备。</p>
+<p>从本质上讲，软件流水线就是从程序到专用硬件的传输系统（relay）。虽然软件管线非常重要，但在程序中真正会用到的只有应用层，它向你公开了 API。</p>
+<h2 id="编后记该部分为编者资料收集自行补充">编后记（该部分为编者资料收集自行补充）</h2>
+<p>在本文叙述的时间点之后（2014），图形 API 的情况实际上更加复杂了。</p>
+<p>OpenGL 的设计目标之一是易用性和跨平台兼容性，其抽象层次不允许开发者直接控制硬件细节来充分利用显卡的并行计算等能力。故 OpenGL 的管理者 Khronos Group 由最初的 AMD 开发的 Mantle 而发展出了更加底层的图形 API 标准 <strong>Vulkan</strong>，在 2015 年将其宣布为下一代的 OpenGL 计划，随着移动平台性能的提升，提供新的统一的行业标准（先前由于移动平台硬件问题，催生 OpenGL ES 的压缩版本）。如老牌游戏开发商 id software 的自研引擎 id tech 6 所开发出的《德军总部 2》以及《DOOM》就有非常良好的 Vulkan 的表现。</p>
+<p>微软 <strong>Direct3D 12</strong> 版本也是同样的思路，更进一步更新为底层 API 来更直接地和底层硬件进行交流，提供优化和充分发挥硬件能力的可能，并随着后续更新，加入了光线追踪（Ray Tracing）的功能。而 Apple 苹果作为软硬件结合的开发商，也发布了自家的图形 API <strong>Metal</strong>，同样也是一个底层级的图形 API。</p>
+<p>使用越底层的图形 API 的游戏或软件并不代表其性能一定好，因为其编码要求更高，如果没有足够丰富的经验和能力，可能还不如使用更高层的 API，就如同样使用了 DX12 的《方舟进化》的表现远不如《战地1》一样。（在游戏主机如 PS4上，也有诸如 GNM 底层 API 和使用 GNMX 高层 API 的区别）。</p>
+<p>但电子游戏的开发者并不常直接使用对应的图形 API 进行游戏开发，因为那就需要每开发一个平台都要写一次图形和渲染代码——开发者通常使用游戏引擎作为一个不同平台和图形 API 的中间层来进行开发。</p>
+<p>所以当前的游戏引擎如 Unity，就会支持多种图形 API （<a href="https://docs.unity3d.com/Manual/GraphicsAPIs.html" target="_blank" rel="noopener noreffer">https://docs.unity3d.com/Manual/GraphicsAPIs.html</a>），具体取决于 API 在特定平台上的可用性。那么如果开发者要在游戏引擎（这样的一个跨平台应用）中写调用底层 GPU 的 shader 代码，那么你需要使用引擎所推荐的着色器语言，如 Unity 中你需要使用 HLSL（High Level Shading Language，是 Direct X 图形 API的语言），以及 Unity 官方的 Shaderlab 框架（底层为 Nvidia 的 Cg 语言）来编写 Shader（或使用 Shader Graph），而后 Unity 会再将其编译为能够调用其他图形 API 的语言。</p>
+<p>故纵观计算机图形学到电子游戏渲染的历史，这始终是一个统一与分裂的市场竞争，以及性能与通用性之间的权衡：1. 不同显卡硬件及其显卡驱动需要支持同样的图形 API 的标准来便于软件使用，但最终还是分裂为了多种图形 API。2. 不同的图形 API 标准需要被同样的游戏引擎的图形架构所统一，以便于开发者能够在一个引擎上开发适用于多平台的游戏。3. 但是这个游戏引擎对接各个图形 API 的图形架构的统一模版并不能满足多样的游戏渲染风格的要求，故过去的 Unity 统一的内置（built-in）的渲染管线又再一次需要更加可定制化，开放了可编程渲染管线，Scriptable Render Pipeline，将图形架构变得可以定制修改的，提供一个更灵活的，对应不同图形 API 的可编程的函数，可容许更加底层定制的渲染管线的自定义。</p>
+<p>而今天的手机应用也拥有同样复杂的情形，使用引擎或者在某些平台上开发的应用，有可能再一次地成为某种独立和统一的区块（例如中国正是一个 app 作为底层平台的互联网环境）。网页端实际上为我们提供了一个通过浏览器而在不同平台上有相同运行环境的统一层（如 mac，windows，安卓和 ios 上的浏览器应用），使得浏览器的 js 代码等运行良好，而诸如微信这样的应用则又再封装一层，通过改造传统浏览器的一些代码而再出现了诸如小程序/小游戏这样的独立生态。</p>
+<p>这种充满了复杂度和竞争统一和跨平台问题过程实际上就正是技术发展和演进的过程，也是我们今天在各种丝滑的应用背后被封装起来的暗流。</p>
+<p>更多可以参考的资料：</p>
+<ol>
+<li><a href="https://www.bilibili.com/video/BV1Hb41177JB/" target="_blank" rel="noopener noreffer">20年前的游戏与PC：探秘3D游戏史上最辉煌的岁月（上）</a></li>
+<li><a href="https://www.bilibili.com/video/BV1vb411h7DD/" target="_blank" rel="noopener noreffer">【科普】DirectX和OpenGL：游戏为什么离不开它们？</a></li>
+<li><a href="https://alain.xyz/blog/a-review-of-shader-languages" target="_blank" rel="noopener noreffer">A Review of Shader Languages</a></li>
+</ol>
+</div><div id="comments"></div></div></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

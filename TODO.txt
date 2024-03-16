@@ -1,0 +1,4 @@
+Bresenham 直线算法
+radiosity
+Langford pairing
+曲别针制造机 https://www.decisionproblem.com/paperclips/index2.html

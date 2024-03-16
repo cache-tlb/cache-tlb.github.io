@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>称硬币问题与纠错码 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="称硬币问题与纠错码" />
+<meta property="og:description" content="这个题目来自著名的 &ldquo;Heard on the Street&rdquo; 一书，问题描述如下： You are given a set of scales and 12 marbles. The scales are of the old balance variety. That is, a small dish hangs from each end of a rod that is balanced in the middle. The device enables you to conclude either that the contents of" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/finding-bad-marble/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-09-12T17:55:17&#43;08:00" />
+<meta property="article:modified_time" content="2021-09-12T17:55:17&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="称硬币问题与纠错码"/>
+<meta name="twitter:description" content="这个题目来自著名的 &ldquo;Heard on the Street&rdquo; 一书，问题描述如下： You are given a set of scales and 12 marbles. The scales are of the old balance variety. That is, a small dish hangs from each end of a rod that is balanced in the middle. The device enables you to conclude either that the contents of"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/finding-bad-marble/" /><link rel="prev" href="https://cache-tlb.github.io/algo-bot-game-review/" /><link rel="next" href="https://cache-tlb.github.io/watch-game-review/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "称硬币问题与纠错码",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/finding-bad-marble\/"
+        },"genre": "posts","wordcount":  5319 ,
+        "url": "https:\/\/cache-tlb.github.io\/finding-bad-marble\/","datePublished": "2021-09-12T17:55:17+08:00","dateModified": "2021-09-12T17:55:17+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">称硬币问题与纠错码</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-09-12">2021-09-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 5319 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 11 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>这个题目来自著名的 &ldquo;Heard on the Street&rdquo; 一书，问题描述如下：</p>
+<blockquote>
+<p>You are given a set of scales and 12 marbles. The scales are of the old balance variety. That is, a small dish hangs from each end of a rod that is balanced in the middle. The device enables you to conclude either that the contents of the dishes weigh the same or that the dish that falls lower has heavier contents than the other.</p>
+<p>The 12 marbles appear to be identical. In fact, 11 of them are identical, and one is of a different weight. Your task is to identify the unusual marble and discard it. You are allowed to use the scales three times if you wish, but no more.</p>
+<p>Note that the unusual marble may be heavier than the others, or it may be lighter. You are asked to both identify it and determine whether it is heavy or light.</p>
+</blockquote>
+<p>大意是说，有 12 个外观一样的金币，其中 11 个重量是真币，它们重量一样，剩下的那个剩下那个是假币，可能比真币偏轻或者偏重。给一个天平，要用最多 3 次称量找出假币，并判断它是偏轻还是偏重。</p>
+<hr>
+<p>如果接触过类似的题目，可能马上会想到对这些金币分组，然后确定假币在哪组，这样不断缩小问题规模。
+接下来的问题是：要如何分组？一般的套路是分成 3 组，天平上放两组，留一组。
+可是一次称量最好情况就是天平平衡，有问题的在剩下的一组里，更坏的情况是天平不平衡，我们只能知道假币在天平上的两组中，既无法知道具体在哪一组，也不知道是偏轻还是偏重。
+即便再花一次称量知道了这些信息，也无法用一次称量从 4 个候选里找到假币。这个思路似乎行不通。</p>
+<p>笔者第一次看到这个题目也是思考了很久，也没有想到如何用 3 次称量就达到目标。
+这道题算得上是 Quant 智力题中偏难的一个，笔者也只在书上见过这一次，不管是本人还是朋友都没有在实际面试中遇到过。
+好在作者很厚道地提供了答案，看了解答之后让人直呼巧妙。
+巧妙到仿佛一个精密的机关，环环相扣。
+然而作者没有给出构思的过程，不禁让人担心，如果换成规模更大的问题，又该如何凑出答案呢？</p>
+<p>果不其然，&ldquo;Heard on the Street&rdquo; 在后面确实也有一个拓展的问题，金币总数换成了 90，其他条件不变，问需要多少次称量可以确保找出来并指出轻重。12 个金币就已经如此复杂，90 个金币怕是难上加难啊。</p>
+<hr>
+<p>先来看书上给出的 12 个金币的版本的解答。</p>
+<p>将它们分成三组，每组 4 个金币。每组再分成 1 + 3 的两个小组，记为 $ \{ \{ 1 \}_A, \{ 3 \}_A \}$, $\{ \{ 1 \}_B, \{ 3 \}_B \}$ 和 $\{ \{ 1 \}_C, \{ 3 \}_C \} $。</p>
+<p>先比较 $ \{ \{ 1 \}_A, \{ 3 \}_A \}$ 和 $\{ \{ 1 \}_B, \{ 3 \}_B \} $，如果平衡，说明假币在 $C$ 组，且 $A$ 组和 $B$ 组都是真币。
+此时继续比较 $\{3\}_B$ 和 $\{3\}_C$，如果再次平衡，只需要再比较 $\{1\}_B$ 和 $\{1\}_C$，就可以知道 $\{1\}_C$是偏轻还是偏重。如果 $\{3\}_B$ 和 $\{3\}_C$ 不能平衡，比如 $\{3\}_C$ 比  $\{3\}_B$ 轻，说明假币偏轻，此时只要取 $\{3\}_C$ 中任意两个比较，如果不平衡则偏轻的那个是假币，如果平衡则说明剩下的那个是假币且偏轻。 $\{3\}_C$ 比  $\{3\}_B$ 重的情况也是同理。</p>
+<p>回到最开始，如果第一次称量不平衡，比如  $ \{ \{ 1 \}_A, \{ 3 \}_A \}$ 比 $\{ \{ 1 \}_B, \{ 3 \}_B \} $ 轻，那我们再比较  $ \{ \{ 1 \}_A, \{ 3 \}_B \}$ 和 $\{ \{ 1 \}_B, \{ 3 \}_C \} $，如果平衡了，则可以知道假币在 $\{3\}_A$ 里，且偏轻，任取其中两个比较即可。如果 $ \{ \{ 1 \}_A, \{ 3 \}_B \}$ 比 $\{ \{ 1 \}_B, \{ 3 \}_C \} $ 轻，说明 $\{ 3 \}_A$ 是真币，于是要么是 $ \{ 1 \}_A $ 偏轻，要么是 $\{  1 \}_B $ 偏重。只要任取一个与 $\{ 1 \}_C$ 比较即可。如果第二次称量 $ \{ \{ 1 \}_A, \{ 3 \}_B \}$ 比 $\{ \{ 1 \}_B, \{ 3 \}_C \} $ 重，说明假币在 $\{ 3 \}_B $里，且偏重。从其中任取两个比较即可。</p>
+<p>如果最开始是 $ \{ \{ 1 \}_A, \{ 3 \}_A \}$ 比 $\{ \{ 1 \}_B, \{ 3 \}_B \} $ 重，也是对称的分析。</p>
+<hr>
+<p>原文并没有给出解答的思路，根据每次称量结果需要做一些推理才能决定下一次天平两端放哪些金币。上面解答的精髓在于每个大组再分成 1+3 的小组，以及第一次称量不平衡时，下一次将 $\{ 3 \}_A $，$\{ 3 \}_B $ 和 $\{ 3 \}_C $ 的位置进行轮换。
+当问题规模增加时要怎么分组，怎么分小组？每个小组要不要进一步细分？每次称量怎么推理？等等。情况会变得特别复杂。</p>
+<p>有一个比较系统的解法是将所有假币的可能性列出来，每次称量排除掉一部分，直到最后只剩一种可能性。比如，把金币编号为 $1-12$ 。用 $ n^+ $ 和 $ n^- $ 表示第 $ n $ 号偏重和偏轻的情况，这样共有 $ 12\times 2 = 24 $ 种可能的假币的情况。我们希望把这些情况分成相等的几份，每次称量筛选出一份，这样即使在最坏情况下后续的候选情况不至于太多。</p>
+<p>先举一个例子。显然需要在天平两边放相同数量的金币才有意义。如果第一次称天平左右两边放 1 号和 2 号。结果可能有 3 种，每一种对应的可能性情况如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>结果</th>
+<th>可能性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Case 1</td>
+<td>偏左</td>
+<td>$1^+, 2^-$</td>
+</tr>
+<tr>
+<td>Case 2</td>
+<td>偏右</td>
+<td>$1^-, 2^+$</td>
+</tr>
+<tr>
+<td>Case 3</td>
+<td>平衡</td>
+<td>$3^+, 3^-, 4^+, 4^-, 5^+, 5^-, 6^+, 6^-, \cdots, 12^+, 12^- $</td>
+</tr>
+</tbody>
+</table>
+<p>如果恰好天平平衡了，需要用 2 次称量分辨 20 种可能性，是做不到的。此外，经过上表可以观察到，如果天平偏向某一侧，则说明这一侧的某个金币可能偏重，或者对侧的某个金币偏轻。如果天平平衡说明假币不在天平上。</p>
+<p>我们往两边放更多的金币，各放 4 个的时候，各种可能性可以被均分。例如，1-4在左边，5-8在右边，得到下表：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>结果</th>
+<th>可能性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Case 1</td>
+<td>偏左</td>
+<td>$1^+, 2^+, 3^+, 4^+, 5^-, 6^-, 7^-, 8^- $</td>
+</tr>
+<tr>
+<td>Case 2</td>
+<td>偏右</td>
+<td>$1^-, 2^-, 3^-, 4^-, 5^+, 6^+, 7^+, 8^+ $</td>
+</tr>
+<tr>
+<td>Case 3</td>
+<td>平衡</td>
+<td>$9^+, 9^-, 10^+, 10^-, 11^+, 11^-, 12^+, 12^- $</td>
+</tr>
+</tbody>
+</table>
+<p>Case 1 和 Case 2 筛选出来的情况是对称的，我们选其中偏左的这个结果（Case 1）来分析第二次称量的策略。经过一些尝试，可以左边放 $\{1,5,9\}$，右边放 $\{2,3,6\}$。注意此时如果天平偏左，说明有 $ \{ 1^+, 5^+, 9^+, 2^-, 3^-, 6^- \}$ 这些可能，再结合第一次称量的结论，就只剩下 $ \{1^+, 6^- \} $ 两种可能。类似的推出偏右和平衡的情况。最后，有下表的分析：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>结果</th>
+<th>可能性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Case 1.1</td>
+<td>偏左</td>
+<td>$1^+, 6^-$</td>
+</tr>
+<tr>
+<td>Case 1.2</td>
+<td>偏右</td>
+<td>$2^+, 3^+, 5^- $</td>
+</tr>
+<tr>
+<td>Case 1.3</td>
+<td>平衡</td>
+<td>$4^+, 7^-, 8^- $</td>
+</tr>
+</tbody>
+</table>
+<p>对于 Case 1.1，只要再比较 1 号和 2 号；平衡对应 $ 6^- $ ；偏向 1 号对应 $ 1^+ $ ，不会出现偏向 2 号的情况。 
+对于 Case 1.2，比较 2 号和 3 号，偏向哪个说明哪个是假币，且偏重；平衡说明是 $ 5^- $。 
+对于 Case 1.3，比较 7 号和 8 号，偏向哪个说明另一边是假币，且更轻；平衡说明是 $ 4^+ $。</p>
+<p>Case 2 和 Case 1是类似的。</p>
+<p>再看 Case 3，经过一些尝试，可以左边放 $ \{ 1,9 \} $，右边放 $ \{ 10, 11 \} $，得到下表：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>结果</th>
+<th>可能性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Case 3.1</td>
+<td>偏左</td>
+<td>$9^+, 10^-, 11^-$</td>
+</tr>
+<tr>
+<td>Case 3.2</td>
+<td>偏右</td>
+<td>$9^-, 10^+, 11^+ $</td>
+</tr>
+<tr>
+<td>Case 3.3</td>
+<td>平衡</td>
+<td>$12^+, 12^- $</td>
+</tr>
+</tbody>
+</table>
+<p>Case 3.1 和 Case 1.3 类似，而 Case 3.2 和 Case 1.2 类似。</p>
+<p>对于 Case 3.3，只要比较 1 号和 12 号，就可知道 12 号是偏轻还是偏重，同样这里不存在平衡的情况。</p>
+<hr>
+<p>上面的思路不用纠结于先找到假币在哪一堆里还是先判断假币到底是偏轻还是偏重，只要我们每次将排除后剩余的可能性均等地分成 3 份，总能找到称量方案，并且是最优的。</p>
+<p>但是这里后续的策略要依赖于前面的称量结果进行调整，就需要逐个情况分析验证，工作量巨大。这里借鉴纠错码的思路给出一个通用的解法，每一步称量策略不依赖于前面的结果。</p>
+<p>回到最初的问题。我们将称量这一操作用数学的语言描述。设编号 $ i $ 的金币质量为 $ m_i $, 取值为 $ \{-1,0,1\} $，分别对应偏轻、正常、偏重的情况。 
+天平的倾斜状态同样可以定义为 $ \{-1, 0, 1\} $， 对应偏左、平衡、偏右的情况，于是，每个左盘的金币贡献了负的力矩，右盘的金币贡献正的力矩。
+当然，对于质量是 $-1$ 的金币则是反过来。将每个金币放在左盘还是右盘用 $ w_i $ 表示，同样 $w_i$ 的取值范围是 $ \{-1, 0, 1\} $。
+于是，天平状态 $ r $ 可以表示成：
+$$ r = \sum_{i=1}^N{w_im_i} = \boldsymbol{w}^T\boldsymbol{m} .$$
+也就是两个向量 $ \boldsymbol{w} $ 和 $ \boldsymbol{m} $ 的内积。
+这里把 $ \boldsymbol{m} $ 向量称为质量向量，每次称质量向量都是固定不变的，$ \boldsymbol{w} $ 向量和 $ r $ 可能会变。 
+此外，$ \boldsymbol{m} $ 向量有 11 个元素为 0，剩下那个元素可能是 $\pm{1}$。</p>
+<p>记三次称量使用的 $ \boldsymbol{w} $ 向量分别是 $ \boldsymbol{w}_1 $, $ \boldsymbol{w}_2 $, $ \boldsymbol{w}_3 $，它们构成了一个 $ 3\times 12 $ 的矩阵 $ \mathbf{W} $，称为称量矩阵。
+三次称量的天平状态构成了一个 3 维列向量，称为结果向量。
+我们的目标是确定矩阵 $ \mathbf{W} $ 的具体形式，使得根据结果向量可以推出质量向量的非零元是哪个，以及值是多少。</p>
+<p>注意到每次称量左右两边的金币个数要一样才有意义，说明 $ \mathbf{W} $ 每一行 $+1$ 的个数和 $-1$ 的个数要相等。</p>
+<p>继续观察，假设第 $ j $ 个是假币且偏重，则质量向量第 $ j $ 个元素是 $ 1 $，其余是 $0$，与称量矩阵相乘后，结果向量正好是称量矩阵的第 $ j $ 列。
+如果是第 $ j $ 个金币偏轻，则结果向量是负的矩阵第 $ j $列。
+一旦定下来称量矩阵，它乘以不同质量向量得出的结果向量一定不能相同。而质量向量有 24 种可能性，对应的结果向量就是称量矩阵的每一列以及负的每一列。
+换言之，称量矩阵每一列和负的每一列向量构成的集合必须两两不相等，否则就会有不同的质量向量得出相同的结果矩阵，这是没法确定具体是哪个质量矩阵。</p>
+<p>到目前为止，已经找到了确定称量矩阵的 3 个条件：</p>
+<ul>
+<li>任意两列不同</li>
+<li>任意两列和不为零向量</li>
+<li>每行元素之和为 0</li>
+</ul>
+<p>下面进行构造。先写出所有由 $ \{-1,0,1\} $ 组成的 3 维列向量，共 27 个，除掉零向量，还剩 26 个。
+将它们分成 13 组，每组互为相反向量。每组最多选一个向量作为称量矩阵的一列，这样就自动满足前两个条件。
+至于第三个条件，需要做一些搜索。
+总的来说，这个问题是 NP-Hard 的。搜索的原则是，每一行的 $-1, 0, 1$ 三个数要尽量一样多。 
+如果前 $ k $ 行已经满足条件，在不改变前 $ k $ 行之和的前提下调整后面的行。直到全部满足条件。</p>
+<p>这里构造一个称量矩阵：
+$$ \begin{bmatrix}
+-1 &amp; -1 &amp; -1 &amp; -1 &amp;  1 &amp;  1 &amp;  1 &amp;  1 &amp;  0 &amp;  0 &amp;  0 &amp;  0\\  1 &amp;  1 &amp; -1 &amp; -1 &amp;  1 &amp;  0 &amp;  0 &amp;  0 &amp; -1 &amp; -1 &amp;  1 &amp;  0\\ -1 &amp;  0 &amp;  1 &amp; -1 &amp;  0 &amp; -1 &amp;  1 &amp;  0 &amp;  1 &amp; -1 &amp;  0 &amp;  1 
+\end{bmatrix} $$</p>
+<p>如何根据结果向量找到假币以及判断轻重呢？
+每次称量矩阵的一行放置金币，-1 表示对应的金币在左边，1 表示对应的金币在右边，0 表示不参与此次称量。
+我们得到了结果向量，拿它跟称量矩阵每一列比较，如果第 $ j $ 列等于结果向量，说明第 $ j $ 个金币偏重；如果是第 $ j $的相反向量等于结果向量，说明第 $ j $ 个金币偏轻。</p>
+<p>非常巧妙的做法，把纠错码的原理跟这个问题联系在了一起。我是在 bilibili 上看到这个解法的，链接：<a href="https://www.bilibili.com/video/BV1Fy4y1T7mL">https://www.bilibili.com/video/BV1Fy4y1T7mL</a></p>
+<hr>
+<p>Heard on the Street 给出的拓展问题的三个解法，也在这里给出，读者可以感受一下复杂程度。</p>
+
+<div class="noindent">
+    <p><strong>解法1</strong></p>
+    
+</div>
+<p>将金币分成 3 个组，每组 30 个，记为 $ A, B, C $。先称 $A$ 和 $B$。</p>
+<p>Case 1：平衡。再把 $C$ 分成 $ 10\times 3 $ 的三组：$C.A, C.B, C.C$，比较 $C.A$ 和 $C.B$。</p>
+<p>Case 1.1：再次平衡。假币在剩下的 $C.C$ 里，只要再加入 2 个真币，套用 12 个金币的解法，再称 3 次就行。</p>
+<p>Case 1.2：$C.A &lt; C.B$。将存疑的这两个组的金币分别再分成 $ 3+4+3 $ 的 3 份出来。同样还是以后缀 $ A,B,C $ 表示三个小组，例如 $C.A.A$ 和 $C.A.C$ 有 3 个金币，$ C.A.B $有 4 个。取 $ C.A.A + C.B.B $ 和 $ C.A.B + C.B.A $ 比较。</p>
+<p>Case 1.2.1：$ C.A.A + C.B.B = C.A.B + C.B.A $，说明是 $ C.A.C &lt; C.B.C $，再将存疑的两组各取一个比较。</p>
+<p>Case 1.2.1.1：$ C.A.C.A + C.B.C.A = C.A.C.B + C.B.C.B $，说明是 $ C.A.C.C &lt; C.B.C.C $，只要拿 $ C.A.C.C $ 与任何一个真币比较就行。</p>
+<p>Case 1.2.1.2：$ C.A.C.A + C.B.C.A &lt; C.A.C.B + C.B.C.B $，说明是 $ C.A.C.A &lt; C.B.C.B $，跟 Case 1.2.1.1 类似。</p>
+<p>Case 1.2.1.3：$ C.A.C.A + C.B.C.A &gt; C.A.C.B + C.B.C.B $，说明是 $ C.A.C.B &lt; C.B.C.A $，也跟 Case 1.2.1.1 类似。</p>
+<p>Case 1.2.2：$ C.A.A + C.B.B &lt; C.A.B + C.B.A $，说明 $ C.A.A &lt; C.B.A $，存疑的两组各有 3 个金币，跟 Case 1.2.1 一样。</p>
+<p>Case 1.2.3：$ C.A.A + C.B.B &gt; C.A.B + C.B.A $，说明 $ C.A.B &lt; C.B.B $，存疑的两组各有 4 个金币，并且知道要么是 $ C.A.B $ 的 4 个更轻，要么是 $ C.B.B $ 的 4 个更重，这跟 12 个金币的问题种第一次称量不平衡的情况是一样的。</p>
+<p>Case 2：$A$ 和 $B$ 不平衡。不妨设 $A &lt; B$。再次将 $ A $ 和 $ B $ 分别分成三组，记为 $A.A, A.B, A.C, B.A, B.B, B.C $，取 $ A.A $ 和 $ B.A $ 放左侧，$ A.B $ 和 $B.B $ 放右侧。</p>
+<p>Case 2.1：$ A.A + B.A = A.B + B.B $。说明 $ A.C &lt; B.C $，这与 Case 1.2 一样。</p>
+<p>Case 2.2：$ A.A + B.A &lt; A.B + B.B $，说明 $ A.A &lt; B.B $，也跟 Case 1.2 一样。</p>
+<p>Case 2.3：$ A.A + B.A &gt; A.B + B.B $，说明 $ A.B &lt; B.A $，还是跟 Case 1.2 一样。</p>
+<p>Case 3：$ A &gt; B $，跟 Case 2 是对称的。</p>
+<br/>
+
+<div class="noindent">
+    <p><strong>解法2</strong></p>
+    
+</div>
+<p>首先说明一个结论：如果事先知道假币是偏轻还是偏重，那么我们可以用 $k$ 次称量，就可以从 $3^k$ 个金币中找到假币。</p>
+<p>将 90 个金币分成 $ 90 = 81 + 9 $ 的两部分。再将 81 的那部分分成 3 组 $ A,B,C$ ，每组 27 个。
+先用两次称量，比如 $A$ 对 $B$ 以及 $A$ 对 $C$，可以知道这三组里哪一组有假币，并且知道假币偏轻还是偏重。
+然后用 3 次称量在 27 个候选里找到假币。 
+总共需要称 5 次。</p>
+<p>当然也有可能是 $ A, B, C $ 全相等，就说明假币在 9 的那部分里。
+可以拿 9 个真币和它们比较，确定假币偏轻还是偏重，然后用两次称量找到假币；或者在 9 个假币候选者里加入 3 个真币凑成 12 个金币的问题，不管用哪种方式，也都需要 5 次称量。</p>
+<br/>
+
+<div class="noindent">
+    <p><strong>解法3</strong></p>
+    
+</div>
+<p>这个方法可以解更强的 120 个金币的问题，或者更一般的 $N = \dfrac{3^n - 3}{2}$ 个金币的问题。
+缺点是只能解这些特定个数的问题，不能处理任意个数。
+下面讨论 120 个金币的问题。</p>
+<p>将 120 个金币分成 $ 40\times 3 $ 的三组，每组内部分成 $ 1 + 3 + 9 + 27 $ 的四部分。
+记为 $ \{\{1\}_A, \{3\}_A, \{9\}_A, \{27\}_A \} $，和 $ \{\{1\}_B, \{3\}_B, \{9\}_B, \{27\}_B \} $，以及 $ \{\{1\}_C, \{3\}_C, \{9\}_C, \{27\}_C \} $。先比较 $A$ 和 $B$ 两个大组。</p>
+<p>Case 1：$ A = B $。假币在 $ C $ 组中，此时拿 $ \{27\}_A $ 和 $ \{27\}_C $ 比。</p>
+<p>Case 1.1：不平衡。可以知道假币在 $ \{27\}_C $ 中，且知道偏轻还是偏重，需要再称 3 次找出来。</p>
+<p>Case 1.2：平衡。此时再拿 $ \{9\}_A $ 和 $ \{9\}_C $ 比，不平衡则需要再称两次，平衡则又拿 $ \{3\}_A $ 和 $ \{1\}_C $，等等。不管何种情况，总数都是 5 次。</p>
+<p>Case 2：$ A &lt; B $。我们把 27 的那部分在 3 组里做一个置换，$ A\leftarrow B\leftarrow C\leftarrow A $，比较 $ \{\{1\}_A, \{3\}_A, \{9\}_A, \{27\}_B \} $ 和 $ \{\{1\}_B, \{3\}_B, \{9\}_B, \{27\}_C \} $，剩下 $ \{\{1\}_C, \{3\}_C, \{9\}_C, \{27\}_A \} $。</p>
+<p>Case 2.1：$ \{1\}_A + \{3\}_A + \{9\}_A + \{27\}_B = \{1\}_B + \{3\}_B + \{9\}_B + \{27\}_C $。
+说明假币在 $ \{27\}_A $ 里，且偏轻，用 3 次称量可以找出。</p>
+<p>Case 2.2：$ \{1\}_A + \{3\}_A + \{9\}_A + \{27\}_B &gt; \{1\}_B + \{3\}_B + \{9\}_B + \{27\}_C $。
+说明假币在 $ \{27\}_B $ 里，且偏重，同样用 3 次称量可以找出。</p>
+<p>Case 2.3：$ \{1\}_A + \{3\}_A + \{9\}_A + \{27\}_B &lt; \{1\}_B + \{3\}_B + \{9\}_B + \{27\}_C $。
+说明三组的 27 个金币的那部分都是真币，将它们丢掉，把 9 的那部分在 3 组里做置换，也就是比较 $ \{\{1\}_A, \{3\}_A, \{9\}_B \} $ 和 $ \{\{1\}_B, \{3\}_B, \{9\}_C \} $，这又回到了规模更小的 Case 2。
+递归下去也都需要 5 次得到结论。</p>
+<p>Case 3：$ A &gt; B $，跟 Case 2 是对称的。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2021-09-12</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/algo-bot-game-review/" class="prev" rel="prev" title="[游戏评论] Algo Bot"><i class="fas fa-angle-left fa-fw"></i>[游戏评论] Algo Bot</a>
+            <a href="/watch-game-review/" class="next" rel="next" title="[游戏评论] 透视">[游戏评论] 透视<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

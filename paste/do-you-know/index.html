@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>知识 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="知识" />
+<meta property="og:description" content="来自微博@Libre盖子，地址 引用 我之前提到科学计算领域，某些算法存在不可逾越的内存墙。因 @有个梨GPT 说有兴趣但不了解是什么算法，因此我解" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/paste/do-you-know/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="paste" />
+<meta property="article:published_time" content="2023-01-01T09:00:00&#43;08:00" />
+<meta property="article:modified_time" content="2023-01-01T09:00:00&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="知识"/>
+<meta name="twitter:description" content="来自微博@Libre盖子，地址 引用 我之前提到科学计算领域，某些算法存在不可逾越的内存墙。因 @有个梨GPT 说有兴趣但不了解是什么算法，因此我解"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/paste/do-you-know/" /><link rel="prev" href="https://cache-tlb.github.io/paste/tips/" /><link rel="next" href="https://cache-tlb.github.io/paste/critical/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "知识",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/paste\/do-you-know\/"
+        },"genre": "paste","wordcount":  16521 ,
+        "url": "https:\/\/cache-tlb.github.io\/paste\/do-you-know\/","datePublished": "2023-01-01T09:00:00+08:00","dateModified": "2023-01-01T09:00:00+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="page single special"><h1 class="single-title animated pulse faster">知识</h1><div class="content" id="content"><p>来自微博@Libre盖子，<a href="https://weibo.com/1219205751/N6qoycFsn" target="_blank" rel="noopener noreffer">地址</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>我之前提到科学计算领域，某些算法存在不可逾越的内存墙。因 @有个梨GPT 说有兴趣但不了解是什么算法，因此我解释一下。</p>
+<p>科学计算（与工程计算）中有一种典型的算法，叫做“模板”（stencil）算法。它广泛用于物理仿真领域，求解偏微分方程。简单来说，它将空间离散化并建立网格。每个时间步中，用简单运算来逐一更新所有格点的数值，将物理系统一个时间步一个时间步的向前推进，如同《生命游戏》等细胞自动机的运作。</p>
+<p>举个更具体的例子：最简单、最典型的是解传热方程的 2D Jacobi 算法。它建立一个 2D 网格，算法逐一遍历每个格子计算有限差分，而每个格点的数值取决于它自身和它的上、下、左、右。更新格子并不需要什么复杂的运算，只是 4 个加法和 1 个乘法，因此 CPU 核心无所事事，99% 压力全在内存控制器上，算法只能跑出 CPU 浮点性能的 1%.</p>
+<p>由于这种算法普遍存在，科学计算界往用“算术强度”（Arithmetic Intensity）这一概念来指导性能分析。算术强度是是浮点运算量与内存吞吐量的比例。如果目测 AI 小于 1，那么代码优化（例如写 SIMD 或汇编）就都不用考虑了，因为基本没有意义。只有 AI 大于 1 的时候，CPU 优化才有意义。例如在这里，算法每做 5 个浮点运算就要读取 20 个字节，写入 4 个字节（单精度），算术强度为 0.2。</p>
+<p>大多数 stencil 型物理仿真算法差不多都是这个算术强度。除了最简单的二维 5 格点模板外，还有三维 7 格点模板，甚至在在流体力学仿真中会使用三维 19 格点模板（高阶差分）。</p>
+<p>因此，这类算法就存在两个离谱的问题：</p>
+<ol>
+<li>算法瓶颈不是 CPU 的浮点运算性能，而是内存吞吐量。</li>
+<li>这类问题非常容易并行化，甚至接近完美并行——但是多核 CPU 几乎没有用。将空间拆分，然后每个 CPU 负责自己的一部分即可。但因为算法瓶颈是内存吞吐量，因此多线程在单机上无用（其实有一点用，因为一个核心很难跑满内存带宽，正如下载文件。SIMD 和多线程都有助于提升带宽占用率，经验是 10-20 GB/s 每核心，双通道 DDR4 约 40 GB/s，用 4 个线程就基本跑满了）；而在集群上只有相当于增加了内存通道数，不解决 CPU 只能跑 1% 性能的根本问题，而且随着机器增加，相邻节点的通讯开销就会越来越大。因此，这类算法一般只能 weak scaling，很少能 strong scaling（即，扩大集群规模可解决更大型的问题，但不能提升现有问题的解决速度）</li>
+</ol>
+<p>虽然，2D Jacobi 没有实用价值，工程上有更快的算法。但是在许多其他的物理模拟领域，类似 2D Jacobi stencil 算法存在普遍应用，而且可能是唯一实用的算法，会伴随计算机永远存在下去。如计算流体力学（CFD）领域求解纳维-斯托克斯方程、计算电磁学（CEM）领域求解麦克斯韦方程组，再如气象预报等（根据一篇旧研究报告，著名的欧洲气象数值模型 ECMWF 当时据说也只能跑到超级计算机 5% 算力）。因此如果你遇到这类问题，只能耸耸肩。当计算机硬件发展不再能为这些重要科学与工程问题服务时，有理由认为硬件发展已经出问题了（至少对 HPC 用户而言）。</p>
+<p>那么在现阶段如何解决呢？</p>
+<p>软件优化：</p>
+<ol>
+<li>增加计算强度。</li>
+</ol>
+<p>既然我们接受了 stencil 计算强度不高的根本问题，那么我们是否可以多计算一些东西？答案是肯定的。</p>
+<p>首先是可以使用冗余计算。为了方便，仿真模拟程序往往会将所有需要的参数提前计算好，计算过程中遍历数组以查表。但如今计算廉价，load/store 昂贵。所以，如果有些物理参数需要通过复杂的计算得到，但是输出比输入要大，那么不如在仿真过程中实时计算。因此，浮点运算量大的算法可能反而比运算量小的算法更快。</p>
+<p>另一个解决方案是使用高阶有限差分，提高计算量，这可能会让计算速度进一步下降，但是好处是结果会更准确，让漫长的等待得到更大的收获——CPU 闲着也是闲着，不如给它多安排点工作。有的时候，高阶算法可能有助于降低网格密度，利大于弊，得到提速。</p>
+<ol start="2">
+<li>
+<p>使用自适应网格。如果模型在某处有复杂的细节，就使用密集的网格，否则使用稀疏的网格。这样可以降低需要计算的网格数量，降低空间尺寸而提升仿真速度。</p>
+</li>
+<li>
+<p>使用循环分块（loop tiling）改进算法的缓存利用率。</p>
+</li>
+</ol>
+<p>与其在每个时间步重新计算整个空间，不如在每个时间步只计算空间的一小部分，让 CPU 三级缓存中的上一轮数据发挥作用——这叫做空间分块（spatial tiling）。</p>
+<p>但除非计算有很多步骤，否则空间分块几乎没有用，还需要使用时间分块（temporal tiling），又称时间偏移（time skewing）。与其在遍历整个空间，每次计算一步（同步计算），不如将空间分成许多区块，然后每个区块能算多少步就算多少步，直到因为数据依赖关系不能再算下去为止。</p>
+<p>这样一来，这样整个空间的格点处于异步状态。如果程序存在依赖关系（例如分析一个完整的时间步），修改会有困难。而且由于物理模拟是三维的，因此时间分块后程序的运行轨迹是一个 4 维超多面体，理解会比较困难，限制了其应用（不过物理学家自然是可以理解的，而会写程序的物理学家也是存在的。）</p>
+<p>但这仅仅是缓解了内存带宽问题，但并没有解决。提速几倍后的算术强度依然不高。而且分块大小依然受三级缓存限制。</p>
+<p>硬件升级：</p>
+<ol>
+<li>
+<p>使用多路服务器。因为内存通道是随 CPU 插槽数而扩展的，所以当 1 个物理 CPU 内存带宽跑满后，可以再增加一个物理 CPU 获得崭新的内存通道。只要 NUMA 互联带宽不跑满（因为只需要相邻格点通讯，所以不会跑满），理论可提速 1 倍。</p>
+</li>
+<li>
+<p>使用矢量架构超级计算机。历史上，经典的 Cray 超级计算机都是不需要缓存的矢量计算机，拥有巨大内存带宽，计算以超宽的矢量为单位进行大规模并行运算，不严谨的说，就好比 AVX-16384。但是由于多种原因（因编程困难，不适合解决其他类型问题），这类计算机如今已经式微，只有 NEC 的 SX 系列超算还在坚守这一路线（而且现在也从计算机变成加速卡了）。</p>
+</li>
+<li>
+<p>使用 GPU 运算。一台普通的 PC，使用 DDR4 双通道的带宽为 40 GB/s，8 通道内存的服务器也不过 200 GB/s. 但由于 GPU 为大规模并行处理优化，中端其内存带宽高达 500 GB/s，而高端 GPU 高达 1000-3000 GB/s。因此，将算法移植到 GPU 后，可以提速 10-20 倍。</p>
+</li>
+</ol>
+<p>但无论是矢量超算还是 GPU 都仅仅是缓解了内存带宽问题，但并没有解决。同样的算法依然只能发挥 GPU 的 1% 的算力。</p>
+<ol start="4">
+<li>使用先进封装或 3D 堆叠缓存。如 AMD 的 EPYC Milan-X 和 Genoa-X，拥有高达 1 GB 缓存。而 Intel 的 Sapphire Rapid Max 的 CPU 基板上自带高达 8 GB 的 HBM 内存。这两者都是 Intel 和 AMD 专门为科学计算用户特制的。</li>
+</ol>
+<p>在未来有什么方向呢？</p>
+<ol start="0">
+<li>
+<p>如果可能，研发其他类型的算法，不要再依赖有限差分等 stencil 计算解决问题了。但说说容易，许多领域 stencil 类计算是唯一实用的算法，会伴随计算机永远存在下去。</p>
+</li>
+<li>
+<p>继续开发先进封装技术，提升内存带宽。</p>
+</li>
+<li>
+<p>对于重点科研问题，开发 FPGA 甚至 ASIC 加速器。随着摩尔定律的终结，专用加速器的作用将越来越大。例如，我看到一篇采用非标准浮点数格式，将浮点数无损压缩降低带宽占用的论文。这在常规的硬件上是难以实现的。</p>
+</li>
+<li>
+<p>研发内存内计算（存算一体，In-Memory Computing）技术，使 DRAM 内存具有简单的运算能力。这类科学计算的特点是算法本身很简单，没有复杂的逻辑分支，难题基本仅限于搬运数据。那么，我们是否可以将使 DRAM 具有一定的运算能力？这在学术界多年来一直有断续研究，最近随着 AI 计算需求又引发了研究兴趣。如果这一领域研究能取得进展，至少可以实现一个数量级的提速。</p>
+</li>
+</ol>
+<p>另外一个非常有趣的方向（相反方向，把主存集成到 CPU 中）是 Cerebras Systems 的晶圆级超级计算机。这个芯片的尺寸为整个晶圆大小，它拥有 40 GB 的 SRAM，提供高达 20 PB/s 的内存带宽。据 Cerebras 的说法，美国能源部的测试表明，它在物理模拟仿真中实现 strong scaling，得到了 100 倍的性能提升。由于它造价是天文数字（就算以半导体行业的标准），这个技术方向未来仍不明确。但我认为对于打造世界级超级计算机而言，成本还是合理的。</p>
+<ol start="4">
+<li>在未来超级计算机的硬件设计中，至少在一部分科研机构的机器中，要脱离 LINPACK 至上主义，才能更好服务于为科学、工程界的仿真模拟——这是 LINPACK 的原作者、超算元老 Jack Dongarra 本人说的。LINPACK 是衡量超算世界跑名的标准测试，但这种稠密线性代数的计算强度极大，容易发挥出 CPU 的全部性能。但对于低强度算法来说，完全不切实际。追求最高 LINPACK 跑分往往适得其反，衡量超算性能，也要多加提倡衡量低算术强度算法的 HPCG 性能测试（在世界顶级超算 Frontier 上，HPCG 性能是 LINPACK 性能的 0.8%，情形不容乐观）。</li>
+</ol>
+</div>
+        </div>
+    </div>
+<hr>
+<p>来自微博@有个梨GPT，<a href="https://weibo.com/1655747731/N6pfwsmlb" target="_blank" rel="noopener noreffer">地址</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>@Libre盖子 说了经典的内存墙问题，这让我想起了一个Dijkstra和Hoare早年都引用过的例子，我们看看能不能聊出一点新的insight。</p>
+<p>++++</p>
+<p>这个例子是求质数，从2开始递增。</p>
+<p>因为是个抽象模型讨论，我们不假设任何实际的计算机体系结构，硬件或软件环境；这个讨论的上下文，是大家众口一词的拿它做「并发」计算的经典例子。但什么是并发计算呢，如果离开具体的计算机体系结构、硬件或软件（尤其os和runtime），也没有高度一致的定义，包括学术界和工业界。</p>
+<p>Harper有个模糊的说法是并发是组合程序的一种方式，应该算是目前从计算机语言理论出发的最高看法；但Dijkstra和Hoare并非搞这个方向的，他们的年代是搞process calculus的，在sequential program上很成功，但对并发的描述都不算完备吧。Milner的ccs和pi是描述了通讯的，符号逻辑，但众所周知lambda是对计算的canonical模型，意思是如果有其它模型也必须和lambda等价，但ccs和pi没这个地位。我们能安全的说并行是和语义无关的，即一个程序它并不并行，怎么并行，程序的性能可以不同但语义一致。但并发明显不是如此，并发在组合语义，但什么是组合语义，不太好回答了。</p>
+<p>++++</p>
+<p>说了很长一段的前言厘清概念之后，我们来说这个很简单的，基于并发的求质数算法。</p>
+<p>从2开始，因为2是质数，所以我们创建一个process，标记为2，然后把2之后的数字都发送给它。</p>
+<p>process2的算法是，如果一个数字能被2整除，就抛弃它，如果不能，出现第一个不能的，就创建一个新的process，实际上这个process的标记是3，之后2就把自己不能整除的数字统统扔给3。</p>
+<p>process3如法炮制，它会创建process5。。。以此类推，这个算法一直进行下去，我们就能获得足够的质数，限制是，这个环境允许我们创建多少个process。</p>
+<p>++++</p>
+<p>我没见过对这个求质数算法的更严肃的讨论，大家只是拿出来讴歌它说你看这算法夺莫优雅夺莫美。</p>
+<p>这里我们放弃游客思维。看看这个算法到底有什么不同。</p>
+<p>首先需要的process数量，和solution的数量，一样的scale；如果和输入数的数量比，这成了一个数论上质数的密度问题了，和我们要讨论的问题没有根本关系。</p>
+<p>其次，我们看一下bandwidth，即在任何一个round，整个系统的bandwidth是多少？我们发现它也是和solution的数量成正比的，随着process的增加，bandwidth也在增加，而这一点，是实际的现有计算机体系结构不具备的，存储系统必然有一个bandwidth的上限。</p>
+<p>这件事情是有点意思的。从网络的角度说，pipeline可以看过通讯网络拓扑结构里最简单的一种。网络的总带宽，就像理论上蜂窝网络可以无限细分，是随着节点数量scale的，但是，任意两点间的平均带宽，是随着网络中节点数量的增长越来越低的，这是因为「任意两点」是需要multi-hop的。无论实践上还是理论上，解决这个问题的办法都是构建超高速bus，就像Internet的骨干网。这一点，如果实现到计算机系统上，将意味着超多处理器和超高速片上bus。但每个处理器能访问的，例如tightly coupled，single clock sram，倒不一定需要很多。</p>
+<p>如果我们对比这样的一个算法，和一个sequential，recursive算法，我们会发现后者，很快会无法把足够多的质数都装入cache，而遭受penalty。well，not really，对于这个例子而言这种penalty可以是没有或者可以忽略不计的，因为判断下一个数字是不是质数可以顺序读取当前结果，但是这里的idea是清楚的，就是如果要比较随机的访问范围很大的内存地址空间，现代计算机体系结构是倒霉的。</p>
+<p>++++</p>
+<p>为什么这个例子看起来，简直是完美并发？我们再考虑一下这个问题。</p>
+<p>这个问题本身有几个特点。第一它的解法具有顺序的依赖性。不能简单的按照数字范围把输入数空间partition成多个部分，用不同的处理器去解决，任何一个数字判断它是不是质数，如果我们不假定数论里有什么更牛叉的方法，必须先得到它之前的所有质数才行。</p>
+<p>第二，它类似general的归纳法，就是不只依赖于最近的几个结果；最常见的归纳法是n推出n+1，而general的归纳法需要1..n推出n+1，这个问题的本质也是这样的。而所谓的牛叉并发，就是并发了这个1..n，利用一个线性的、无限带宽，或者说O(n)的，在process space里pipelining，unroll了一个递归算法。</p>
+<p>我重复一下这句话，这是这个例子里真正的insight：在process space里pipelining，unroll了原本sequential的递归算法。</p>
+<p>++++</p>
+<p>回归到开头 @Libre盖子 说的问题。我不熟悉他说的算法，都是数值计算领域的。但本文讨论的问题可能很多人都感兴趣，包括做计算机体系结构的 @裴喜龙 ，遇到了ai训练瓶颈的 @机器人老师傅 ，在亚特兰大有点不适应的计算机语言新秀 @业余早睡选手 ，等等。</p>
+<p>++++</p>
+<p>实际上从现在流行的计算机体系结构来说，这种multiple process的实现可能在软件层面不太容易。</p>
+<p>对一个实际的计算机系统，要应对没那么linear的问题，实际上是一个生产线的logistic模型，只是实际的生产线不那么递归，即很少会把一个后道工序的产出拿回前道工序再加工，但是在软件里我们经常这样crunch numbers。</p>
+<p>先不说这一点，流水线模型是这样思考问题的：比如Intel需要生产两种CPU，一种桌面的，一种移动的；假定桌面的需要光刻机和测试台的比例是5：3，而移动的需要光刻机和测试台的比例是2：7，实际的车间里就要看怎样摆放光刻机和测试台的比例，如何schedule，能满足动态的市场需求变化。如果桌面处理器的需求突然飙升，那设备配置比例和生产时间都会向桌面处理器倾斜，反之亦然。</p>
+<p>这个问题基本上是那种NP类的吧，跟路由器的动态路线类似的，可能不会有很好的解析解。</p>
+<p>但pipelining和unrolling仍然可以给出一些重要的insight，包括片上处理器的不对称计算，配置成pipeline，记住高速总线虽然是需要的，但是local的1对1通讯更提升总带宽；片上内存可配置，这个目前在MCU里已经很常见了，比如总计1M sram分成8个bank，配置多少给全局，哪些是比如arm core或音视频处理器专用，那些能dma访问，如果用于core之间的通讯，是否可以配置成FIFO，等等。</p>
+<p>++++</p>
+<p>内存配置是系统一次启动配置好的还是运行时可修改？因为process和process之间使用buffer，就像生产线上一个节点的产成品可以暂时堆一下；如果buffer full，这个节点就得停下，解决的办法就是增加下游节点，这样上游节点就可以把堆积在生产线上的半成品分发给两个下游节点。</p>
+<p>这个问题王垠激烈的抨击过Pike，因为Pike可能没深入学过计算机语言理论，两个人也都没学过工业工程，但我确定Pike在说这个意思，而王垠指责Pike一直在说并发但指的是并行。logistic里不区分这个概念。Pike的意思也就是出现瓶颈就创建新的goroutine，这样能赚到更多地CPU时间。这个叫并发还是并行呢？按照Harper的定义是并行，说明印第安纳和匹兹堡至少达成了并行概念的一致理解。</p>
+<p>++++</p>
+<p>不多说了，也没什么总结，我肚子里就这么点墨水了，请大家指正。抄送 @九瓜 老师，@阅千人 老师，@美人她爹 ，@蔡少伟 老师，@ExcitedVczh 轮子哥，@甜菜欣欣 老师，@Hux黄玄 哥。</p>
+<p>++++</p>
+<p>补充：这篇一定意义上说golang的并发想法挺高级的但是不适合现代计算机硬件的实际实现。期待能早日看到超多核的片上系统，sram可配置以获得每个核的buffer和点对点通讯，但这个东西怎么编程呢？我的脑袋已经冒烟了。</p>
+</div>
+        </div>
+    </div>
+<hr>
+<p>来自微博@月风_投资笔记，<a href="https://weibo.com/1670659923/N6AURh3f3" target="_blank" rel="noopener noreffer">地址</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>你要这么去理解A股——它本质上是一个容量越来越大，所有人在为了保持水位不下降（而不是上升）都已经竭尽全力的特殊市场。</p>
+<p>1、A股大部分企业的分红比例和回购减计体量不少，但是实际上分给普通投资者/回流市场的体量不大。比如2022年年报季数据，966家A股公司全年分红金额达10810.73亿元。但是这万亿分红额里，银行、非银、石化就占到了50%以上，这三个行业的特点是国有股东占比高，分红也不会回补市场（个人投资者拿到分红更有可能回头再买股票）；</p>
+<p>2、与之对应的，2022年A股市场股权融资总金额约为1.69万亿元，其中IPO融资5869.66亿元，同比增长8.17%，创下历史新高；</p>
+<p>3、也就是说，即使不考虑国有股东对金融石化行业大额分红的分流，A股实质上本身就是一个减量大于增量、融资大于分红的消耗型市场；</p>
+<p>4、如果我们拿美股做对比，根据Birinyi Associates的数据，美国公司宣布2022年的股票回购规模达到创纪录的1.26万亿美元，同比增长3%；另外分红总额是7780亿美元。——作为比对，2022年美国共有149宗IPO，融资总额207.9亿美元，相较于2021年的908宗和2826.6亿美元融资额分别减少约84%和93%；</p>
+<p>5、即使考虑到2022年美股IPO是非常态数据，我们用2021年的融资数据与之比较，也会发现美股本身是一个分红回购额大于融资额的市场。当然，如果单单看分红数据，中国是分红万亿IPO融资六千亿，美国是分红八千亿IPO融资三千亿（21年数据），差距看起来好像不明显；</p>
+<p>6、但是我说了，美股的特殊性在于，它们的上市公司股东整体上以民企和公众投资者为主，大量的分红会回流市场或者回购自己股票，等于上市公司控股股东也在用心哺育市场。举个例子，美股的回购金额已经大于分红金额了，达到万亿美元量级，实际上加上这点差异会明显拉大，国内A股股东往往缺乏这种动力；</p>
+<p>7、另外监管也在鼓励许多融资特性远大于分红特性的企业上市，包括科创板和北交所的落地，等于承认了A股融资特性的重要地位。长期看有助于优质企业脱颖而出，但是短期看越发加剧了资金短缺；</p>
+<p>8、再考虑到大小非减持需求的长期存在，加上我国产业结构特点里比如面板光伏历史上在全球都是融资额持续大于分红额的制造业占比不低（产业融资需求旺盛），所以A股在没有外部因素扰动下，本身其实就是一个“减量”市场；</p>
+<p>9、很多企业“没利润有估值靠融资”受到市场追捧，比如半导体产业，这样会进一步加剧A股的失血度，这个前面已经提过了，大家越追捧这些行业，a股的“失血”其实越严重。其实相比于美股，A股高分红的金融石化股的历史股性也弱于美股，理由前面也有提及——美股也有大股东拿走高分红公司大部分分红的情况，但是一部分大股东会选择回购自己股份再把这些分红回补市场，大家都在真心呵护市场，大小股东利益高度一致。国内国有大股东往往更加注重上交国库，利益出发点不同；</p>
+<p>10、那么，你先接受了A股融资功能为主/“稳态减量”的特性，就会更加容易理解为什么A股历史上的牛市都和增量资金强相关：2015年是配资资金入市，2017年是北上加速，2020年是全球央行放水，2021年是理财资金搬家；</p>
+<p>11、因为假如没有增量资金的灌溉，A股本身是在缓慢失血的，新的IPO模式也在加剧这一过程。也就是说，无增量，不牛市；无增量，不牛市。所以今年一旦北上流入速度反复，产品发行困难，市场立马会出现大幅波动；</p>
+<p>12、增量资金，比如央妈放水利率下行带来的钱，它们影响的往往是估值中枢（利率影响P/E），所以这就影响A股成为一个估值中枢博弈效率远高于业绩博弈效率的市场，也就是大家常说的，炒题材炒赛道风行；</p>
+<p>13、增量资金历史是间歇式的，导致A股历史上的牛市也是间歇式的。问题来了，今年的增量资金在哪里？这是全市场都在努力寻找的答案；</p>
+<p>14、想明白A股这个本质，才能帮你更好的想明白，你来A股到底是是干嘛的。价值投资当然难能可贵，但是要记得，A股值得价值投资的标的，要更加稀少和珍贵，因为很多上市公司宁愿把资金低息借给员工买理财，也不愿意回购注销股票，这一点一定和美股不一样，记得这一点。</p>
+</div>
+        </div>
+    </div>
+<hr>
+<p>来自微博@瘦驼，23-4-10 12:08 发布于 广东，<a href="https://weibo.com/1229068373/MBjXKfUlD" target="_blank" rel="noopener noreffer">链接</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>前阵子在霞浦观鸟，乘桴浮于海，就看见了远处岛上一处热火朝天的工地。定睛一瞧，这不是，核电站吗？</p>
+<p>这是正在兴建中的中核霞浦核电站。右边的是一号机组，预计今年就能并网发电，左边是二号机组，预计2025年建成。我国能源格局决定了东部缺电，核电是东部能源缺口的重要解决方案。这几年在东部沿海，核电站已经不是什么稀罕物了。但是这两个反应堆，却依然是稀罕物。</p>
+<p>很稀罕。</p>
+<p>这两个反应堆，型号是CFR-600，600兆瓦钠金属池式冷却快中子反应堆，是目前中国乃至全世界新一代核电技术的旗舰堆型。</p>
+<p>先说什么是快中子反应堆。目前所有的核反应堆采用的都是裂变产能，也就是一个重的原子核，比如铀、钚之类的，在被中子撞击之后，碎裂成两个较轻的原子核和一些中子。这个过程有一部分质量变成能量。产生的中子碎片继续撞击其他的重原子核，让反应继续。这就是链式反应，说起来很简单。然而，中子跟中子不一样，裂变产生的中子，速度比较高。速度高未必是好事，常见的裂变材料铀235就不能跟速度过高的中子反应，因此普通反应堆里必须要有能让中子减速的东西，最常见的就是水。减速之后的中子，称为热中子。目前不管是军用还是民用，最主流的就是热中子反应堆，简称热堆。热堆的最常见燃料就是铀235。</p>
+<p>问题来了，铀235是铀的一个天然同位素，它在自然界中的含量极低，只占所有铀的大约0.7％。超过99％的，是铀238，也就是俗称的贫铀。数量占绝对多数的铀238之所以被称为贫铀，原因是它很难当做核燃料，要让它发生裂变，需要能量非常大的中子，比它裂变产生的中子能量还大才行，所以无法产生链式反应。打个比方就是贫铀是特别难烧的木柴，即便用很高的温度点燃了它，燃烧产生的热量都不足以维持燃烧。</p>
+<p>废物。铀238就是核工业里最主要的废物，好在本身很硬，被军工拿去当装甲板或者穿甲弹材料。另外说一句，贫铀本身的放射性不强，但是一旦燃烧破碎变成气溶胶，吸入身体还是很危险的。</p>
+<p>然而，人们刚开始建反应堆的时候就发现，作为废物的铀238，在堆里会有一些变成别的东西。吸收了一个快中子之后，它会变成铀239，经历两次衰变，它变成了另一种元素-钚239。</p>
+<p>钚239，是比铀235更好的裂变材料。钚，原子序数94，是天然存在的最重的元素，在自然界中的含量极低。因此，有些反应堆，特别设计来被生产钚239。</p>
+<p>有了足够的钚239，快中子堆就变成了可能。怎么就可能了呢？快堆，一般是用钚239作为核心裂变材料，外面包上一层铀238。一个钚239分裂之后产生好几个快中子，这些快中子虽然还没有快到让铀238裂变，但是别忘了，吸收了一个中子之后铀238就变成了钚239。这样，每一个钚239裂变，都能产生三四个新的钚239。核燃料不但没有消耗，反而增加了。</p>
+<p>这就是快堆又被称为增殖堆的原因。</p>
+<p>用这种方式，自然界中数量很多，价格低廉的铀238，一举从核废料变成了可燃之材。快堆可以压榨出核燃料60％的能量，是热堆的一百倍。并且由于不再需要体积庞大的中子减速材料，快堆的体积可以变得比较紧凑。</p>
+<p>有利就有弊，我们接下来说说快堆的弊端。首先，它需要比热堆数量更多、浓度更高的核心核燃料，本身成本就高。另外，这造成反应堆产生的能量更大更集中，如果不能及时把这些能量转移出来，会烧毁反应堆，造成严重事故。</p>
+<p>大部分反应堆使用的冷却剂是水。水是自然界中比热容最高的物质，吸热能力超强，让大家选冷却材料，水肯定是自然而然的选择。不过，水要在管道里当冷却材料，必须要维持在液态，常压下水0℃结冰，100℃沸腾，只有这100°的区间可以用来吸热。福岛出事的几个反应堆，就是沸水堆，当丧失外部电力的时候，循环水泵停转，水温持续升高沸腾，反应堆就变成了高压锅，最终蒸汽泄漏导致放射性污染。</p>
+<p>何不主动把反应堆变成高压锅呢？给反应堆内部加压，加到一百多个大气压，这时候水的沸点会升高到300℃左右。这就是压水堆，同样多的水可以比沸水堆多吸收三倍的热量。一旦停机，高压的一回路和产生蒸汽的二回路之间不直接接触，增加了安全性。又但是，能做常压谁想做高压啊，各种高压管路、阀门、法兰盘，既增加成本又增加了安全风险。</p>
+<p>这还是散热需求相对较低的热堆，快堆就更难了。</p>
+<p>富贵险中求，为了解决快堆更大的散热需求，核物理学家们想到了一个让中学化学老师最头皮发麻的材料&mdash;钠。你还记得化学课上老师从煤油瓶子里夹出一粒豆那么大的白花花的钠金属，丢在装了水的试管里，然后会怎样？</p>
+<p>会炸。钠的化学性质太活泼了，能跟水反应产生氢气和大量的热。这一点天津人民，尤其是塘沽的朋友可能印象更深刻一些。</p>
+<p>但是钠是很好的冷却材料，它常压下的熔点是97.72℃，沸点883℃，虽然比热容只有水的1/3，但是可以保持液态的温度范围是水的7倍多。因此在不加压的情况下跟压水堆的冷却能力差不多。额外的优点还有两个，一个是钠金属导电，因此可以用电磁泵来推动，电磁泵不像机械泵一样需要叶轮之类的运动部件，结构简单，容易密封，故障率低；第二个好处是钠的沸点比反应堆工作温度高，因此无需考虑任何加压防止沸腾的问题。</p>
+<p>用金属钠做反应堆冷却剂最大的难题就是要保证它的绝对密封，不能跟空气、水发生接触。</p>
+<p>我国在1992年立项研发钠金属快堆，2000年在房山的中国原子能科学研究院内动工“中国实验快堆CEFR”，2012年通过验收。在CEFR的基础上，CFR600应运而生，接下来，还有更大的CFR1000正在筹划中。</p>
+<p>前两天马克龙访华中法两国达成了一系列重要的共识，其中就包括核电方面的合作。法国是世界上的核电大国，我国的核电起步，也离不开中法合作的推动。赫赫有名的大亚湾核电站就采用了法国的技术引进。</p>
+<p>在钠冷快堆方面，法国人也很有经验。迄今为止全球建成的最大的钠冷快堆，就是法国的“超级凤凰反应堆”，位于法瑞边境上，始建于1976年的这个堆，发电功率1242兆瓦。超级凤凰也是命运多舛，1977年，6万多名抗议者与警方爆发冲突，1死100多重伤。1982年1月18日晚上，五枚RPG中两枚击中正在建设中的反应堆安全壳，造成轻微损伤。直到2003年，瑞士人Chaïm Nissim承认是自己策划了那起袭击事件。这位Nissim，属于瑞士绿党，在1985-2001年间一直是日内瓦州大议会的议员。在各种政治博弈之下，运行状况良好的超级凤凰也在1997年被关停，没能够涅槃。</p>
+<p>核能是一个典型的不进步就倒退的产业。不进步的原因，早在1990年出版的《核能选项》（The Nuclear Energy Option）一书中，核物理学家科恩（Bernard Cohen）就给出了论断：“20世纪80年代，大多数西方国家停止建设核电站的原因并不是害怕出现事故、核泄漏或者放射性废料的扩散，而是因为监管导致成本出现了不可逆的攀升。”</p>
+<p>福岛事故正是这样一个典型反面教材。如果日本没有停止新核反应堆的研发和建造，充满各种安全漏洞的旧反应堆就不会超期服役，最终天灾人祸于一身。</p>
+<p>除了霞浦这两座钠冷快堆，我国目前还有包括常规压水堆和高温气冷堆等多个先进的堆型在兴建和运营。更安全的核电技术在科学家的硬盘里保存了很久了，现在，我们把它变成现实。</p>
+</div>
+        </div>
+    </div>
+<hr>
+<p>Braess 悖论介绍，来自微博@木遥，<a href="https://weibo.com/1644684112/MgylbDI2Y" target="_blank" rel="noopener noreffer">原博</a>，<a href="https://en.wikipedia.org/wiki/Braess%27s_paradox" target="_blank" rel="noopener noreffer">Wikipedia</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>附图就是那个著名的例子。从起点到终点有两条路，一条经过A，一条经过B。</p>
+<p>从起点到A 是小路，通行时间和车流量成正比，等于车流量T除以带宽100。从起点到B是大路，固定要耗费45分钟。</p>
+<p>从A或B到终点也一样，只是顺序刚好反过来。</p>
+<p>假定每天有4000辆车要从起点去终点。因为两条路本质上是一样的，很自然两条路就会各有2000辆车。最后每辆车花的时间都等于 2000/100+45=65分钟。</p>
+<p>现在你在A和B之间修一个虫洞，带宽无限，耗时为0。会发生什么事呢？听起来这是净利好。</p>
+<p>这时候起点的所有车，不管本来是要走A 还是B，都会选择走到A，因为即使所有人都挤在上面那条路，到A也最多需要4000/100=40分钟，然后从A到B需要0分钟，这还是比从起点直接去B要快。那直接走B无论如何都显得很蠢。</p>
+<p>然后等所有车到了A点之后，又因为同样的原因都会选择先走到B再去终点，因为这样最多也只需要40分钟，还是比直接走到终点快。</p>
+<p>但这样一来，最后所有车都花了4000/100+4000/100=80分钟。所有人都慢了15分钟。</p>
+<p>为什么？</p>
+<p>这时候你可能就理解了我上一条微博里的解释：「多出来的这条路有可能会因为显得局部优势，从而诱导更多的司机选择这条他们本来未必会选的路，其结果是恶化了整体的最优交通分布。」</p>
+<p>或者再确切一点说，这个捷径起到的作用是吸引大家选择了一系列局部上的最优解，但局部上的最优解联在一起并不等于全局最优解。每一步你都觉得自己赢麻了，但每一步都限缩了下一步的可能性。最终你在自己赢麻的路上花了更多的时间和成本。并且即使你看到了这一点也还是很难逃脱。</p>
+<p>你最终陷在了自己的选择里。</p>
+<p><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+width="600px" height="154px" viewBox="0 0 750.443 193.5" xml:space="preserve">
+<filter  id="AI_GaussianBlur_4">
+<feGaussianBlur  stdDeviation="4"></feGaussianBlur>
+</filter>
+<g filter="url(#AI_GaussianBlur_4)">
+<line fill="none" stroke="#A0A0A0" stroke-width="5" x1="165" y1="94.703" x2="334.791" y2="36.766"/>
+<g>
+<path fill="#A0A0A0" d="M331.393,37.925l-6.475-5.403l0.18-0.235l12.628,0.624c4.165-0.471,8.331-0.94,12.496-1.41
+c-3.583,2.176-7.167,4.349-10.75,6.524l-9.614,8.211l-0.272-0.035L331.393,37.925z"/>
+</g>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<line fill="none" stroke="#A0A0A0" stroke-width="5" x1="165" y1="94.703" x2="334.938" y2="157.823"/>
+<g>
+<path fill="#A0A0A0" d="M331.572,156.573l-1.6-8.28l0.288-0.068l9.389,8.467c3.524,2.27,7.048,4.539,10.572,6.809
+c-4.152-0.579-8.302-1.163-12.454-1.742l-12.639,0.283l-0.188-0.199L331.572,156.573z"/>
+</g>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<line fill="none" stroke="#A0A0A0" stroke-width="5" x1="400.222" y1="31.5" x2="570.013" y2="89.438"/>
+<g>
+<path fill="#A0A0A0" d="M566.615,88.278l-1.821-8.234l0.286-0.076l9.612,8.213c3.584,2.174,7.167,4.349,10.751,6.522
+c-4.166-0.468-8.33-0.939-12.496-1.408l-12.627,0.622l-0.194-0.194L566.615,88.278z"/>
+</g>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<line fill="none" stroke="#A0A0A0" stroke-width="5" x1="400.222" y1="163.5" x2="570.159" y2="100.38"/>
+<g>
+<path fill="#A0A0A0" d="M566.794,101.63l-6.617-5.228l0.173-0.24l12.641,0.285c4.151-0.581,8.302-1.163,12.453-1.744
+c-3.523,2.271-7.048,4.539-10.571,6.811l-9.391,8.465l-0.272-0.027L566.794,101.63z"/>
+</g>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<line fill="none" stroke="#A0A0A0" stroke-width="5" stroke-dasharray="10,10" x1="375.222" y1="56.5" x2="375.222" y2="122.195"/>
+<g>
+<path fill="#A0A0A0" d="M375.222,118.605l7.205-4.383l0.164,0.246l-4.668,11.75c-0.9,4.094-1.801,8.188-2.701,12.281
+c-0.902-4.094-1.801-8.188-2.703-12.281l-4.666-11.75l0.121-0.246L375.222,118.605z"/>
+</g>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<path fill="#A0A0A0" d="M165,110.748c0,4.945-4.712,8.955-10.526,8.955H25.526c-5.813,0-10.526-4.01-10.526-8.955v-32.09
+c0-4.945,4.713-8.955,10.526-8.955h128.947c5.814,0,10.526,4.01,10.526,8.955V110.748z"/>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<path fill="#A0A0A0" d="M735.443,110.748c0,4.945-4.713,8.955-10.526,8.955H595.97c-5.813,0-10.526-4.01-10.526-8.955v-32.09
+c0-4.945,4.713-8.955,10.526-8.955h128.947c5.813,0,10.526,4.01,10.526,8.955V110.748z"/>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<circle fill="#A0A0A0" cx="375.222" cy="163.5" r="25"/>
+</g>
+<g filter="url(#AI_GaussianBlur_4)">
+<circle fill="#A0A0A0" cx="375.222" cy="31.5" r="25"/>
+</g>
+<g>
+<g>
+<line fill="none" stroke="#231F20" stroke-width="5" x1="159" y1="88.703" x2="328.791" y2="30.766"/>
+<g>
+<path fill="#231F20" d="M325.393,31.925l-6.475-5.403l0.18-0.235l12.628,0.623c4.165-0.47,8.331-0.94,12.496-1.41
+c-3.583,2.176-7.167,4.349-10.75,6.524l-9.614,8.211l-0.272-0.035L325.393,31.925z"/>
+</g>
+</g>
+</g>
+<g>
+<g>
+<line fill="none" stroke="#231F20" stroke-width="5" x1="159" y1="88.703" x2="328.938" y2="151.823"/>
+<g>
+<path fill="#231F20" d="M325.572,150.573l-1.6-8.28l0.288-0.068l9.389,8.467c3.524,2.27,7.048,4.539,10.572,6.809
+c-4.152-0.579-8.302-1.163-12.454-1.742l-12.639,0.283l-0.188-0.199L325.572,150.573z"/>
+</g>
+</g>
+</g>
+<g>
+<g>
+<line fill="none" stroke="#231F20" stroke-width="5" x1="394.222" y1="25.5" x2="564.013" y2="83.438"/>
+<g>
+<path fill="#231F20" d="M560.615,82.278l-1.821-8.234l0.286-0.076l9.612,8.213c3.584,2.174,7.167,4.349,10.751,6.522
+c-4.166-0.468-8.33-0.939-12.496-1.408l-12.627,0.622l-0.194-0.194L560.615,82.278z"/>
+</g>
+</g>
+</g>
+<g>
+<g>
+<line fill="none" stroke="#231F20" stroke-width="5" x1="394.222" y1="157.5" x2="564.159" y2="94.38"/>
+<g>
+<path fill="#231F20" d="M560.794,95.63l-6.617-5.228l0.173-0.24l12.641,0.285c4.151-0.581,8.302-1.163,12.453-1.744
+c-3.523,2.271-7.048,4.539-10.571,6.811l-9.391,8.465l-0.272-0.027L560.794,95.63z"/>
+</g>
+</g>
+</g>
+<g>
+<g>
+<line fill="none" stroke="#231F20" stroke-width="5" stroke-dasharray="10,10" x1="369.222" y1="50.5" x2="369.222" y2="116.195"/>
+<g>
+<path fill="#231F20" d="M369.222,112.605l7.205-4.383l0.164,0.246l-4.668,11.75c-0.9,4.094-1.801,8.188-2.701,12.281
+c-0.902-4.094-1.801-8.188-2.703-12.281l-4.666-11.75l0.121-0.246L369.222,112.605z"/>
+</g>
+</g>
+</g>
+<path fill="#6FBE44" stroke="#231F20" d="M159,104.748c0,4.945-4.712,8.955-10.526,8.955H19.526c-5.813,0-10.526-4.01-10.526-8.955
+v-32.09c0-4.945,4.713-8.955,10.526-8.955h128.947c5.814,0,10.526,4.01,10.526,8.955V104.748z"/>
+<text transform="matrix(1 0 0 1 43.8545 97.7969)" font-family="'DejaVuSans'" font-size="26">START</text>
+<path fill="#71C8F1" stroke="#231F20" d="M729.443,104.748c0,4.945-4.713,8.955-10.526,8.955H589.97
+c-5.813,0-10.526-4.01-10.526-8.955v-32.09c0-4.945,4.713-8.955,10.526-8.955h128.947c5.813,0,10.526,4.01,10.526,8.955V104.748z"/>
+<text transform="matrix(1 0 0 1 626.4941 97.7969)" font-family="'DejaVuSans'" font-size="26">END</text>
+<circle fill="#FFCD33" stroke="#231F20" cx="369.222" cy="157.5" r="25"/>
+<text transform="matrix(1 0 0 1 360.3032 165.5)" font-family="'DejaVuSans'" font-size="26">B</text>
+<circle fill="#FFCD33" stroke="#231F20" cx="369.222" cy="25.5" r="25"/>
+<text transform="matrix(1 0 0 1 360.3286 33.5)" font-family="'DejaVuSans'" font-size="26">A</text>
+<text transform="matrix(1 0 0 1 193.1426 39)" font-family="'DejaVuSans'" font-size="20">t=T/100</text>
+<text transform="matrix(1 0 0 1 208.9824 156.5)" font-family="'DejaVuSans'" font-size="20">t=45</text>
+<text transform="matrix(1 0 0 1 482.4824 39)" font-family="'DejaVuSans'" font-size="20">t=45</text>
+<text transform="matrix(1 0 0 1 466.6426 156.5)" font-family="'DejaVuSans'" font-size="20">t=T/100</text>
+</svg></p>
+</div>
+        </div>
+    </div>
+<hr>
+<p>来自微博@酷炫脑科学，<a href="https://weibo.com/2124970203/IEXmB500N" target="_blank" rel="noopener noreffer">地址</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>消极思维让你变成社交黑洞。</p>
+<p>不断地产生消极想法（也称反刍）是非常不健康的，想要克服这种想法需要很强的意识控制和持续的努力。产生消极想法是人们生活中不可避免的部分。消极想法让我们无法操控自己生活，同时阻碍了我们对重要决策作出正确判断。</p>
+<p>相比于让你自己被不真实的想法所缠绕，专注于现实，学习去了解自己的消极情绪才是你应该做的。如果你想重新找回快乐，那你就必须学会改变你的消极情感和想法，这需要你克服内心里重重困难。</p>
+<p>消极的想法到底是从何而来的呢？</p>
+<p>消极想法是建立在恐惧的基础上的，它们来自于你的不安全感，可能是生命中伤害过我们的事情的后遗症，也可能是对未来的担忧。我们生下来本是一张白纸，在生活的过程中我们形成了我们的信仰和观点以及与这个世界的相处模式，也正是通过这些经历，我们形成了自我。</p>
+<p>消极想法如果不加以处理便会变成深埋在我们心中的秘密，因此我们需要去了解这些想法并弄清楚它们从何而来。当我们的经历造就了我们消极的思维模式，我们大脑的形态也会改变，反过来又会影响我们思考问题的方式，恶性循环最终有可能造成精神疾病（例如抑郁和焦虑等）。</p>
+<p>不同类型的消极想法</p>
+<p>在心理学的世界里，消极想法被认为是认知扭曲。这些消极想法会不断说服我们去相信那些不真实的想法，不断强化我们消极思考的思维方式。在克服消极想法之前，了解它们从何而来是第一步。</p>
+<p>1.极端化</p>
+<p>当我们被极端化思维所限制的时候，我们看到的世界都是“非黑即白”的。极端思维表示全或无，它表示要么做到完美，要不就完全失败。当极端思维出现的时候，中间的情况是不存在的。极端思维把人们所处的情境放置于“要不-就”的状况里，当他们看世界的时候，即使在非常复杂的情况下，也看不到其中的灰色地带。这是造成消极想法的其中一种原因，同时也是最难克服的一种情况。</p>
+<p>2.有选择性地过滤自己的想法</p>
+<p>这一类人总是喜欢放大生活中他人或者事情的消极细节，忽视好的一面，他们戴着有色眼镜来观察生活，但却只关注消极的方面。他们之所以这么做，是因为这可以让他们扮演成受害者的形象，从而来获取道德制高点，他们本质上是黑暗和扭曲的，他们就像是一个无限吸取别人能量的黑洞。</p>
+<p>3.情感判断</p>
+<p>情感判断的扭曲意味着人们相信他们这种情绪是自动产生的，并且是正确的，但事实上，我们的情绪并不总是正确的。当我们的情感占据主导地位时，我们根本无法理性或者有逻辑的从另一个角度来思考问题。情感并不只受到大脑的控制，它也与过去的经历息息相关，因此在受到情感影响的判断常常会不那么可靠。</p>
+<p>4.过度自我</p>
+<p>当你认为你所做的每一件事都会引发别人的反应时，那就说明你正在处于过度自我化的状态。这样的想法会让你变得偏激，你无法停止拿自己和他人比较，这样不仅不健康，同时也会加重自我贬损。过度自我的人认为所有不好的事情都是自己引起的，这种行为虽然可以在一定程度上称为自我鞭笞，但过度的自我鞭笞会极大地降低自尊。但我们进一步思考这种行为的内在心理可以发现，这种行为可能来源于对他人关注的需求和对他人情感操控的欲望。</p>
+<p>5.泛化</p>
+<p>这是一种普遍的认知扭曲，即通过某一次的意外或随机事件推出一个普遍适用的结论，但这种推论是缺乏证据且极度不可靠的。发展到后期，当一件坏事发生时，他们甚至会期待这件事一遍又一遍的发生。本来一件偶然的事件却变成了一种永无止尽不断重复的自我贬低模式。泛化是需要被破除的一种恶性循环，不然它将不断歪曲我们的世界观。</p>
+<p>6.灾难化</p>
+<p>这种类型的人很善于在听到一件事情之后立刻从中找到问题并立刻灾难化成“如果-那么”的情境。他们总是想象不好的事情，笃定即使他们已经做了万全的措施，不好的事情仍一定会发生的结果。</p>
+<p>7.关于控制</p>
+<p>有一种理论认为你可以改变或者控制另一个人的选择。这种情况大多发生在一段相互依赖的关系里，也同样会发生在曾经被伤过心或者有创伤应激的人身上。</p>
+<p>以各种方式存在于快乐中的消极</p>
+<p>消极可能会以各种方式存在于我们的快乐之中。这不仅会对我们的健康造成巨大的威胁，更会损害我们看待自己的方式，进而改变我们的决策。改变消极思维的前提就是必须意识到并接受它存在于我们的潜意识中。</p>
+<p>1.承认消极想法的存在</p>
+<p>消极思维会消耗我们认知资源，使得我们无法完成我们为自己和未来设立的目标，并且失去了跳出来去追求重要机会的力气。想要找到真实的快乐那就必须先正视我们自己，直面那些让我们不舒服的情感，承认消极想法存在于我们的思维中是第一步，改变我们的行为模式前提是改变我们的思考角度。</p>
+<p>我们必须改变扭曲的想法，努力将其转变为好的或有益的想法。尝试着跳出恶性循环，清除掉不好的想法，重新开始把目光集中于我们的幸福生活上。</p>
+<p>2.从皮质醇的角度来进行分析</p>
+<p>皮质醇（荷尔蒙）对我们免疫系统和新陈代谢产生了很大的影响，且在压力调剂中也起了重要作用。另外，皮质醇也会影响血糖浓度和血压，记忆控制和日间活动的生物钟。当你感到被困在消极思维的恶性循环里的时候，皮质醇会使得你更难正常工作。</p>
+<p>3.损害认知功能</p>
+<p>慢性的消极想法会对我们的认知和决策能力造成损害，它们通常会潜移默化地影响我们的思维方式。当我们处于压力或者不舒服的情境时，消极思维开始占主导地位，损害运作和组织功能，最终影响有效决策。然后我们会感到害怕，认为身边的一切都糟透了。但如果我们每天坚持做出改变，例如使用感激之旅和正念训练，都可以在一定程度上缓解我们的症状。</p>
+<p>4.内化</p>
+<p>因为消极的想法太容易夺去注意力了，我们常常会对它们内化成了自己的一部分，坚信发生在我们身上的每一件事情都是坏事，自己亲手断送了本来可能降临自己身上的好事。我们拒绝最亲密的关系，舍弃理想和目标，亲手将我们的生活推入黑暗。悲观主义者坚信这个世界上没有好事会发生，他们从未感到开心过。</p>
+<p>让消极思维对我们的人生肆意破坏是一件再糟糕不过的事情。我们必须找回消极思维和积极思维的平衡点，当我们在思维中找到平衡的时候，我们也能重新使生活回归平衡。</p>
+<p>5.躲在舒适圈里</p>
+<p>我们通常不愿意面对真相，但如果我们真的想成长，我们就必须走出舒适圈。去寻找可以开阔你眼界和朋友圈的课程、组织和团体。一点一点地，你会找到打开消极思维大门的方式，找到与未来的正确连接方式。</p>
+<p>如何超越你的消极思维？</p>
+<p>我们的消极思维看起来很吓人，但是只要了解和掌握了改变的方式，消极思维就可以被改变和重塑。一旦你开始有意识地去辨认你的消极思维方式和行为模式，你就可以开始挑战原有的不正确的想法，然后重塑它们。</p>
+<p>1.在思维的恶性循环开始之前就将它辨认出来</p>
+<p>一旦你能意识到你最容易陷入什么样的消极思维中，你就可以阻止它的发生并且打败这个思维死循环。你可以理性地想一想可能会发生的最坏的结果，看看自己能否接受。消灭生活中影响你生活的消极因素，用积极的因素来替代它们，为更有效率的事情注入能量。</p>
+<p>2.不断询问你自己</p>
+<p>当你发现自己不小心掉入了消极循环中，扪心自问一下为什么会这样。回溯你之前的经历，思考可能使你产生消极情绪的生活经历，以及在这个情境你能做什么来改变你的态度。</p>
+<p>3.分散你自己的注意力</p>
+<p>当消极思维发展到你无法处理的时候，不要再想这件事，给你自己一个冷静期，做一些转移注意力的活动，试图分散一下自己的注意力。跟其他人交流、出去远足或者旅行都是很适合用于分散精力的事情。</p>
+<p>4.用理性思维来替代消极思维</p>
+<p>尝试着去思考一些你可以做的事情。消极思维通常建立在对于真相的扭曲思维之上的，我们可以将这些思维用积极的方式替代。例如将觉得“我很丑”转化为把关注点放在你最欣赏自己的一部分。专注于自身的优势，是一种选择。</p>
+<p>5.停止消极的判断</p>
+<p>消极思维本质上其实是一个判断，对自己和他人的判断。相比一直拿你自己跟其他人比，倒不如更轻松的接受你是谁和你已经拥有的一切。当你开始拿自己与他人进行消极比较时，快停下来，试着从积极地思考，可能会有不同的结果。</p>
+<p>6.练习感激</p>
+<p>感激是最快也是最容易改变我们消极思维的方法之一，但是这需要时间和创造力。学会感激可以有效的帮助你提升积极感。关注到当下正在发生的美好的事情，可以帮助你克服生活中的困难，也可以帮助你应对生活中将发生的不好的事情。保持感恩之心最简单的方法就是每天写下几件令你感到感激的事情。</p>
+<p>总结</p>
+<p>消极思维模式给我们的生活造成了很大的负面影响，因此我们首先要相信自己有能力去改变消极思维。改变我们的想法是摆脱消极的前提，也是帮助实现我们的目标及创造未来最有力的方式，但最重要的在于每天坚持。</p>
+<p>学会理解你的消极思维，努力找到一种平衡它与生活的方式，放下纠缠我们多年的既有观念，学会用好的想法替代它们，重塑消极想法，重新掌控快乐！</p>
+<p>参考文献</p>
+<p>Bennett, S. , Bennett, M. J. , Chatchawan, U. , Jenjaiwit, P. , Pantumethakul, R. , &amp; Kunhasura, S. , et al. (2016). Acute effects of traditional thai massage on cortisol levels, arterial blood pressure and stress perception in academic stress condition: a single blind randomised controlled trial. Journal of Bodywork &amp; Movement Therapies, 20(2), 286-292.</p>
+<p>Pearson Murphy, B. E. , Patrick, J. , Denton, R. L. , Clark, S. J. , Marvin, M. , &amp; HA?DAR, RENéE. (1975). Cortisol in amniotic fluid during human gestation. Obstetrical &amp; Gynecological Survey, 30(8), 503.</p>
+<p>Vugt, M. K. V. , &amp; Velde, M. V. D. . (2018). How does rumination impact cognition? a first mechanistic model. Topics in Cognitive Science, 10(1), 175-191.</p>
+<p>Watkins, E. , &amp; Baracaia, S. . (2002). Rumination and social problem-solving in depression. Behaviour Research and Therapy,40(10), 0-1189.</p>
+<p>Watkins, E. , &amp; Teasdale, J. D. . (2001). Rumination and overgeneral memory in depression: effects of self-focus and analytic thinking. Journal of Abnormal Psychology, 110(2), 353-357.</p>
+<p>作者 | E.B.Johnson
+翻译 | 冷夏至</p>
+</div>
+        </div>
+    </div>
+<hr>
+<p>《关于发明的故事两则》，来自 EST Blog，<a href="https://blog.est.im/2023/stdin-04" target="_blank" rel="noopener noreffer">原文</a></p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>过去在非洲赞比西(Zambezi)河河边有许多鳄鱼，攻击到河边取水的人，结果不少人被鳄鱼吃掉。一个传教士李文斯顿(David Livingstone)路过，帮当地人想出一个好方法，在河边用木头建了一个栅栏，人在栅栏内定点取水，鳄鱼便无法伤害他们。</p>
+<p>这个故事出自道光一鸦年间，一个去非洲传教的苏格兰人自传《深入非洲三万里
+·Biography of David Livingstone》，俞敏洪阐述这个故事说上千年来人们就这么打水没人想过去解决被鳄鱼吃掉的问题。而走出非洲的人类遇到了太多的挑战——不同季节的挑战、不同环境的挑战、不同族群的挑战，在一次次挑战中人类变得越来越机警和有创造力，越来越懂得利用工具和群体合作。</p>
+<p>不知道是Zambezi河边的土著真的这么蠢，还是俞敏洪发挥歪了？直到我看到了第二个故事：</p>
+<p>李商隐的那句诗：“何当共剪西窗烛，却话巴山夜雨时”。奇怪，剪烛是什么意思？你想，蜡烛燃烧得快，但是烛芯，就是那根中间的棉线，燃烧得慢，所以点蜡烛的时候长期不剪掉烛芯，就会导致火焰太大，浪费。所以，古人用蜡烛旁边还得配把剪子。这太麻烦了啊。那今天的蜡烛为啥不会出现这个问题呢？这个问题是直到1820年才解决的。法国人强巴歇列发明了三根棉线编成的烛芯，蜡烛烧的时候，自然就松开，末端正好翘到火焰的外侧，然后就被火烧掉了。就没有剪烛这个问题了。你看，就这么一个简单的技术，要等到19世纪初期，蒸汽机都发明了，才有机会解决。从这个例子，你看得出来，人类文明有多复杂，创新的发生有多偶然了。</p>
+<p>这个故事来自《罗胖60秒·2019年·056》，搜了下，这个叫 <a href="https://pubquizammo.wordpress.com/2009/04/23/7-the-candle-wick-is-probably-the-best-re-invention-of-the-19th-century/" target="_blank" rel="noopener noreffer">braided wick</a>，但是具体是不是这法国人发明的我没查到。但是的确说是19世纪，灯芯才被改良。读完这篇对蜡烛这个古老的「发明」有了全新的认知。好神奇啊。比如为什么「香」是直接拿来燃烧，而蜡烛一定要有根棉线做的「灯芯」？蜡作为固体是没法直接燃烧的，蜡自己熔点低而且烧得慢，上面的石蜡融化后就会盖住下面的石蜡，隔绝空气，使下面的石蜡难以燃烧。解决办法是让石蜡液化、气化。灯芯起了一个capillary action毛细作用，蜡烛燃烧先把表面一层蜡融化，然后吸到焰心再充分燃烧。所谓 the wick is simply a delivery devise for the wax。如何控制燃烧速度不要太快导致黑烟，而不要太暗导致照明不够，听上去又是一个负反馈优化问题？</p>
+<p>感觉蜡烛其实也不简单。</p>
+</div>
+        </div>
+    </div>
+</div><div id="comments"></div></div></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

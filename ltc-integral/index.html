@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>Linearly Transformed Cosines 积分部分推导 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="Linearly Transformed Cosines 积分部分推导" />
+<meta property="og:description" content="用 LTC 计算多边形面光源对标准材质光照时需要计算一个积分式: $$ \int_{P_o}{D_o(\omega_o)}\ \mathrm{d}\omega_o = \mathrm{E}(P_o) . $$ 这里 $P_o$ 表示原多边形面光源经过线性变换后的形状在单位球面上投影的区域, 因" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/ltc-integral/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-12T13:28:03&#43;08:00" />
+<meta property="article:modified_time" content="2022-08-12T13:28:03&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="Linearly Transformed Cosines 积分部分推导"/>
+<meta name="twitter:description" content="用 LTC 计算多边形面光源对标准材质光照时需要计算一个积分式: $$ \int_{P_o}{D_o(\omega_o)}\ \mathrm{d}\omega_o = \mathrm{E}(P_o) . $$ 这里 $P_o$ 表示原多边形面光源经过线性变换后的形状在单位球面上投影的区域, 因"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/ltc-integral/" /><link rel="prev" href="https://cache-tlb.github.io/spherical-interpolation/" /><link rel="next" href="https://cache-tlb.github.io/the-straw-that-broke-the-camels-back/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Linearly Transformed Cosines 积分部分推导",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/ltc-integral\/"
+        },"genre": "posts","wordcount":  895 ,
+        "url": "https:\/\/cache-tlb.github.io\/ltc-integral\/","datePublished": "2022-08-12T13:28:03+08:00","dateModified": "2022-08-12T13:28:03+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">Linearly Transformed Cosines 积分部分推导</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-08-12">2022-08-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 895 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 2 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>用 LTC 计算多边形面光源对标准材质光照时需要计算一个积分式:
+$$
+\int_{P_o}{D_o(\omega_o)}\ \mathrm{d}\omega_o = \mathrm{E}(P_o) .
+$$
+这里 $P_o$ 表示原多边形面光源经过线性变换后的形状在单位球面上投影的区域, 因为积分变量$\omega_o$是单位向量, 所以需要将多边形的积分域投影到单位球面上. 被积函数为 $D_o(\omega_o = (x, y, z)) = \dfrac{1}{\pi}\max(0, z)$. 只要将球面上的积分域与$z^+$半球求交集, 作为新的积分域, 就可以将 $D_o$ 中的 $\max$ 函数去掉了. 这个积分有解析表达式, 原论文中没有给出推导, 而是直接给出结论:
+$$
+\mathrm{E}(p_1,\cdots,p_n) = \frac{1}{2\pi}\sum_{i=1}^{n}{\arccos( \langle p_i,p_j \rangle) \langle  \frac{p_i\times p_j}{||p_i\times p_j||}, [0,0,1]^T\rangle}
+$$
+其中 $p_1, \cdots, p_n$ 为多边形的各顶点在单位球面上投影的坐标, $j=(i+1)\ \mathrm{mod}\ n$, $\langle p_i, p_j \rangle$ 表示 $p_i$ 与 $p_j$ 的内积,  $p_i \times p_j$ 表示 $p_i$ 与 $p_j$ 的外积.</p>
+<p>如何推导呢?</p>
+<p>用球面坐标$(\theta,\phi)$表示球面上的点. 
+$$
+\begin{aligned} 
+x &amp;= \cos\theta\sin\phi \\ 
+y &amp;= \sin\theta\sin\phi \\ 
+z &amp;= \cos\phi
+\end{aligned} 
+$$
+分别求微分得到:
+$$
+\begin{aligned} 
+\mathrm{d}x &amp;= -\sin\theta\sin\phi\ \mathrm{d}\theta + \cos\theta\cos\phi\ \mathrm{d}\phi \\ 
+\mathrm{d}y &amp;= \cos\theta\sin\phi\ \mathrm{d}\theta + \sin\theta\cos\phi\ \mathrm{d}\phi\\ 
+\mathrm{d}z &amp;= -\sin\phi\ \mathrm{d}\phi
+\end{aligned} 
+$$
+将 $\mathrm{d}x$ 和 $\mathrm{d}y$ 的表达式分别乘以 $-\sin\theta$ 和 $\cos\theta$ 并相加, 得:
+$$
+\cos\theta\ \mathrm{d}y - \sin\theta\ \mathrm{d}x = \sin\phi\ \mathrm{d}\theta \qquad\cdots\qquad (1)
+$$</p>
+<p>回到原积分问题, 要求的是 
+$$
+\begin{aligned}
+\mathrm{E}(P_o) &amp;= \int_{P_o}{D_o(\omega_o)}\ \mathrm{d}\omega_o = \iint_{P_o}{\frac{1}{\pi}\cdot z\ \sin\phi\ \mathrm{d}\phi\mathrm{d}\theta}\\ 
+2\pi\cdot\mathrm{E}(P_o) &amp;= \iint_{P_o}2\ \cos\phi\ \sin\phi\ \mathrm{d}\phi\mathrm{d}\theta = \iint_{P_o}\sin{2\phi}\ \mathrm{d}\phi\mathrm{d}\theta
+\end{aligned}
+$$
+令 
+$$
+P = \frac{1}{2}(1-\cos{2\phi}) = \sin^2\phi, \qquad Q = 0
+$$
+则
+$$
+\frac{\partial P}{\partial\phi} - \frac{\partial Q}{\partial\theta} = \sin{2\phi}
+$$
+根据格林公式有
+$$
+\begin{aligned}
+I = 2\pi\cdot\mathrm{E}(P_o) &amp;= \iint_{P_o}\sin{2\phi}\ \mathrm{d}\phi\mathrm{d}\theta = \iint_{P_o}\left(\frac{\partial P}{\partial\phi} - \frac{\partial Q}{\partial\theta}\right)\ \mathrm{d}\phi\mathrm{d}\theta \\ 
+&amp;= \oint_{\partial P_o} \left(P\ \mathrm{d}\theta + Q\ \mathrm{d}\phi \right) = \oint_{\partial P_o} {\sin^2\phi}\ \mathrm{d}\theta
+\end{aligned}
+$$
+这里 $\partial P_o$ 表示球面上多边形投影区域$P_o$的边界. 由 (1) 式可进一步得到:
+$$
+I = \oint_{\partial P_o}\sin\phi(\cos\theta\ \mathrm{d}y - \sin\theta\ \mathrm{d}x) = \oint_{\partial P_o}x\ \mathrm{d}y - y\ \mathrm{d}x = \sum_{i=1}^{n}\int_{\overset{\frown}{p_ip_j}} x\ \mathrm{d}y - y\ \mathrm{d}x
+$$
+沿着闭曲线的积分被拆成了逐段曲线积分, 每一段积分的路径 $\overset{\frown}{p_ip_j}$ 表示 $p_i$ 和 $p_j$ 所在的大圆上从$p_i$ 到 $p_j$ 的一段圆弧, 其中 $j = (i+1)\ \mathrm{mod}\ n$.</p>
+<p>为了计算这一系列的曲线积分, 考虑每一段的参数方程, 由球面插值函数 slerp 可以得到第 $i$ 段曲线的参数方程为:
+$$
+f_i(t) = a_i(t) p_i + b_i(t) p_j = \frac{\sin (1-t)\alpha_i}{\sin\alpha_i} p_i + \frac{\sin t\alpha_i}{\sin\alpha_i} p_j
+$$
+其中 $\alpha_i = \arccos(\langle p_i,p_j \rangle)$ 为 $p_i$ 与 $p_j$ 之间的夹角, 或$p_i$ 到 $p_j$ 的大圆弧的圆心角. 在曲线 $\overset{\frown}{p_ip_j}$ 上, 有
+$$
+\begin{aligned}
+x\ \mathrm{d}y - y\ \mathrm{d}x &amp;= (a_ix_i+b_ix_j)(a'_iy_i+b'_iy_j)\mathrm{d}t - (a_iy_i+b_iy_j)(a'_ix_i+b'_ix_j)\mathrm{d}t\\ 
+&amp;= (a_ib'_i - a'_ib_i)(x_iy_j - y_ix_j)\mathrm{d}t
+\end{aligned}
+$$
+这里$(x_i,y_i,z_i)=p_i, (x_j,y_j,z_j)=p_j$ 为常数, $a_i, a'_i, b_i, b'_i$ 为 $t$ 的函数, 而
+$$
+\begin{aligned}
+a'_i(t) &amp;= \frac{1}{\sin\alpha_i}\cos(1-t)\alpha_i\cdot(-\alpha_i)\\ 
+b'_i(t) &amp;= \frac{1}{\sin\alpha_i}\cos t\alpha_i \cdot \alpha_i
+\end{aligned}
+$$
+于是
+$$
+\begin{aligned}
+a_ib'_i - a'_ib_i &amp;= \frac{\alpha_i}{\sin^2\alpha_i}\left(\sin(1-t)\alpha_i\cdot\cos t\alpha_i + \cos(1-t)\alpha_i\cdot\sin t\alpha_i\right)\\ 
+&amp;= \frac{\alpha_i}{\sin^2\alpha_i}\sin((1-t)\alpha_i + t\alpha_i)\\ 
+&amp;= \frac{\alpha_i}{\sin\alpha_i}
+\end{aligned}
+$$</p>
+<p>参数 $t$ 被消去了. 这样每段曲线积分的结果就是
+$$
+\begin{aligned}
+I_i &amp;= \int_{\overset{\frown}{p_ip_j}} x\ \mathrm{d}y - y\ \mathrm{d}x \\ 
+&amp;= \int_0^1(a_ib'_i - a'_ib_i)(x_iy_j - y_ix_j)\ \mathrm{d}t \\ 
+&amp;= \int_0^1 \frac{\alpha_i}{\sin\alpha_i}(x_iy_j - y_ix_j)\ \mathrm{d}t\\ 
+&amp;= \frac{\alpha_i}{\sin\alpha_i}(x_iy_j - y_ix_j)
+\end{aligned}
+$$
+注意到 $||p_i\times p_j|| = \sin\alpha_i$, 而 $x_iy_j - y_ix_j$ 正好是 $p_i\times p_j$ 的 $z$ 分量, 于是
+$$
+I_i = \frac{\arccos(\langle p_i,p_j \rangle)}{||p_i\times p_j||}\langle p_i\times p_j,[0,0,1]^T \rangle
+$$
+所求积分为 
+$$
+\mathrm{E}(P_o) = \frac{1}{2\pi}I = \frac{1}{2\pi}\sum_{i=1}^n \frac{\arccos(\langle p_i,p_j \rangle)}{||p_i\times p_j||}\langle p_i\times p_j,[0,0,1]^T \rangle
+$$</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2022-08-12</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/spherical-interpolation/" class="prev" rel="prev" title="球面插值函数 slerp 推导"><i class="fas fa-angle-left fa-fw"></i>球面插值函数 slerp 推导</a>
+            <a href="/the-straw-that-broke-the-camels-back/" class="next" rel="next" title="压垮骆驼的最后一根稻草">压垮骆驼的最后一根稻草<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

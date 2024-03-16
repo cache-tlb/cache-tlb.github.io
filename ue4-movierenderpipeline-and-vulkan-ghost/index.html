@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>UE4 MovieRenderPipeline 以及在 Vulkan 下的重影问题 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="UE4 MovieRenderPipeline 以及在 Vulkan 下的重影问题" />
+<meta property="og:description" content="最近在折腾用 Linux 的集群做 UE4 的离屏渲染（off-screen rendering）。UE4 官方提供了一个用于渲染过场动画的 Movie Render Queue 插件。 虽然还只是 Beta" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/ue4-movierenderpipeline-and-vulkan-ghost/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-10-29T20:03:05&#43;08:00" />
+<meta property="article:modified_time" content="2021-10-29T20:03:05&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="UE4 MovieRenderPipeline 以及在 Vulkan 下的重影问题"/>
+<meta name="twitter:description" content="最近在折腾用 Linux 的集群做 UE4 的离屏渲染（off-screen rendering）。UE4 官方提供了一个用于渲染过场动画的 Movie Render Queue 插件。 虽然还只是 Beta"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/ue4-movierenderpipeline-and-vulkan-ghost/" /><link rel="prev" href="https://cache-tlb.github.io/watch-game-review/" /><link rel="next" href="https://cache-tlb.github.io/reservoir-sampling/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "UE4 MovieRenderPipeline 以及在 Vulkan 下的重影问题",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/ue4-movierenderpipeline-and-vulkan-ghost\/"
+        },"genre": "posts","wordcount":  4537 ,
+        "url": "https:\/\/cache-tlb.github.io\/ue4-movierenderpipeline-and-vulkan-ghost\/","datePublished": "2021-10-29T20:03:05+08:00","dateModified": "2021-10-29T20:03:05+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">UE4 MovieRenderPipeline 以及在 Vulkan 下的重影问题</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%BC%80%E5%8F%91/"><i class="far fa-folder fa-fw"></i>开发</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-10-29">2021-10-29</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4537 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 10 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>最近在折腾用 Linux 的集群做 UE4 的离屏渲染（off-screen rendering）。UE4 官方提供了一个用于渲染过场动画的 Movie Render Queue 插件。
+虽然还只是 Beta 版，但主要功能已经能用并且能满足离线出片的基础需求，有现成的为什么不用呢？</p>
+<p>Movie Render Queue 在编辑器里是一个非常简单的窗口，用户选择一个或多个 LevelSequence，然后发起渲染。可以是本机或远程渲染。
+这里的 LevelSequence 是一种 UE4 的资源文件，它描述了动画里的每一个镜头（camera cut）的起止帧、相机参数，还有每个 Actor 的关键帧数据，比如 CameraActor 就只有平移、旋转、缩放，而 CineCameraActor 在此基础上还可以设焦距。
+此外还可以指定在某一帧触发蓝图，播放骨骼动画，等等。
+它的输出功能也十分强大，除了最终渲染结果，还可以保存渲染的中间结果，比如 Lighting Only，Unlit，甚至 Object Id 都可以存下来。这对于做深度学习的朋友来说又多了一条生成数据的途径。古有用 GTA5 生成的图像数据训练自动驾驶，今有用 UE4 的 Movie Render Queue 生成数据做视频语义分割，我们都有光明的未来。</p>
+<p>这些都是题外话。</p>
+<p>Movie Render Queue 的功能也开放了对应的调用接口，用户可以在蓝图中发起渲染任务，效果跟在编辑器中操作一样，具体做法请参考<a href="https://docs.unrealengine.com/4.26/en-US/AnimatingObjects/Sequencer/Workflow/RenderAndExport/HighQualityMediaExport/RuntimeBuilds/" target="_blank" rel="noopener noreffer">官方文档</a>。
+蓝图里需要指定必要的输入信息，包括 LevelSequence 路径，拍摄场景的 Map 路径，输出的图像格式、分辨率，输出目录等等。
+值得一提的是，这里发起渲染任务的蓝图可以在离屏模式下运行，这正是我们所需要的。</p>
+<p>我们将官方文档的蓝图翻译成 C++ 代码，加入到我们定制的管线中，大功告成，在 Windows 下打包测试，一切正常，十分顺利。中间有一个小插曲是如何动态生成 LevelSequence 和如何指定使用当前运行中的 Map 进行拍摄（编辑器和蓝图版本中指定一个 Map 的含义是重新加载该 Map 到 Movie Render Pipeline 里并渲染，所以当前场景中的任何修改在渲染出来的结果中都是无法体现的。好在 C++ 代码里暴露了更多选项以满足我们的需求），然而这些都不是重点。</p>
+<p>上 Linux 一测立刻发现问题：所有输出的图像都出现了 ghost，即在每一帧的图像都有上一帧的残影。
+因为 Linux 下渲染使用的 RHI 是 Vulkan，所以我第一时间又在 Windows 下用 Vulkan 跑了一遍，也是同样的问题。不甘心的我又在官方自带的 Blank 场景，自己构造了一个简单的 LevelSequence，只不过换成用 Vulkan 运行，也有同样的问题，但同样的情况用 DX 就是正常的，这就排除了我们自己的场景和设置的原因。就是说 Windows 下 DX11 和 Vulkan 拍的效果不一致。直觉告诉我麻烦可能有点大。</p>
+<p>又做了一些简单尝试，仍没有什么实质性的进展，只好硬着头皮看代码了。
+找来找去发现可以通过设置输出每个 spatial sample 对应的渲染图，进而发现 Vulkan 下前 3 张图像是全黑的，以后每一帧的 sample 都会落后 3 张图，比如第一帧的最后 3 个 sample 会算作第二帧前 3 个 sample，以此类推。前几帧这个规律还比较稳定，帧数多了之后前后帧的 sample 完全混在一起，不能用简单把所有sample都往前挪 3 个这样的 ad-hoc 的方法粗暴解决。于是继续看代码，梳理逻辑。</p>
+<p>代码可以从 <code>void UMoviePipeline::RenderFrame()</code> 函数入手，有一个 for 循环，对每个 spatial sample 调用一次 <code>RenderPass-&gt;RenderSample_GameThread(SampleState)</code>，
+这里的 RenderPass 指的是 Movie Pipeline 保存哪些 pass 的内容，比如 Deferred Base，Unlit，Light Only，等等。
+最常用的就是 Deferred Base，也就是 Deferred Rendering 最终输出的颜色。
+<code>RenderSample_GameThread</code> 函数最终会调用到对应 RenderPass 的 <code>RenderSample_GameThreadImpl</code>函数。
+对于 <code>UMoviePipelineDeferredPassBase</code> 来说，逻辑如下：
+首先将场景渲染到 RenderTarget 上，接着将 RenderTarget 的内容拷贝到纹理 ReadbackTexture，然后回读 ReadbackTexture 到内存，最后把内存的图像数据做累加。
+这里涉及到几个线程：主线程（Game Thread）上跑的是整个引擎的主循环，负责调用游戏各个系统的更新逻辑。
+渲染线程（Render Thread）可以看成是一个处理任务队列的线程，别的线程发来一个命令就处理一个。通常是主线程根据场景中要画的物体提交一系列渲染任务放在渲染线程执行。
+主线程提交到渲染线程的任务的执行顺序跟提交顺序是一致的。</p>
+<p><code>RenderSample_GameThreadImpl</code>函数从名字上看是要执行在主线程上，对应的代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="n">UMoviePipelineDeferredPassBase</span><span class="o">::</span><span class="n">RenderSample_GameThreadImpl</span><span class="p">(</span><span class="k">const</span> <span class="n">FMoviePipelineRenderPassMetrics</span><span class="o">&amp;</span> <span class="n">InSampleState</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Super</span><span class="o">::</span><span class="n">RenderSample_GameThreadImpl</span><span class="p">(</span><span class="n">InSampleState</span><span class="p">);</span>
+
+    <span class="c1">// Wait for a surface to be available to write to. This will stall the game thread while the RHI/Render Thread catch up.
+</span><span class="c1"></span>	<span class="p">{</span>
+		<span class="n">SCOPE_CYCLE_COUNTER</span><span class="p">(</span><span class="n">STAT_MoviePipeline_WaitForAvailableSurface</span><span class="p">);</span>
+		<span class="n">SurfaceQueue</span><span class="o">-&gt;</span><span class="n">BlockUntilAnyAvailable</span><span class="p">();</span>
+	<span class="p">}</span>
+
+    <span class="c1">// 省略了一些准备工作代码
+</span><span class="c1"></span>    <span class="c1">// ...
+</span><span class="c1"></span>
+    <span class="n">FRenderTarget</span><span class="o">*</span> <span class="n">RenderTarget</span> <span class="o">=</span> <span class="n">GetViewRenderTarget</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GameThread_GetRenderTargetResource</span><span class="p">();</span>
+    <span class="n">FCanvas</span> <span class="n">Canvas</span> <span class="o">=</span> <span class="n">FCanvas</span><span class="p">(</span><span class="n">RenderTarget</span><span class="p">,</span> <span class="k">nullptr</span><span class="p">,</span> <span class="n">GetPipeline</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="n">ERHIFeatureLevel</span><span class="o">::</span><span class="n">SM5</span><span class="p">,</span> <span class="n">FCanvas</span><span class="o">::</span><span class="n">CDM_DeferDrawing</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+    <span class="n">GetRendererModule</span><span class="p">().</span><span class="n">BeginRenderingViewFamily</span><span class="p">(</span><span class="o">&amp;</span><span class="n">Canvas</span><span class="p">,</span> <span class="n">ViewFamily</span><span class="p">.</span><span class="n">Get</span><span class="p">());</span>
+
+    <span class="c1">// Readback + Accumulate.
+</span><span class="c1"></span>    <span class="n">PostRendererSubmission</span><span class="p">(</span><span class="n">InOutSampleState</span><span class="p">,</span> <span class="n">PassIdentifier</span><span class="p">,</span> <span class="n">GetOutputFileSortingOrder</span><span class="p">(),</span> <span class="n">Canvas</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>它首先会等待 SurfaceQueue。
+SurfaceQueue 存了一些 ReadbackTexture，当主线程超前渲染线程太多帧，所有的 ReadbackTexture 都在被占用，就需要阻塞主线程，直到有可用的。
+然后获得一个 RenderTarget，用来承接渲染结果。
+接着调用了 <code>BeginRenderingViewFamily</code> 函数，可以看成是提交了整个场景渲染的全部命令到渲染线程。这些命令一旦执行完，我们指定的 RenderTarget 上就有渲染结果了。</p>
+<p><code>PostRendererSubmission</code> 函数提交了额外的命令到渲染线程，以便于将 RenderTarget 上的图像内容复制到 ReadbackTexture 上，并回读到内存中，后续好做累加并存文件。
+代码逻辑如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="n">UMoviePipelineDeferredPassBase</span><span class="o">::</span><span class="n">PostRendererSubmission</span><span class="p">(</span><span class="k">const</span> <span class="n">FMoviePipelineRenderPassMetrics</span><span class="o">&amp;</span> <span class="n">InSampleState</span><span class="p">,</span> <span class="k">const</span> <span class="n">FMoviePipelinePassIdentifier</span> <span class="n">InPassIdentifier</span><span class="p">,</span> <span class="k">const</span> <span class="n">int32</span> <span class="n">InSortingOrder</span><span class="p">,</span> <span class="n">FCanvas</span><span class="o">&amp;</span> <span class="n">InCanvas</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// 准备工作，代码略
+</span><span class="c1"></span>    <span class="c1">// ...
+</span><span class="c1"></span>
+    <span class="n">MoviePipeline</span><span class="o">::</span><span class="n">FImageSampleAccumulationArgs</span> <span class="n">AccumulationArgs</span><span class="p">;</span>
+	<span class="p">{</span>
+		<span class="n">AccumulationArgs</span><span class="p">.</span><span class="n">OutputMerger</span> <span class="o">=</span> <span class="n">GetPipeline</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">OutputBuilder</span><span class="p">;</span>
+		<span class="n">AccumulationArgs</span><span class="p">.</span><span class="n">ImageAccumulator</span> <span class="o">=</span> <span class="n">StaticCastSharedPtr</span><span class="o">&lt;</span><span class="n">FImageOverlappedAccumulator</span><span class="o">&gt;</span><span class="p">(</span><span class="n">SampleAccumulator</span><span class="o">-&gt;</span><span class="n">Accumulator</span><span class="p">);</span>
+		<span class="n">AccumulationArgs</span><span class="p">.</span><span class="n">bAccumulateAlpha</span> <span class="o">=</span> <span class="n">bAccumulatorIncludesAlpha</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="k">auto</span> <span class="n">Callback</span> <span class="o">=</span> <span class="p">[</span><span class="k">this</span><span class="p">,</span> <span class="n">FramePayload</span><span class="p">,</span> <span class="n">AccumulationArgs</span><span class="p">,</span> <span class="n">SampleAccumulator</span><span class="p">](</span><span class="n">TUniquePtr</span><span class="o">&lt;</span><span class="n">FImagePixelData</span><span class="o">&gt;&amp;&amp;</span> <span class="n">InPixelData</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="kt">bool</span> <span class="n">bFinalSample</span> <span class="o">=</span> <span class="n">FramePayload</span><span class="o">-&gt;</span><span class="n">IsLastTile</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">FramePayload</span><span class="o">-&gt;</span><span class="n">IsLastTemporalSample</span><span class="p">();</span>
+		<span class="kt">bool</span> <span class="n">bFirstSample</span> <span class="o">=</span> <span class="n">FramePayload</span><span class="o">-&gt;</span><span class="n">IsFirstTile</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">FramePayload</span><span class="o">-&gt;</span><span class="n">IsFirstTemporalSample</span><span class="p">();</span>
+
+		<span class="n">FMoviePipelineBackgroundAccumulateTask</span> <span class="n">Task</span><span class="p">;</span>
+		<span class="c1">// There may be other accumulations for this accumulator which need to be processed first
+</span><span class="c1"></span>		<span class="n">Task</span><span class="p">.</span><span class="n">LastCompletionEvent</span> <span class="o">=</span> <span class="n">SampleAccumulator</span><span class="o">-&gt;</span><span class="n">TaskPrereq</span><span class="p">;</span>
+
+		<span class="n">FGraphEventRef</span> <span class="n">Event</span> <span class="o">=</span> <span class="n">Task</span><span class="p">.</span><span class="n">Execute</span><span class="p">([</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">MoveTemp</span><span class="p">(</span><span class="n">InPixelData</span><span class="p">),</span> <span class="n">AccumulationArgs</span><span class="p">,</span> <span class="n">bFinalSample</span><span class="p">,</span> <span class="n">SampleAccumulator</span><span class="p">]()</span> <span class="k">mutable</span>
+		<span class="p">{</span>
+			<span class="c1">// Enqueue a encode for this frame onto our worker thread.
+</span><span class="c1"></span>			<span class="n">MoviePipeline</span><span class="o">::</span><span class="n">AccumulateSample_TaskThread</span><span class="p">(</span><span class="n">MoveTemp</span><span class="p">(</span><span class="n">PixelData</span><span class="p">),</span> <span class="n">AccumulationArgs</span><span class="p">);</span>
+			<span class="k">if</span> <span class="p">(</span><span class="n">bFinalSample</span><span class="p">)</span>
+			<span class="p">{</span>
+				<span class="c1">// Final sample has now been executed, break the pre-req chain and free the accumulator for reuse.
+</span><span class="c1"></span>				<span class="n">SampleAccumulator</span><span class="o">-&gt;</span><span class="n">bIsActive</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+				<span class="n">SampleAccumulator</span><span class="o">-&gt;</span><span class="n">TaskPrereq</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">});</span>
+		<span class="n">SampleAccumulator</span><span class="o">-&gt;</span><span class="n">TaskPrereq</span> <span class="o">=</span> <span class="n">Event</span><span class="p">;</span>
+
+		<span class="k">this</span><span class="o">-&gt;</span><span class="n">OutstandingTasks</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">Event</span><span class="p">);</span>
+	<span class="p">};</span>
+
+	<span class="n">FRenderTarget</span><span class="o">*</span> <span class="n">RenderTarget</span> <span class="o">=</span> <span class="n">InCanvas</span><span class="p">.</span><span class="n">GetRenderTarget</span><span class="p">();</span>
+
+	<span class="n">ENQUEUE_RENDER_COMMAND</span><span class="p">(</span><span class="n">CanvasRenderTargetResolveCommand</span><span class="p">)(</span>
+		<span class="p">[</span><span class="n">LocalSurfaceQueue</span><span class="p">,</span> <span class="n">FramePayload</span><span class="p">,</span> <span class="n">Callback</span><span class="p">,</span> <span class="n">RenderTarget</span><span class="p">](</span><span class="n">FRHICommandListImmediate</span><span class="o">&amp;</span> <span class="n">RHICmdList</span><span class="p">)</span> <span class="k">mutable</span>
+		<span class="p">{</span>
+			<span class="c1">// Enqueue a encode for this frame onto our worker thread.
+</span><span class="c1"></span>			<span class="n">LocalSurfaceQueue</span><span class="o">-&gt;</span><span class="n">OnRenderTargetReady_RenderThread</span><span class="p">(</span><span class="n">RenderTarget</span><span class="o">-&gt;</span><span class="n">GetRenderTargetTexture</span><span class="p">(),</span> <span class="n">FramePayload</span><span class="p">,</span> <span class="n">MoveTemp</span><span class="p">(</span><span class="n">Callback</span><span class="p">));</span>
+		<span class="p">});</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其核心就是最后一句 <code>ENQUEUE_RENDER_COMMAND</code>，往渲染线程加入一个任务。
+所以到此为止场景还没有开始渲染，要等渲染线程中的渲染场景的命令执行完才能拿到渲染结果（其实也不是真正执行完，渲染指令会由 RHI Command List 交给 RHI 线程执行）。
+为了保证时序，将 RenderTarget 拷到 ReadbackTexture 的任务也需要放在渲染线程，往任务队列加入一个命令。
+这个命令实际上就是调用 <code>FMoviePipelineSurfaceQueue::OnRenderTargetReady_RenderThread</code>函数。从名字也可以看出来，这个函数要执行在渲染线程。
+函数定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="n">FMoviePipelineSurfaceQueue</span><span class="o">::</span><span class="n">OnRenderTargetReady_RenderThread</span><span class="p">(</span><span class="k">const</span> <span class="n">FTexture2DRHIRef</span> <span class="n">InRenderTarget</span><span class="p">,</span> <span class="n">TSharedRef</span><span class="o">&lt;</span><span class="n">FImagePixelDataPayload</span><span class="p">,</span> <span class="n">ESPMode</span><span class="o">::</span><span class="n">ThreadSafe</span><span class="o">&gt;</span> <span class="n">InFramePayload</span><span class="p">,</span> <span class="n">TUniqueFunction</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">(</span><span class="n">TUniquePtr</span><span class="o">&lt;</span><span class="n">FImagePixelData</span><span class="o">&gt;&amp;&amp;</span><span class="p">)</span><span class="o">&gt;&amp;&amp;</span> <span class="n">InFunctionCallback</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">ensure</span><span class="p">(</span><span class="n">IsInRenderingThread</span><span class="p">());</span>
+
+	<span class="c1">// Pick the next destination surface and ensure it&#39;s available.
+</span><span class="c1"></span>	<span class="n">FResolveSurface</span><span class="o">*</span> <span class="n">NextResolveTarget</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">Surfaces</span><span class="p">[</span><span class="n">CurrentFrameIndex</span><span class="p">];</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">NextResolveTarget</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">IsAvailable</span><span class="p">())</span>
+	<span class="p">{</span>
+		<span class="c1">// BlockUntilAnyAvailable should have been called before submitting more work. We can&#39;t block
+</span><span class="c1"></span>		<span class="c1">// until a surface is available in this callback because we&#39;d be waiting on the render thread
+</span><span class="c1"></span>		<span class="c1">// from the render thread.
+</span><span class="c1"></span>		<span class="n">check</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">NextResolveTarget</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
+	<span class="n">NextResolveTarget</span><span class="o">-&gt;</span><span class="n">FunctionCallback</span> <span class="o">=</span> <span class="n">MoveTemp</span><span class="p">(</span><span class="n">InFunctionCallback</span><span class="p">);</span>
+	<span class="n">NextResolveTarget</span><span class="o">-&gt;</span><span class="n">FunctionPayload</span> <span class="o">=</span> <span class="n">InFramePayload</span><span class="p">;</span>
+
+	<span class="c1">// Queue this sample to be copied to the target surface.
+</span><span class="c1"></span>	<span class="n">NextResolveTarget</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">ResolveSampleToReadbackTexture_RenderThread</span><span class="p">(</span><span class="n">InRenderTarget</span><span class="p">);</span>
+
+	<span class="c1">// By the time we get to this point, our oldest surface should have successfully been rendered to, and no longer be in use by the GPU.
+</span><span class="c1"></span>	<span class="c1">// We can now safely map the surface and copy the data out of it without causing a GPU stall.
+</span><span class="c1"></span>	<span class="p">{</span>
+		<span class="k">const</span> <span class="n">int32</span> <span class="n">PrevCaptureIndexOffset</span> <span class="o">=</span> <span class="n">FMath</span><span class="o">::</span><span class="n">Clamp</span><span class="p">(</span><span class="n">FrameResolveLatency</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Surfaces</span><span class="p">.</span><span class="n">Num</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+
+		<span class="c1">// Get PrevCaptureIndexOffset surfaces back, handling wraparound at 0.
+</span><span class="c1"></span>		<span class="k">const</span> <span class="n">int32</span> <span class="n">PrevCaptureIndex</span> <span class="o">=</span> <span class="p">(</span><span class="n">CurrentFrameIndex</span> <span class="o">-</span> <span class="n">PrevCaptureIndexOffset</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="n">Surfaces</span><span class="p">.</span><span class="n">Num</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">PrevCaptureIndexOffset</span> <span class="o">-</span> <span class="n">CurrentFrameIndex</span><span class="p">)</span> <span class="o">:</span> <span class="p">(</span><span class="n">CurrentFrameIndex</span> <span class="o">-</span> <span class="n">PrevCaptureIndexOffset</span><span class="p">);</span>
+
+		<span class="n">FResolveSurface</span><span class="o">*</span> <span class="n">OldestResolveTarget</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">Surfaces</span><span class="p">[</span><span class="n">PrevCaptureIndex</span><span class="p">];</span>
+
+		<span class="c1">// Only try to do the readback if the target has ever been written to.
+</span><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="n">OldestResolveTarget</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">WasEverQueued</span><span class="p">())</span>
+		<span class="p">{</span>
+			<span class="n">SCOPE_CYCLE_COUNTER</span><span class="p">(</span><span class="n">STAT_MoviePipeline_SurfaceReadback</span><span class="p">);</span>
+			<span class="n">OldestResolveTarget</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">CopyReadbackTexture_RenderThread</span><span class="p">(</span><span class="n">MoveTemp</span><span class="p">(</span><span class="n">OldestResolveTarget</span><span class="o">-&gt;</span><span class="n">FunctionCallback</span><span class="p">),</span> <span class="n">OldestResolveTarget</span><span class="o">-&gt;</span><span class="n">FunctionPayload</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+
+	<span class="c1">// Write to the next available surface next time.
+</span><span class="c1"></span>	<span class="n">CurrentFrameIndex</span> <span class="o">=</span> <span class="p">(</span><span class="n">CurrentFrameIndex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">Surfaces</span><span class="p">.</span><span class="n">Num</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>本质上做了两件事：一是拷贝 RenderTarget 到 ReadbackTexture（代码中的 FResolveSurface 类），二是回读 ReadbackTexture 到内存。
+对应的函数分别是 <code>ResolveSampleToReadbackTexture_RenderThread</code> 和 <code>CopyReadbackTexture_RenderThread</code>。
+但仔细一点看可以发现这两个 ReadbackTexture 并不是同一个。实际上 FMoviePipelineSurfaceQueue 类里存了 3 份 FResolveSurface。
+第 0 帧将 RenderTarget_0 拷贝到 ReadbackTexture_0，并尝试回读 ReadbackTexture_2，但因为还没有 RenderTarget 拷贝到 ReadbackTexture_2 上面过，所以没有回读。
+第 1 帧将 RenderTarget_1 拷贝到 ReadbackTexture_1，并将 ReadbackTexture_0 回读。
+第 2 帧将 RenderTarget_2 拷贝到 ReadbackTexture_2，并将 ReadbackTexture_1 回读。等等。</p>
+<p>之前将每个 spatial sample 图像存出来发现有 3 帧的延迟，可能就跟 3 组 FResolveSurface 有关。
+<code>ResolveSampleToReadbackTexture_RenderThread</code> 拷贝 RenderTarget 的做法是用后处理的做法画一个全屏四边形逐像素复制的。
+<code>CopyReadbackTexture_RenderThread</code> 先是回读到内存，然后调用一个回调函数做 spatial sample 的累加，代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="n">FMoviePipelineSurfaceReader</span><span class="o">::</span><span class="n">CopyReadbackTexture_RenderThread</span><span class="p">(</span><span class="n">TUniqueFunction</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">(</span><span class="n">TUniquePtr</span><span class="o">&lt;</span><span class="n">FImagePixelData</span><span class="o">&gt;&amp;&amp;</span><span class="p">)</span><span class="o">&gt;&amp;&amp;</span> <span class="n">InFunctionCallback</span><span class="p">,</span> <span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FImagePixelDataPayload</span><span class="p">,</span> <span class="n">ESPMode</span><span class="o">::</span><span class="n">ThreadSafe</span><span class="o">&gt;</span> <span class="n">InFramePayload</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">// We use GetModuleChecked here to avoid accidentally loading the module from the non-main thread.
+</span><span class="c1"></span>	<span class="k">static</span> <span class="k">const</span> <span class="n">FName</span> <span class="nf">RendererModuleName</span><span class="p">(</span><span class="s">&#34;Renderer&#34;</span><span class="p">);</span>
+	<span class="n">IRendererModule</span><span class="o">*</span> <span class="n">RendererModule</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">FModuleManager</span><span class="o">::</span><span class="n">GetModuleChecked</span><span class="o">&lt;</span><span class="n">IRendererModule</span><span class="o">&gt;</span><span class="p">(</span><span class="n">RendererModuleName</span><span class="p">);</span>
+
+	<span class="n">FRHICommandListImmediate</span><span class="o">&amp;</span> <span class="n">RHICmdList</span> <span class="o">=</span> <span class="n">GetImmediateCommandList_ForRenderCommand</span><span class="p">();</span>
+	<span class="p">{</span>
+		<span class="kt">void</span><span class="o">*</span> <span class="n">ColorDataBuffer</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+
+		<span class="n">int32</span> <span class="n">ActualSizeX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ActualSizeY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+		<span class="n">RHICmdList</span><span class="p">.</span><span class="n">MapStagingSurface</span><span class="p">(</span><span class="n">ReadbackTexture</span><span class="p">,</span> <span class="n">ColorDataBuffer</span><span class="p">,</span> <span class="n">ActualSizeX</span><span class="p">,</span> <span class="n">ActualSizeY</span><span class="p">);</span>
+		<span class="n">int32</span> <span class="n">ExpectedSizeX</span> <span class="o">=</span> <span class="n">Size</span><span class="p">.</span><span class="n">X</span><span class="p">;</span>
+		<span class="n">int32</span> <span class="n">ExpectedSizeY</span> <span class="o">=</span> <span class="n">Size</span><span class="p">.</span><span class="n">Y</span><span class="p">;</span>
+
+		<span class="n">TUniquePtr</span><span class="o">&lt;</span><span class="n">FImagePixelData</span><span class="o">&gt;</span> <span class="n">PixelData</span><span class="p">;</span>
+		<span class="n">uint8</span><span class="o">*</span> <span class="n">TypeErasedPixels</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+		<span class="n">int32</span> <span class="n">SizeOfColor</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+		<span class="k">switch</span> <span class="p">(</span><span class="n">PixelFormat</span><span class="p">)</span>
+		<span class="p">{</span>
+		<span class="k">case</span> <span class="n">EPixelFormat</span><span class="o">::</span><span class="nl">PF_FloatRGBA</span><span class="p">:</span>
+		<span class="p">{</span>
+			<span class="n">TUniquePtr</span><span class="o">&lt;</span><span class="n">TImagePixelData</span><span class="o">&lt;</span><span class="n">FFloat16Color</span><span class="o">&gt;&gt;</span> <span class="n">NewPixelData</span> <span class="o">=</span> <span class="n">MakeUnique</span> <span class="o">&lt;</span> <span class="n">TImagePixelData</span><span class="o">&lt;</span><span class="n">FFloat16Color</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">FIntPoint</span><span class="p">(</span><span class="n">Size</span><span class="p">.</span><span class="n">X</span><span class="p">,</span> <span class="n">Size</span><span class="p">.</span><span class="n">Y</span><span class="p">),</span> <span class="n">InFramePayload</span><span class="p">);</span>
+			<span class="n">NewPixelData</span><span class="o">-&gt;</span><span class="n">Pixels</span><span class="p">.</span><span class="n">SetNumUninitialized</span><span class="p">(</span><span class="n">ExpectedSizeX</span> <span class="o">*</span> <span class="n">ExpectedSizeY</span><span class="p">);</span>
+			<span class="n">SizeOfColor</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">FFloat16Color</span><span class="p">);</span>
+			<span class="n">TypeErasedPixels</span> <span class="o">=</span> <span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="n">uint8</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">NewPixelData</span><span class="o">-&gt;</span><span class="n">Pixels</span><span class="p">.</span><span class="n">GetData</span><span class="p">());</span>
+			<span class="n">PixelData</span> <span class="o">=</span> <span class="n">MoveTemp</span><span class="p">(</span><span class="n">NewPixelData</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">case</span> <span class="n">EPixelFormat</span><span class="o">::</span><span class="nl">PF_B8G8R8A8</span><span class="p">:</span>
+		<span class="p">{</span>
+            <span class="c1">// 略
+</span><span class="c1"></span>		<span class="p">}</span>
+		<span class="k">default</span><span class="o">:</span>
+			<span class="n">check</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// Unsupported, add a new switch statement.
+</span><span class="c1"></span>		<span class="p">}</span>
+
+
+		<span class="c1">// Due to padding, the actual size might be larger than the expected size. If they are the same, do a block copy. Otherwise copy
+</span><span class="c1"></span>		<span class="c1">// line by line.
+</span><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="n">ExpectedSizeX</span> <span class="o">==</span> <span class="n">ActualSizeX</span> <span class="o">&amp;&amp;</span> <span class="n">ExpectedSizeY</span> <span class="o">==</span> <span class="n">ActualSizeY</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="n">FMemory</span><span class="o">::</span><span class="n">BigBlockMemcpy</span><span class="p">(</span><span class="n">TypeErasedPixels</span><span class="p">,</span> <span class="n">ColorDataBuffer</span><span class="p">,</span> <span class="p">(</span><span class="n">ExpectedSizeX</span> <span class="o">*</span> <span class="n">ExpectedSizeY</span><span class="p">)</span> <span class="o">*</span> <span class="n">SizeOfColor</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">else</span>
+		<span class="p">{</span>
+            <span class="c1">// 略
+</span><span class="c1"></span>		<span class="p">}</span>
+
+		<span class="c1">// Enqueue the Unmap before we broadcast the resulting pixels, though the broadcast shouldn&#39;t do anything blocking.
+</span><span class="c1"></span>		<span class="n">RHICmdList</span><span class="p">.</span><span class="n">UnmapStagingSurface</span><span class="p">(</span><span class="n">ReadbackTexture</span><span class="p">);</span>
+
+		<span class="n">InFunctionCallback</span><span class="p">(</span><span class="n">MoveTemp</span><span class="p">(</span><span class="n">PixelData</span><span class="p">));</span>
+
+		<span class="c1">// Now that we&#39;ve successfully used the surface, we trigger the Available event so that we can reuse this surface. This
+</span><span class="c1"></span>		<span class="c1">// triggers the Available event and then returns it to the pool.
+</span><span class="c1"></span>		<span class="n">Reset</span><span class="p">();</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 <code>InFunctionCallback</code> 实际上就是之前在 <code>PostRendererSubmission</code> 里定义的 Callback。
+Callback里又生成了一个异步计算的任务，在其中调用 <code>AccumulateSample_TaskThread</code> 函数，除了累加之外，<code>AccumulateSample_TaskThread</code> 还会根据设置决定是否将每个累加的 sample 存盘。
+这里存盘又是通过 ImageWriteQueue 这个线程做的。涉及到异步的过程都有问题，于是将 Callback 和存盘都改成同步。
+并且在 <code>PostRendererSubmission</code> 后面用了一个 <code>FlushRenderingCommands()</code>，
+在 <code>ResolveSampleToReadbackTexture_RenderThread</code> 和 <code>CopyReadbackTexture_RenderThread</code> 加入 <code>RHICmdList.ImmediateFlush()</code>，
+前者是等待 RenderThread 的命令全部执行完，后者是强制让 RHI 执行现有的 Command List，并等待完成。
+结果问题依旧。</p>
+<p>难道是 Flush 的用法不对？笔者尝试在 UE4 的源码中搜索其他类似的带有回读纹理的代码，发现 <code>RHICmdList.MapStagingSurface</code> 的用法各有区别，别的地方有些是带了 Fence 参数，这里没有带。
+一路跟到 <code>FVulkanDynamicRHI::RHIMapStagingSurface</code> 函数，如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="n">FVulkanDynamicRHI</span><span class="o">::</span><span class="n">RHIMapStagingSurface</span><span class="p">(</span><span class="n">FRHITexture</span><span class="o">*</span> <span class="n">TextureRHI</span><span class="p">,</span> <span class="n">FRHIGPUFence</span><span class="o">*</span> <span class="n">FenceRHI</span><span class="p">,</span> <span class="kt">void</span><span class="o">*&amp;</span> <span class="n">OutData</span><span class="p">,</span> <span class="n">int32</span><span class="o">&amp;</span> <span class="n">OutWidth</span><span class="p">,</span> <span class="n">int32</span><span class="o">&amp;</span> <span class="n">OutHeight</span><span class="p">,</span> <span class="n">uint32</span> <span class="n">GPUIndex</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">FRHITexture2D</span><span class="o">*</span> <span class="n">TextureRHI2D</span> <span class="o">=</span> <span class="n">TextureRHI</span><span class="o">-&gt;</span><span class="n">GetTexture2D</span><span class="p">();</span>
+	<span class="n">check</span><span class="p">(</span><span class="n">TextureRHI2D</span><span class="p">);</span>
+	<span class="n">FVulkanTexture2D</span><span class="o">*</span> <span class="n">Texture2D</span> <span class="o">=</span> <span class="n">ResourceCast</span><span class="p">(</span><span class="n">TextureRHI2D</span><span class="p">);</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">FenceRHI</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">FenceRHI</span><span class="o">-&gt;</span><span class="n">Poll</span><span class="p">())</span>
+	<span class="p">{</span>
+		<span class="n">FRHICommandListExecutor</span><span class="o">::</span><span class="n">GetImmediateCommandList</span><span class="p">().</span><span class="n">ImmediateFlush</span><span class="p">(</span><span class="n">EImmediateFlushType</span><span class="o">::</span><span class="n">FlushRHIThread</span><span class="p">);</span>
+		<span class="n">Device</span><span class="o">-&gt;</span><span class="n">SubmitCommandsAndFlushGPU</span><span class="p">();</span>
+		<span class="n">FVulkanGPUFence</span><span class="o">*</span> <span class="n">Fence</span> <span class="o">=</span> <span class="n">ResourceCast</span><span class="p">(</span><span class="n">FenceRHI</span><span class="p">);</span>
+		<span class="n">Device</span><span class="o">-&gt;</span><span class="n">GetImmediateContext</span><span class="p">().</span><span class="n">GetCommandBufferManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">WaitForCmdBuffer</span><span class="p">(</span><span class="n">Fence</span><span class="o">-&gt;</span><span class="n">GetCmdBuffer</span><span class="p">());</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+		<span class="k">if</span><span class="p">(</span><span class="n">GVulkanFlushOnMapStaging</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="n">FRHICommandListExecutor</span><span class="o">::</span><span class="n">GetImmediateCommandList</span><span class="p">().</span><span class="n">ImmediateFlush</span><span class="p">(</span><span class="n">EImmediateFlushType</span><span class="o">::</span><span class="n">FlushRHIThread</span><span class="p">);</span>
+			<span class="n">Device</span><span class="o">-&gt;</span><span class="n">WaitUntilIdle</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+
+	<span class="n">check</span><span class="p">((</span><span class="n">Texture2D</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">UEFlags</span> <span class="o">&amp;</span> <span class="n">TexCreate_CPUReadback</span><span class="p">)</span> <span class="o">==</span> <span class="n">TexCreate_CPUReadback</span><span class="p">);</span>
+	<span class="n">OutData</span> <span class="o">=</span> <span class="n">Texture2D</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">GetMappedPointer</span><span class="p">();</span>
+	<span class="n">Texture2D</span><span class="o">-&gt;</span><span class="n">Surface</span><span class="p">.</span><span class="n">InvalidateMappedMemory</span><span class="p">();</span>
+	<span class="n">OutWidth</span> <span class="o">=</span> <span class="n">Texture2D</span><span class="o">-&gt;</span><span class="n">GetSizeX</span><span class="p">();</span>
+	<span class="n">OutHeight</span> <span class="o">=</span> <span class="n">Texture2D</span><span class="o">-&gt;</span><span class="n">GetSizeY</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果函数带了 Fence 参数会等待 Fence，不带 Fence 但设了 <code>GVulkanFlushOnMapStaging</code> 则会 Flush RHI Command List。
+否则就什么都不做，直接 Map。这也是本例的情况。
+看上去很容易出错的样子，可能会导致前面使用该纹理作为 RenderTarget 还没写完，后面就要将它回读了。
+渲染线程中，不管是场景渲染还是 <code>ResolveSampleToReadbackTexture</code> ，也都只是发了一个命令到 RHI 线程，实际执行 Vulkan API 在 RHI 线程。
+而 <code>RHIMapStagingSurface</code> 却是在渲染线程调用，所以 RHI 线程还没执行上一帧的渲染任务是合理的。</p>
+<p>下面的时序图说明了这几个线程之间的关系。</p>
+<a class="lightgallery" href="/ue4-movierenderpipeline-and-vulkan-ghost/mrq_threads.svg" title=" " data-thumbnail="/ue4-movierenderpipeline-and-vulkan-ghost/mrq_threads.svg">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="mrq_threads.svg"
+            data-srcset="/ue4-movierenderpipeline-and-vulkan-ghost/mrq_threads.svg, mrq_threads.svg 1.5x, /ue4-movierenderpipeline-and-vulkan-ghost/mrq_threads.svg 2x"
+            data-sizes="auto"
+            alt="/ue4-movierenderpipeline-and-vulkan-ghost/mrq_threads.svg" width="100%" />
+    </a>
+<p>从上到下表示时间行进方向，三列分别表示了三个线程。每个线程的数字表示执行的任务在逻辑上的帧号。实线箭头表示一个线程向另一个线程的任务队列里添加一组命令。
+通常来说，主线程向渲染线程提交命令是通过 <code>ENQUEUE_RENDER_COMMAND</code> 宏，渲染线程向 RHI 线程提交命令是通过 <code>RHICommandList</code> 的各个成员函数。
+但反过来，<code>RHICommandList</code> 也有一些成员函数实际调用的是带了 <code>_RenderThread</code> 后缀的函数，他们是在渲染线程运行的，而非 RHI 线程。</p>
+<p>在这个例子中，第 1 帧渲染线程的 CopyReadbackTexture 理论上应该等第 0 帧的 ResolveSampleToReadbackTexture 对应的 RHI 命令全部完成才能执行，但 Vulkan 版本没有等。只要 RHI 线程延迟足够大，回读到内存的图像就是上次残留的版本。
+先试试最简单的把 <code>GVulkanFlushOnMapStaging</code> 改成 true，只要启动时加上 <code>r.Vulkan.FlushOnMapStaging 1</code> 选项就行。</p>
+<p>居然就成功了。不过这会造成 CPU 和 GPU 占用率都过低。改用 Fence 试试，具体做法是为每个 ReadbackTexture 创建一个 Fence 对象，在 <code>ResolveSampleToReadbackTexture_RenderThread</code> 画全屏四边形的 pass 结束后调用 <code>RHICmdList.WriteGPUFence(Fence);</code>
+并且在 <code>CopyReadbackTexture_RenderThread</code> 里的 <code>RHICmdList.MapStagingSurface</code> 函数传入这个 Fence 作为参数。
+也正确了。因为用 Fence 可以不必清空 Command List，所以 CPU 和 GPU 的占用率也上去了。</p>
+<p>至此，Windows Vulkan 下的 Movie Pipeline 能正常工作了。到 Linux 上又有一些问题，
+比如每次必定触发 Fence 的等待，只好增加 ReadbackTexture （亦即SurfaceQueue）的个数，让 <code>ResolveSampleToReadbackTexture</code> 和 <code>CopyReadbackTexture</code> 之间间隔的帧数更多。
+这样又会造成莫名其妙 deadlock，不得不在必要的地方加上 <code>FlushRenderingCommands()</code>。</p>
+<p>终于 Linux 也能正常工作了，比起用设 r.Vulkan.FlushOnMapStaging 的方法，速度可以提升 3 倍。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2021-10-29</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/watch-game-review/" class="prev" rel="prev" title="[游戏评论] 透视"><i class="fas fa-angle-left fa-fw"></i>[游戏评论] 透视</a>
+            <a href="/reservoir-sampling/" class="next" rel="next" title="蓄水池采样算法">蓄水池采样算法<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

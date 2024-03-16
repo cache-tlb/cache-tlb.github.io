@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>GPT 使用体验 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="GPT 使用体验" />
+<meta property="og:description" content="最近 OpenAI 的对话类大语言模型产品 ChatGPT 异常火爆，以其出色的对话、信息归纳等能力，引发人们对通用人工智能、搜索引擎、人机交互的重新思考，有人甚至称它开" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/gpt-experience/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-03-20T19:20:22&#43;08:00" />
+<meta property="article:modified_time" content="2023-03-20T19:20:22&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="GPT 使用体验"/>
+<meta name="twitter:description" content="最近 OpenAI 的对话类大语言模型产品 ChatGPT 异常火爆，以其出色的对话、信息归纳等能力，引发人们对通用人工智能、搜索引擎、人机交互的重新思考，有人甚至称它开"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/gpt-experience/" /><link rel="prev" href="https://cache-tlb.github.io/wallis-product/" /><link rel="next" href="https://cache-tlb.github.io/radiosity/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "GPT 使用体验",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/gpt-experience\/"
+        },"genre": "posts","wordcount":  2095 ,
+        "url": "https:\/\/cache-tlb.github.io\/gpt-experience\/","datePublished": "2023-03-20T19:20:22+08:00","dateModified": "2023-03-20T19:20:22+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">GPT 使用体验</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/"><i class="far fa-folder fa-fw"></i>未分类</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-03-20">2023-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2095 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 5 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>最近 OpenAI 的对话类大语言模型产品 ChatGPT 异常火爆，以其出色的对话、信息归纳等能力，引发人们对通用人工智能、搜索引擎、人机交互的重新思考，有人甚至称它开启新一轮的工业革命。</p>
+<p>以下是笔者的几个简单测试问题，可以从中感受一二。首先是一个物理+哲学问题：</p>
+<blockquote>
+<p>Q: what is the purpose of the universe?</p>
+<p>A: The purpose of the universe is a philosophical and existential question that has been debated by scholars and thinkers for centuries. There is no one definitive answer to this question, as it ultimately depends on one&rsquo;s beliefs, values, and worldview.</p>
+<p>Some people believe that the purpose of the universe is to serve a divine plan or to fulfill a specific destiny. Others believe that the universe has no inherent purpose or meaning, and that it is up to individuals to create their own purpose and meaning in life.</p>
+<p>From a scientific perspective, the purpose of the universe can be seen as the result of natural processes and physical laws that have led to the formation of galaxies, stars, planets, and life. The universe exists as a complex and interconnected system, and its purpose can be seen as the ongoing exploration and discovery of its own nature and potential.</p>
+<p>Ultimately, the purpose of the universe is a deeply personal and subjective question that each individual must answer for themselves.</p>
+</blockquote>
+<p>对于同样的问题，Google 给出的答案如下：</p>
+<blockquote>
+<p>The universe is simply the collection of galaxies, stars, planets, comets, meteorites, and other solar system detritus, plus whatever dark matter and dark energy turn out to be. The universe is governed by laws of nature that themselves have no purpose other than dictating what matter and energy do.</p>
+</blockquote>
+<p>GPT 是否清楚自己是如何被创造出来的呢？</p>
+<blockquote>
+<p>Q: how to train a GPT model?</p>
+<p>A: Training a GPT model involves several steps, including data preparation, model architecture selection, hyperparameter tuning, and training.</p>
+<p>Here&rsquo;s a general overview of the steps involved in training a GPT model:</p>
+<p>Data preparation: Gather a large corpus of text data that is representative of the domain you want the GPT model to generate text for. This can include books, articles, web pages, and other sources of text data.</p>
+<p>Preprocessing: Clean and preprocess the text data to remove noise, punctuation, and other irrelevant information. You may also want to tokenize the text data into individual words or subwords, depending on the model architecture you choose.</p>
+<p>Model architecture selection: Choose a GPT model architecture that is appropriate for your task and data. This can include GPT-2, GPT-3, or other variants of the GPT model.</p>
+<p>Hyperparameter tuning: Tune the hyperparameters of the GPT model, such as the learning rate, batch size, and number of training epochs, to optimize performance on your task and data.</p>
+<p>Training: Train the GPT model on the preprocessed text data using a large-scale language modeling objective, such as maximum likelihood estimation or perplexity minimization.</p>
+<p>Fine-tuning: Fine-tune the trained GPT model on your specific task, such as text generation, summarization, or question answering, by fine-tuning the model on a smaller dataset of task-specific examples.</p>
+<p>Evaluation: Evaluate the performance of the trained and fine-tuned GPT model on a held-out test set, using metrics such as perplexity, accuracy, or F1 score.</p>
+<p>Keep in mind that training a GPT model can be a computationally intensive and time-consuming process, requiring specialized hardware and software. It&rsquo;s also important to ensure that the data you use to train the model is representative of the domain you want the model to generate text for, and that the model is evaluated on a diverse and representative set of test examples.</p>
+</blockquote>
+<p>上面的长篇大论好像回答了，又好像没回答。训练大语言模型不是简单就可以描述清楚的，因此问一下相关的代码实现吧！</p>
+<blockquote>
+<p>Q: show me the python code that trains a GPT model</p>
+<p>A: Training a GPT model from scratch can be quite complex and resource-intensive. However, you can use the Hugging Face Transformers library to fine-tune a pre-trained GPT model on your specific task. Here&rsquo;s an example using the GPT-2 model:</p>
+<p>First, install the Hugging Face Transformers library:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">pip install transformers
+</code></pre></td></tr></table>
+</div>
+</div><p>Next, create a Python script to fine-tune the GPT-2 model:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span><span class="p">,</span> <span class="n">GPT2Config</span><span class="p">,</span> <span class="n">TextDataset</span><span class="p">,</span> <span class="n">DataCollatorForLanguageModeling</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
+
+<span class="c1"># Load pre-trained GPT-2 model and tokenizer</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&#34;gpt2&#34;</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2Tokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">GPT2Config</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Prepare training data</span>
+<span class="n">train_file</span> <span class="o">=</span> <span class="s2">&#34;path/to/your/train.txt&#34;</span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">TextDataset</span><span class="p">(</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="o">=</span><span class="n">train_file</span><span class="p">,</span>
+    <span class="n">block_size</span><span class="o">=</span><span class="mi">128</span>
+<span class="p">)</span>
+
+<span class="c1"># Prepare data collator</span>
+<span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+    <span class="n">mlm</span><span class="o">=</span><span class="bp">False</span>
+<span class="p">)</span>
+
+<span class="c1"># Set up training arguments</span>
+<span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&#34;./output&#34;</span><span class="p">,</span>
+    <span class="n">overwrite_output_dir</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">save_steps</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span>
+    <span class="n">save_total_limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Create Trainer instance</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">training_args</span><span class="p">,</span>
+    <span class="n">data_collator</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Train the model</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Replace <code>path/to/your/train.txt</code> with the path to your preprocessed training data file. Adjust the training arguments, such as the number of epochs and batch size, according to your needs and available resources.</p>
+<p>This example demonstrates how to fine-tune a pre-trained GPT-2 model using the Hugging Face Transformers library. For more advanced use cases and customization, refer to the <a href="https://huggingface.co/transformers/" target="_blank" rel="noopener noreffer">Transformers documentation</a>.</p>
+</blockquote>
+<p>同样，好像回答了又好像没回答。要获得更深入的解答需要更详细的问题，不过从现有的答案可以看出 GPT 系列模型是基于 transformer 结构（这是显然的，GPT 全称就是 Generative Pre-trained Transformers）。代码演示了训练（其实是 fine tune）的大致流程：读取预训练模型，从训练文本提取token，设置训练参数，开始训练。</p>
+<p>然后是一道几何问题，回答的正文里有一行公式没有显示出来，可能是前端的 bug。根据后面的代码，推断缺失的公式应该是 $\Omega=2\pi(1-\cos\theta)(1-\cos\phi)$.</p>
+<blockquote>
+<p>Q: how to compute the solid angle of a rectangle in 3D space</p>
+<p>A: To compute the solid angle of a rectangle in 3D space, we can use the formula:</p>
+<p>where Ω is the solid angle, θ is the angle between the normal vector of the rectangle and the observer&rsquo;s line of sight, and φ is the angle between the edges of the rectangle that intersect at the observer&rsquo;s position.</p>
+<p>Here&rsquo;s an example Python function that computes the solid angle of a rectangle in 3D space:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">solid_angle</span><span class="p">(</span><span class="n">rectangle</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
+    <span class="c1"># Compute the normal vector of the rectangle</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="n">normal</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span>
+
+    <span class="c1"># Compute the angle between the normal vector and the observer&#39;s line of sight</span>
+    <span class="n">observer_dir</span> <span class="o">=</span> <span class="n">observer</span> <span class="o">-</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">observer_dir</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">observer_dir</span><span class="p">)</span>
+    <span class="n">cos_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">observer_dir</span><span class="p">)</span>
+
+    <span class="c1"># Compute the angle between the edges of the rectangle that intersect at the observer&#39;s position</span>
+    <span class="n">edge1</span> <span class="o">=</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">observer</span>
+    <span class="n">edge2</span> <span class="o">=</span> <span class="n">rectangle</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">observer</span>
+    <span class="n">cos_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">edge1</span><span class="p">,</span> <span class="n">edge2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">edge1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">edge2</span><span class="p">))</span>
+
+    <span class="c1"># Compute the solid angle</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">cos_theta</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">cos_phi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">omega</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>In this example, <code>rectangle</code> is a 3x3 array of the rectangle&rsquo;s vertices in 3D space, and observer is a 1D array of the observer&rsquo;s position in 3D space. The function returns the solid angle of the rectangle in steradians.</p>
+<p>Note that this formula assumes that the rectangle is a planar surface and that the observer is outside the rectangle. If the <code>observer</code> is inside the rectangle, the formula needs to be modified accordingly.</p>
+</blockquote>
+<p>这个回答的正确性未知，至少不能一眼发现明显的破绽。再来一道数学题：</p>
+<blockquote>
+<p>Q: 已知 $f(x)$ 满足 $1/(f(x)-1)=f(1/(x+1))$, 求 $f(x)$.</p>
+<p>A: 为了求解 $f(x)$, 我们可以先引入一个新的变量$y$, 然后将方程转化为 $y$ 的方程. 设 $y=\dfrac{1}{f(x)-1}$, 则方程可以写成:
+$$y=f(\frac{1}{x+1}) $$
+我们现在需要找到一个关系, 将$x$表示成$y$的形式. 通过观察可以注意到:
+$$ \frac{1}{x+1}=\frac{1}{y}-1 $$
+现在, 我们可以将 $x$ 表示成 $y$ 的形式. 将该式代入到我们的方程中, 我们有:
+$$ y=f(\frac{1}{y}-1) $$</p>
+<p>这是一个对 $y$ 的方程, 我们可以将其称为方程(1). 现在我们需要解这个方程以求得 $f(x)$.</p>
+<p>注意到方程(1)与 $f(x)$ 存在函数关系的形式相似, 因此我们可以猜测 $f(x)$ 可能是一特殊的函数, 假设 $f(x)$ 是一线性函数, 具体地, 假设 $f(x) = ax+b$, 其中$a$和$b$是待定系数.</p>
+<p>将$f(x)$代入到方程(1)中, 我们有:
+$$y=a(\frac{1}{y}-1)+b$$</p>
+<p>将 $y=\dfrac{1}{f(x)-1}$ 代入上式中, 我们得到:
+$$ \frac{1}{f(x)-1}=a(\frac{1}{\frac{1}{f(x)-1}}-1)+b $$
+化简上式，我们有:
+$$ \frac{1}{f(x)-1}=\frac{a}{f(x)-1}-a+b $$
+通过比较系数，我们得到: $a = -1$ 和 $b = 0$。因此，我们得到$f(x) = -x$ 。
+所以，根据给定的条件，我们求解得 $f(x) = -x$，注意，这只是针对我们的猜测函数 $f(x) = ax+ b$ 的一个解，可能还存在其他的函数满足给条件。请注意验证我们的解是否满足原方程。</p>
+</blockquote>
+<p>虽然过程漏洞百出，但结果居然是对的，神奇！</p>
+<p>可以看出，GPT 已经具备了相当不错的文字组织的能力，并且看上去拥有一定的逻辑推理能力，不能断定是真的学到了推理的本质，还是只是匹配到了训练数据中类似的逻辑关系，不管怎样，都已经能满足目前人们的很多方面的需求了。
+期待看到大语言模型未来还有怎样的潜力。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2023-03-20</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/wallis-product/" class="prev" rel="prev" title="Wallis 乘积的几何证明方法"><i class="fas fa-angle-left fa-fw"></i>Wallis 乘积的几何证明方法</a>
+            <a href="/radiosity/" class="next" rel="next" title="Radiosity 辐射度方法">Radiosity 辐射度方法<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

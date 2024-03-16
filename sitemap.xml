@@ -2,20 +2,60 @@
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     ><url>
-            <loc>https://cache-tlb.github.io/mr.mist-game-review/</loc><lastmod>2021-08-11T18:37:11&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
-            <loc>https://cache-tlb.github.io/categories/</loc><lastmod>2021-08-11T18:37:11&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
-            <loc>https://cache-tlb.github.io/posts/</loc><lastmod>2021-08-11T18:37:11&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
-            <loc>https://cache-tlb.github.io/</loc><lastmod>2021-08-11T18:37:11&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
-            <loc>https://cache-tlb.github.io/categories/%E6%B8%B8%E6%88%8F/</loc><lastmod>2021-08-11T18:37:11&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
-            <loc>https://cache-tlb.github.io/hocus-game-review/</loc><lastmod>2021-07-24T18:11:25&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url><url>
-            <loc>https://cache-tlb.github.io/misc/</loc><lastmod>2021-07-14T17:52:35&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url><url>
-            <loc>https://cache-tlb.github.io/links/</loc><lastmod>2021-07-14T17:28:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/</loc><lastmod>2024-02-16T19:37:16&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url><url>
+            <loc>https://cache-tlb.github.io/</loc><lastmod>2024-02-16T19:37:16&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/let-the-bullets-fly-dialogue/</loc><lastmod>2024-02-16T19:37:16&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/united-we-stand/</loc><lastmod>2023-12-20T20:37:08&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/what-is-opengl/</loc><lastmod>2023-12-19T22:57:39&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/superliminal-game-review/</loc><lastmod>2023-06-03T19:20:33&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/categories/</loc><lastmod>2023-06-03T19:20:33&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/posts/</loc><lastmod>2023-06-03T19:20:33&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/categories/%E6%B8%B8%E6%88%8F/</loc><lastmod>2023-06-03T19:20:33&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/radiosity/</loc><lastmod>2023-05-26T21:22:20&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/</loc><lastmod>2023-05-26T21:22:20&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/how-to-ask-questions-the-smart-way/</loc><lastmod>2023-04-27T22:09:22&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/about-header-files/</loc><lastmod>2023-04-27T19:36:33&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/gpt-experience/</loc><lastmod>2023-03-20T19:20:22&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/</loc><lastmod>2023-03-20T19:20:22&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/wallis-product/</loc><lastmod>2023-03-14T21:20:08&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/categories/%E6%95%B0%E5%AD%A6/</loc><lastmod>2023-03-14T21:20:08&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/sifu-game-review/</loc><lastmod>2023-02-19T18:32:37&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/spherical-triangle-area/</loc><lastmod>2023-01-27T16:19:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/graphics-study-of-real-world-games/</loc><lastmod>2023-01-01T12:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/critical/</loc><lastmod>2023-01-01T10:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/do-you-know/</loc><lastmod>2023-01-01T09:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/tips/</loc><lastmod>2023-01-01T08:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/essays/</loc><lastmod>2023-01-01T00:02:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/alias-method/</loc><lastmod>2022-12-15T19:25:05&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/perspective-correct-interpolation/</loc><lastmod>2022-11-11T19:12:20&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/visulization-of-ford-circle/</loc><lastmod>2022-10-11T22:33:10&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/the-straw-that-broke-the-camels-back/</loc><lastmod>2022-09-25T15:09:05&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/ltc-integral/</loc><lastmod>2022-08-12T13:28:03&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/spherical-interpolation/</loc><lastmod>2022-07-11T19:56:35&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/shoelace-formula/</loc><lastmod>2022-06-20T22:10:33&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/cubemap-texel-solid-angle/</loc><lastmod>2022-05-30T20:02:31&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/morton-code/</loc><lastmod>2022-04-22T18:05:50&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/the-basel-problem/</loc><lastmod>2022-03-14T19:20:16&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/bridge-constructor-portal-game-review/</loc><lastmod>2022-02-27T18:32:25&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/importance-sampling/</loc><lastmod>2022-01-16T13:36:05&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/reservoir-sampling/</loc><lastmod>2021-12-13T19:23:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/ea-frostbite-engine-history/</loc><lastmod>2021-11-30T00:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/ue4-movierenderpipeline-and-vulkan-ghost/</loc><lastmod>2021-10-29T20:03:05&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/categories/%E5%BC%80%E5%8F%91/</loc><lastmod>2021-10-29T20:03:05&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/watch-game-review/</loc><lastmod>2021-10-10T20:36:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/finding-bad-marble/</loc><lastmod>2021-09-12T17:55:17&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/opinions/</loc><lastmod>2021-09-02T01:20:24&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/goofy-is-a-dog/</loc><lastmod>2021-09-01T22:10:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/jokes/</loc><lastmod>2021-08-31T00:04:53&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/algo-bot-game-review/</loc><lastmod>2021-08-30T22:55:06&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/mr.mist-game-review/</loc><lastmod>2021-08-11T18:37:11&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/hocus-game-review/</loc><lastmod>2021-07-24T18:11:25&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/misc/</loc><lastmod>2021-07-14T17:52:35&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/links/</loc><lastmod>2021-07-14T17:28:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://cache-tlb.github.io/untouchable-houses/</loc><lastmod>2021-06-30T20:04:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://cache-tlb.github.io/categories/%E6%95%85%E4%BA%8B/</loc><lastmod>2021-06-30T20:04:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://cache-tlb.github.io/gameboy-simulator-dev-log/</loc><lastmod>2021-05-18T20:32:44&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://cache-tlb.github.io/categories/%E7%BC%96%E7%A8%8B/</loc><lastmod>2021-05-18T20:32:44&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</loc><lastmod>2021-05-13T20:02:42&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://cache-tlb.github.io/tags/</loc><lastmod>2021-05-13T20:02:42&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/</loc><lastmod>2021-05-13T20:02:42&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://cache-tlb.github.io/tags/%E7%BB%8F%E9%AA%8C/</loc><lastmod>2021-05-13T20:02:42&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://cache-tlb.github.io/about/</loc><lastmod>2020-04-11T19:15:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url></urlset>
+            <loc>https://cache-tlb.github.io/about/</loc><lastmod>2020-04-11T19:15:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/paste/the-future-of-gaming-in-china/</loc><lastmod>2018-01-09T00:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://cache-tlb.github.io/tags/</loc><changefreq>weekly</changefreq><priority>0.5</priority></url></urlset>
