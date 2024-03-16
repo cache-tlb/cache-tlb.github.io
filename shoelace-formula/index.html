@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>Shoelace 公式 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="Shoelace 公式" />
+<meta property="og:description" content="已知平面上简单多边形的顶点坐标为 $P_0, P_1, \cdots, P_{N-1}$, 求其面积. 设多边形区域为 $\Omega$, 则面积为 $$ A = \iint_\Omega {1}\ \mathrm{d}x\mathrm{d}y $$ 令 $P = 0, Q = x$, 则有 $\dfrac{\partial Q}{\partial x} - \dfrac{\partial P}{\partial y} = 1$, 根据格林公式可得" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/shoelace-formula/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-06-20T22:10:33&#43;08:00" />
+<meta property="article:modified_time" content="2022-06-20T22:10:33&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="Shoelace 公式"/>
+<meta name="twitter:description" content="已知平面上简单多边形的顶点坐标为 $P_0, P_1, \cdots, P_{N-1}$, 求其面积. 设多边形区域为 $\Omega$, 则面积为 $$ A = \iint_\Omega {1}\ \mathrm{d}x\mathrm{d}y $$ 令 $P = 0, Q = x$, 则有 $\dfrac{\partial Q}{\partial x} - \dfrac{\partial P}{\partial y} = 1$, 根据格林公式可得"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/shoelace-formula/" /><link rel="prev" href="https://cache-tlb.github.io/cubemap-texel-solid-angle/" /><link rel="next" href="https://cache-tlb.github.io/spherical-interpolation/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Shoelace 公式",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/shoelace-formula\/"
+        },"genre": "posts","wordcount":  305 ,
+        "url": "https:\/\/cache-tlb.github.io\/shoelace-formula\/","datePublished": "2022-06-20T22:10:33+08:00","dateModified": "2022-06-20T22:10:33+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">Shoelace 公式</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-06-20">2022-06-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 305 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 1 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>已知平面上简单多边形的顶点坐标为 $P_0, P_1, \cdots, P_{N-1}$, 求其面积.</p>
+<p>设多边形区域为 $\Omega$, 则面积为
+$$
+A = \iint_\Omega {1}\ \mathrm{d}x\mathrm{d}y
+$$</p>
+<p>令 $P = 0, Q = x$, 则有 $\dfrac{\partial Q}{\partial x} - \dfrac{\partial P}{\partial y} = 1$, 根据格林公式可得
+$$
+\begin{aligned} 
+A &amp;= \iint_\Omega {\left( \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y} \right)}\ \mathrm{d}x\mathrm{d}y \\ 
+&amp;= \oint_{\partial\Omega} P\mathrm{d}x + Q\mathrm{d}y\\ 
+&amp;= \oint_{\partial\Omega} x\mathrm{d}y\\ 
+&amp;= \sum_{i=0}^{N-1} \int_{P_iP_{i+1}} x\ \mathrm{d}y
+\end{aligned} 
+$$
+其中 $P_N = P_0$. 
+这里用格林公式将闭区域$\Omega$上的二重积分转换成沿着区域边界 $\partial\Omega$ 上的线积分, 然后将沿着闭曲线的线积分拆成逐段积分之和.</p>
+<p>对于多边形的每一条边$P_{i}P_{i+1}$, 参数方程为:
+$$
+x = (x_{i+1}-x_i)t + x_i, \ \ y = (y_{i+1}-y_i)t + y_i, \qquad t\in[0,1].
+$$
+于是 $x\ \mathrm{d}y = ((x_{i+1}-x_i)t+x_i)(y_{i+1}-y_i)\ \mathrm{d}t$, 
+$$
+\begin{aligned} 
+\int_{P_iP_{i+1}} x\ \mathrm{d}y &amp;= \int_0^1 ((x_{i+1}-x_i)t+x_i)(y_{i+1}-y_i)\ \mathrm{d}t\\ 
+&amp;= \frac{1}{2}(x_{i+1}-x_i)(y_{i+1}-y_i) + x_i(y_{i+1}-y_i) \\ 
+&amp;= \frac{1}{2}(x_{i+1}+x_i)(y_{i+1}-y_i) \\ 
+&amp;= \frac{1}{2}(x_i y_{i+1}-x_{i+1} y_i + x_{i+1}y_{i+1}-x_i y_i)
+\end{aligned} 
+$$</p>
+<p>将它代入上面的求和式, 并注意到 $\displaystyle \sum_{i=0}^{N-1}x_iy_i = \sum_{i=0}^{N-1}x_{i+1}y_{i+1} $, 可得
+$$
+\begin{aligned} 
+A &amp;= \sum_{i=0}^{N-1} \int_{P_iP_{i+1}} x\ \mathrm{d}y \\ 
+&amp;= \frac{1}{2}\sum_{i=0}^{N-1}{x_i y_{i+1}-x_{i+1} y_i + x_{i+1}y_{i+1}-x_i y_i}\\ 
+&amp;= \frac{1}{2}\left(\sum_{i=0}^{N-1} (x_i y_{i+1}-x_{i+1} y_i) + \sum_{i=0}^{N-1} x_{i+1}y_{i+1} - \sum_{i=0}^{N-1} x_i y_i\right)\\ 
+&amp;= \frac{1}{2}\sum_{i=0}^{N-1} (x_i y_{i+1}-x_{i+1} y_i)
+\end{aligned} 
+$$</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2022-06-20</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/cubemap-texel-solid-angle/" class="prev" rel="prev" title="Cubemap上每像素对应的立体角计算"><i class="fas fa-angle-left fa-fw"></i>Cubemap上每像素对应的立体角计算</a>
+            <a href="/spherical-interpolation/" class="next" rel="next" title="球面插值函数 slerp 推导">球面插值函数 slerp 推导<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

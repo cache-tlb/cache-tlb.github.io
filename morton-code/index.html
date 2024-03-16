@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>Morton Code - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="Morton Code" />
+<meta property="og:description" content="Morton Code 编码算法 笔者在探索 UE4 源码时，发现一段有趣的代码，如下： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 uint MortonCode2(uint x) { x &amp;= 0x0000ffff; x = (x ^ (x &lt;&lt; 8)) &amp; 0x00ff00ff; // 0b0000000011111111 x = (x ^ (x &lt;&lt; 4)) &amp;" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/morton-code/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-22T18:05:50&#43;08:00" />
+<meta property="article:modified_time" content="2022-04-22T18:05:50&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="Morton Code"/>
+<meta name="twitter:description" content="Morton Code 编码算法 笔者在探索 UE4 源码时，发现一段有趣的代码，如下： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 uint MortonCode2(uint x) { x &amp;= 0x0000ffff; x = (x ^ (x &lt;&lt; 8)) &amp; 0x00ff00ff; // 0b0000000011111111 x = (x ^ (x &lt;&lt; 4)) &amp;"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/morton-code/" /><link rel="prev" href="https://cache-tlb.github.io/the-basel-problem/" /><link rel="next" href="https://cache-tlb.github.io/cubemap-texel-solid-angle/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Morton Code",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/morton-code\/"
+        },"genre": "posts","wordcount":  1167 ,
+        "url": "https:\/\/cache-tlb.github.io\/morton-code\/","datePublished": "2022-04-22T18:05:50+08:00","dateModified": "2022-04-22T18:05:50+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">Morton Code</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%9B%BE%E5%BD%A2/"><i class="far fa-folder fa-fw"></i>图形</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-04-22">2022-04-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1167 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div>
+        </div><div class="content" id="content"><h2 id="morton-code-编码算法">Morton Code 编码算法</h2>
+<p>笔者在探索 UE4 源码时，发现一段有趣的代码，如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">uint</span> <span class="nf">MortonCode2</span><span class="p">(</span><span class="n">uint</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">x</span> <span class="o">&amp;=</span> <span class="mh">0x0000ffff</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x00ff00ff</span><span class="p">;</span>  <span class="c1">// 0b0000000011111111
+</span><span class="c1"></span>    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x0f0f0f0f</span><span class="p">;</span>  <span class="c1">// 0b0000111100001111
+</span><span class="c1"></span>    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x33333333</span><span class="p">;</span>  <span class="c1">// 0b0011001100110011
+</span><span class="c1"></span>    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x55555555</span><span class="p">;</span>  <span class="c1">// 0b0101010101010101
+</span><span class="c1"></span>    <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">uint</span> <span class="nf">MortonEncode</span><span class="p">(</span><span class="n">uint2</span> <span class="n">Pixel</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">uint</span> <span class="n">Morton</span> <span class="o">=</span> <span class="n">MortonCode2</span><span class="p">(</span><span class="n">Pixel</span><span class="p">.</span><span class="n">x</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">MortonCode2</span><span class="p">(</span><span class="n">Pixel</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">Morton</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>它的作用就是将一个图像中的二维像素坐标编码为一个整数。一般而言，二维图像在内存中也是用线性数组存储，通常的做法是将像素数据一整行一整行的接续排列，所以坐标为 $(x,y)$ 的像素排在线性数组的位置为 $x + y\times W$，这里 $W$ 是一行的数据量，也就是图像的宽度。</p>
+<p>Morton Code 提供了另一种像素位置到线性数组的排列顺序，如下图所示。</p>
+<div align="center">
+<canvas id="main_canvas" width="100" height="100" style="border:1px solid"> </canvas>
+<script>
+
+var canvas = document.getElementById("main_canvas");
+var content = document.getElementById("content");
+var canvas_size = 1;
+var point_num_per_row = 16;
+var point_spacing = 1;
+function resize() {
+    var w = content.clientWidth;
+    var h = content.clientHeight;
+    canvas_size = Math.min(w,h) / 1.3;
+    canvas.width = canvas_size;
+    canvas.height = canvas_size;
+    point_spacing = canvas_size / point_num_per_row;
+}
+function MortonCode2(x)
+{
+    x &= 0x0000ffff;
+    x = (x ^ (x << 8)) & 0x00ff00ff;
+    x = (x ^ (x << 4)) & 0x0f0f0f0f;
+    x = (x ^ (x << 2)) & 0x33333333;
+    x = (x ^ (x << 1)) & 0x55555555;
+    return x;
+}
+function MortonEncode(Pixel)
+{
+    var Morton = MortonCode2(Pixel[0]) | (MortonCode2(Pixel[1]) << 1);
+    return Morton;
+}
+function ReverseMortonCode2(x)
+{
+	x &= 0x55555555;
+	x = (x ^ (x >> 1)) & 0x33333333;
+	x = (x ^ (x >> 2)) & 0x0f0f0f0f;
+	x = (x ^ (x >> 4)) & 0x00ff00ff;
+	x = (x ^ (x >> 8)) & 0x0000ffff;
+	return x;
+}
+function MortonDecode(Morton)
+{
+	return [ReverseMortonCode2(Morton), ReverseMortonCode2(Morton >> 1)];
+}
+function run() {
+    var points = [];    
+    for (var y = 0; y < point_num_per_row; y++) {
+        for (var x = 0; x < point_num_per_row; x++) {
+            var pos = [x,y];
+            var index = MortonEncode(pos);
+            points[index] = [x+0.5,y+0.5];
+        }
+    }
+    var ctx=canvas.getContext("2d");
+    for (var i = 0; i < points.length - 1; i++) {
+        ctx.moveTo(points[i][0] * point_spacing, points[i][1] * point_spacing);
+        ctx.lineTo(points[i+1][0]*point_spacing,points[i+1][1]*point_spacing);
+        ctx.lineWidth=1;
+        ctx.strokeStyle="red";        
+        ctx.stroke();
+    }
+}
+resize();
+var frame_index = 0;
+function reset() {
+    frame_index = 0;
+    var ctx=canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);    
+}
+function zoom_in() {
+    if (point_num_per_row > 2) {
+        point_num_per_row /= 2;
+        point_spacing = canvas_size / point_num_per_row;
+        reset();
+    }
+}
+function zoom_out() {
+    if (point_num_per_row < 64) {
+        point_num_per_row *= 2;
+        point_spacing = canvas_size / point_num_per_row;
+        reset();
+    }
+}
+function render() {
+    if (frame_index + 1 < point_num_per_row*point_num_per_row) {
+        var pos1 = MortonDecode(frame_index);
+        var pos2 = MortonDecode(frame_index + 1);
+        var ctx=canvas.getContext("2d");
+        var point_offset = point_spacing / 2;
+        ctx.beginPath();
+        ctx.moveTo(pos1[0] * point_spacing + point_offset, pos1[1] * point_spacing + point_offset);
+        ctx.lineTo(pos2[0] * point_spacing + point_offset, pos2[1] * point_spacing + point_offset);
+        ctx.lineWidth=1;
+        ctx.stroke();
+        frame_index++;
+    }
+    window.requestAnimationFrame(render);
+}
+window.requestAnimationFrame(render);
+</script>
+<br/>
+<input type="button" value="Reset" onclick="reset()">  </input>
+<input type="button" value="ZoomIn" onclick="zoom_in()">  </input>
+<input type="button" value="ZoomOut" onclick="zoom_out()">  </input>
+</div>
+<p>可见在 Morton Code 的编码方式下，相邻的四个像素按 z 字形排列，相邻的四个 z 字形小块又按 z 字形排列成更大的块，如此递归下去。这种编码方式可以使空间位置相近的像素在线性数组也尽量排列在相近的位置。另一个不太重要的好处是像素位置与 Morton Code 的对应关系是固定的，不随图像宽度改变，但使用 Morton Code 的前提是要满足图像宽度为 2 的整数次幂。</p>
+<p>从代码中可以看出，Morton Code将两个整数 $(x,y)$ 变成一个整数 $z$ 的方式是令 $z$ 的二进制的偶数位填上 $x$ 的二进制串，奇数位填上 $y$ 的二进制串，因此解码的算法也比较简单。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">uint</span> <span class="nf">ReverseMortonCode2</span><span class="p">(</span><span class="n">uint</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">x</span> <span class="o">&amp;=</span> <span class="mh">0x55555555</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x33333333</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x0f0f0f0f</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x00ff00ff</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x0000ffff</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">uint2</span> <span class="nf">MortonDecode</span><span class="p">(</span><span class="n">uint</span> <span class="n">Morton</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">uint2</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="n">uint2</span><span class="p">(</span><span class="n">ReverseMortonCode2</span><span class="p">(</span><span class="n">Morton</span><span class="p">),</span> <span class="n">ReverseMortonCode2</span><span class="p">(</span><span class="n">Morton</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">Pixel</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="比较">比较</h2>
+<p>GPU的cache line通常较小，例如 128 bytes，相当于 32 个 RGBA8 格式像素。
+采样纹理时通常会使用双线性插值的方式滤波，这需要访问采样点附近的 2x2 像素块。
+如果显存中纹理用行主序的方式排列像素，当纹理宽度都超过32时，则访问 2x2 的像素块至少需要两个cache line。
+而如果用 Marton Code 的方式排列像素，直观上来看多数情况下一个 cache line 内就能涵盖 2x2 块的每个像素，而有些情况下 4 个像素分别需要一个 cache line。</p>
+<p>虽然双线性插值的 4 个像素需要占用几个 cache line 与纹理采样的效率并没有简单而直接的对应关系，但我们可以用它衡量两种像素排列方式的是否具有好的局部性。下表统计了不同大小的正方形纹理平均需要多少个 cache line 才能完成一次双线性插值，wrap mode 为 clamp to edge。</p>
+<table>
+<thead>
+<tr>
+<th>cache line</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>avg.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>128x128 Linear</td>
+<td>0.8%</td>
+<td>96.9%</td>
+<td>0</td>
+<td>2.3%</td>
+<td>2.039</td>
+</tr>
+<tr>
+<td>128x128 Morton Code</td>
+<td>66.9%</td>
+<td>30.3%</td>
+<td>0</td>
+<td>2.8%</td>
+<td>1.388</td>
+</tr>
+<tr>
+<td>256x256 Linear</td>
+<td>0.4%</td>
+<td>96.9%</td>
+<td>0</td>
+<td>2.7%</td>
+<td>2.051</td>
+</tr>
+<tr>
+<td>256x256 Morton Code</td>
+<td>66.3%</td>
+<td>30.8%</td>
+<td>0</td>
+<td>3.0%</td>
+<td>1.397</td>
+</tr>
+<tr>
+<td>512x512 Linear</td>
+<td>0.2%</td>
+<td>96.9%</td>
+<td>0</td>
+<td>2.9%</td>
+<td>2.057</td>
+</tr>
+<tr>
+<td>512x512 Morton Code</td>
+<td>65.9%</td>
+<td>31.0%</td>
+<td>0</td>
+<td>3.1%</td>
+<td>1.402</td>
+</tr>
+</tbody>
+</table>
+<p>表中的百分比表示多大比例的像素需要 1，2，3，4个 cache line 来完成双线性插值。最后一列表示随机取一个纹理坐标做双线性插值所需的cache line的期望个数。平均而言，Morton Code比线性排列要节省 30% 的 cache 刷新次数。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2022-04-22</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/the-basel-problem/" class="prev" rel="prev" title="巴塞尔问题"><i class="fas fa-angle-left fa-fw"></i>巴塞尔问题</a>
+            <a href="/cubemap-texel-solid-angle/" class="next" rel="next" title="Cubemap上每像素对应的立体角计算">Cubemap上每像素对应的立体角计算<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

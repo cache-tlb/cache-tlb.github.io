@@ -4,7 +4,35 @@
         <link>https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/</link>
         <description>图形 - 分类 - Praise the Sun!</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
-            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Thu, 13 May 2021 20:02:42 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Fri, 26 May 2023 21:22:20 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/" rel="self" type="application/rss+xml" /><item>
+    <title>Radiosity 辐射度方法</title>
+    <link>https://cache-tlb.github.io/radiosity/</link>
+    <pubDate>Fri, 26 May 2023 21:22:20 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/radiosity/</guid>
+    <description><![CDATA[谈及全局光照，绕不开一个重要的方程，即渲染方程（Render Equation），如下是其中一个简化版本： $$ L_o(x, \omega_o) = L_e(x, \omega_o) + \int_\Omega f_r(x,\omega_i\to\omega_o) L_i(x,\omega_i) (\omega_i\cdot n) \ \mathrm{d}\omega_i $$ $L_o$ 表示]]></description>
+</item><item>
+    <title>于 Alias 采样算法中领悟天之道</title>
+    <link>https://cache-tlb.github.io/alias-method/</link>
+    <pubDate>Thu, 15 Dec 2022 19:25:05 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/alias-method/</guid>
+    <description><![CDATA[给定了一个离散概率分布，如何从中采样？这虽然是一个简单问题，但在许多领域都会涉及到。例如遗传算法中，给出种群每个个体的适应度，要从中筛选出一]]></description>
+</item><item>
+    <title>透视矫正插值公式的推导</title>
+    <link>https://cache-tlb.github.io/perspective-correct-interpolation/</link>
+    <pubDate>Fri, 11 Nov 2022 19:12:20 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/perspective-correct-interpolation/</guid>
+    <description><![CDATA[前言 众所周知（？） vertex shader 里顶点属性转换成 pixel shader 里逐像素属性需要经过插值，具体来说，是根据像素所在三角形三个顶点的属性，以像素点的重心坐标为权重进]]></description>
+</item><item>
+    <title>Morton Code</title>
+    <link>https://cache-tlb.github.io/morton-code/</link>
+    <pubDate>Fri, 22 Apr 2022 18:05:50 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/morton-code/</guid>
+    <description><![CDATA[Morton Code 编码算法 笔者在探索 UE4 源码时，发现一段有趣的代码，如下： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 uint MortonCode2(uint x) { x &amp;= 0x0000ffff; x = (x ^ (x &lt;&lt; 8)) &amp; 0x00ff00ff; // 0b0000000011111111 x = (x ^ (x &lt;&lt; 4)) &amp;]]></description>
+</item><item>
     <title>How to Become an Advanced Graphics Programmer</title>
     <link>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</link>
     <pubDate>Thu, 13 May 2021 20:02:42 &#43;0800</pubDate>

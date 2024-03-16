@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>重要性采样 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="重要性采样" />
+<meta property="og:description" content="蒙特卡罗积分 假设随机变量 $x$ 的概率密度函数为 $p(x)$，则以 $x$ 为自变量的函数 $g(x)$ 的期望值为 $$E[g(x)]=\int_{a}^{b}{g(x)p(x){\rm d}x} .$$ 如果要计算一个函数 $f(x)$ 的积分值 $\displaystyle I=\int_{a}^{b}{f(x){\rm d}x}$，只" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/importance-sampling/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-01-16T13:36:05&#43;08:00" />
+<meta property="article:modified_time" content="2022-01-16T13:36:05&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="重要性采样"/>
+<meta name="twitter:description" content="蒙特卡罗积分 假设随机变量 $x$ 的概率密度函数为 $p(x)$，则以 $x$ 为自变量的函数 $g(x)$ 的期望值为 $$E[g(x)]=\int_{a}^{b}{g(x)p(x){\rm d}x} .$$ 如果要计算一个函数 $f(x)$ 的积分值 $\displaystyle I=\int_{a}^{b}{f(x){\rm d}x}$，只"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/importance-sampling/" /><link rel="prev" href="https://cache-tlb.github.io/reservoir-sampling/" /><link rel="next" href="https://cache-tlb.github.io/bridge-constructor-portal-game-review/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "重要性采样",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/importance-sampling\/"
+        },"genre": "posts","wordcount":  1372 ,
+        "url": "https:\/\/cache-tlb.github.io\/importance-sampling\/","datePublished": "2022-01-16T13:36:05+08:00","dateModified": "2022-01-16T13:36:05+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">重要性采样</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-01-16">2022-01-16</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1372 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#蒙特卡罗积分">蒙特卡罗积分</a></li>
+    <li><a href="#重要性采样">重要性采样</a></li>
+    <li><a href="#例子">例子</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="蒙特卡罗积分">蒙特卡罗积分</h2>
+<p>假设随机变量 $x$ 的概率密度函数为 $p(x)$，则以 $x$ 为自变量的函数 $g(x)$ 的期望值为 
+$$E[g(x)]=\int_{a}^{b}{g(x)p(x){\rm d}x} .$$
+如果要计算一个函数 $f(x)$ 的积分值 $\displaystyle I=\int_{a}^{b}{f(x){\rm d}x}$，只要令 $g(x)=\dfrac{f(x)}{p(x)}$，则 $g(x)$ 就是对 $I$ 的一个无偏估计，或者说，$g(x)$ 的期望等于 $I$。</p>
+<p>用单个样本代表整个定义域上的积分值不是很好的主意，一般我们会采样一组独立同分布的样本 $\{x_i\}$，概率密度都是 $p(x)$，样本数量为 $N$，则 $g(x_i)$ 的平均值的期望为：
+$$E\left[\frac{1}{N}\sum_{i=1}^{N}{g(x_i)}\right]=\frac{1}{N}\sum_{i=1}^{N}{E\left[g(x_i)\right]}=\frac{1}{N}\sum_{i=1}^{N}{\int_{a}^{b}{\frac{f(x)}{p(x)}\cdot p(x){\rm d}x}} = I .$$</p>
+<p>可见 $g(x_i)$ 的平均值也是积分值 $I$ 的无偏估计。</p>
+<br/>
+<h2 id="重要性采样">重要性采样</h2>
+<p>再考虑估计的方差。注意到 $i\ne j$时，$x_i$ 与 $x_j$ 独立，$g(x_i)$ 与 $g(x_j)$ 也独立，协方差为 0，$E[g(x_i)g(x_j)]=E[g(x_i)]\cdot E[g(x_j)]=E[g(x)]^2$，</p>
+<p>$$
+\begin{aligned} 
+Var\left[\frac{1}{N}\sum_{i=1}^{N}{g(x_i)}\right] &amp;= E\left[\left(\frac{1}{N}\sum_{i=1}^{N}{g(x_i)}\right)^2\right] - \left(E\left[\frac{1}{N}\sum_{i=1}^{N}{g(x_i)}\right]\right)^2\\ 
+&amp;= \frac{1}{N}\cdot E\left[g(x)^2\right] + \frac{1}{N^2}\cdot E\left[\sum_{i\ne j}{g(x_i)g(x_j)}\right]-E[g(x)]^2 \\ 
+&amp;= \frac{1}{N}\cdot E\left[g(x)^2\right] - \frac{1}{N}\cdot I^2
+\end{aligned}
+$$
+注意到 $I$ 是积分的真实值，是一个常数，于是方差大小取决于样本数 $N$ 以及 $g(x)^2$ 的期望。样本数越大则方差越小，是符合直觉的。什么样的 $g(x)$，或者说如何选取 $p(x)$，能让方差最小呢？</p>
+<p>继续研究 $g(x)^2$ 的期望，根据定义有如下的推导：
+$$
+\begin{aligned} 
+E[g(x)^2] &amp;= \int_{a}^{b}{\frac{f(x)^2}{p(x)^2}\cdot p(x){\rm d}x} \\ 
+&amp;=  \left(\int_{a}^{b}{\frac{f(x)^2}{p(x)^2}\cdot p(x){\rm d}x}\right)\cdot\left(\int_{a}^{b}{p(x){\rm d}x}\right)\\ 
+&amp; \ge \left(\int_{a}^{b}{\sqrt{\frac{f(x)^2}{p(x)^2}\cdot p(x)}\cdot\sqrt{p(x)}{\rm d}x}\right)^2 \\ 
+&amp;= I^2.
+\end{aligned} 
+$$
+第二行利用了概率密度的性质 $\displaystyle \int_{a}^{b}{p(x){\rm d}x} = 1$，第三行利用了 Cauchy-Schwarz 不等式。等号成立的条件是 $\dfrac{f(x)^2}{p(x)}$ 与 $p(x)$ 线性相关，即 $f(x)=k\cdot p(x)$ 恒成立。又因为 $p(x)$ 是概率密度，两边在定义域上积分可以求出 
+$$k = k\int_{a}^{b}{p(x){\rm d}x} = \int_{a}^{b}{f(x){\rm d}x} = I .$$
+换言之，只要取 $p(x)={f(x)}/{I}$，就能使方差达到最小值 $0$。
+事实上，这个时候任取 $x$，都有 $g(x)={f(x)}/{p(x)}=I$，不管采样点在哪里，$g(x)$ 都是恒定的，所以方差是 $0$。</p>
+<p>然而，这里的 $I$ 就是我们要求的积分值，是未知的。我们只能根据已知的信息，让采样点的分布 $p(x)$ 尽量正比于待求积分的被积函数 $f(x)$。这便是重要性采样的含义。</p>
+<p>被积函数 $f(x)$ 的值对不同的 $x$ 函数值有大有小，大的函数值对最终的积分结果贡献更大，因此我们希望在影响更大的 $x$ 处采集更多样本，以提高精度，这也是重要性采样的直观理解。</p>
+<p>从另一个角度说，我们希望贡献大的区域的误差尽量小。例如，被积函数的某一个区间A的积分真实值是0.1，另一个区间B积分的真实值是 100。区间A上 5% 的误差对于结果的影响相比于区间B上 5%的误差来说是微不足道的。只要采样点的分布和被积函数的图像大致匹配，就能达到上述目标。这就是importance sampling的朴素思想。</p>
+<p>需要注意的是，概率密度是非负的，而概率密度正比于函数值，所以重要性采样只适用于非负函数的积分估计。</p>
+<br/>
+<h2 id="例子">例子</h2>
+<div>
+<p>被积函数：
+<select id="integrator"></p>
+<option value="constant"> y=1 </option>
+<option value="linear"> y=x </option>
+<option value="sqr"> y=x^2 </option>
+<option value="negative"> y=1-x </option>
+</select>
+<p>PDF：
+<select id="pdf"></p>
+<option value="constant"> y=1 </option>
+<option value="linear"> y=2*x </option>
+<option value="sqr"> y=3*x^2 </option>
+<option value="negative"> y=2*(1-x) </option>
+</select>
+<p>每次实验采样个数：
+<select id="samples"></p>
+<option value="10"> 10 </option>
+<option value="100" selected > 100 </option>
+<option value="1000"> 1000 </option>
+</select>
+<p>实验次数：
+<select id="times"></p>
+<option value="10"> 10 </option>
+<option value="100" selected> 100 </option>
+<option value="1000"> 1000 </option>
+</select>
+<p>平均值：
+<span id="mean" >  </span></p>
+<p>方差：
+<span id="variance" >  </span></p>
+<script>
+
+function generate_list_by_pdf(inv_cdf, sample_num) {
+    var ret = [];
+    ret.length = sample_num;
+    for (var i = 0; i < sample_num; i++) {
+        var rand = Math.random();
+        ret[i] = inv_cdf(rand);
+    }
+    return ret;
+}
+
+function run_once(f, pdf, inv_cdf, sample_num) {
+    var xs = generate_list_by_pdf(inv_cdf, sample_num);
+    var sum = 0.0;
+    for (var i = 0; i < xs.length; i++) {
+        sum += f(xs[i]) / pdf(xs[i]);
+    }
+    return {"avg": sum / xs.length, "samples": xs};
+}
+
+function constant(x) { return 1; }
+function linear(x) { return x; }
+function sqr(x) { return x*x; }
+function negative(x) { return 1-x; }
+
+var f_list = {
+    "constant": constant,
+    "linear": linear,
+    "sqr": sqr,
+    "negative": negative
+}
+
+function linear_pdf(x) { return 2*x; }
+function sqr_pdf(x) { return 3*x*x; }
+function negative_pdf(x) { return 2*(1-x); }
+
+var pdf_list = {
+    "constant": constant,
+    "linear": linear_pdf,
+    "sqr": sqr_pdf,
+    "negative": negative_pdf
+}
+
+function constant_inv_cdf(x) { return x; }
+function linear_inv_cdf(x) { return Math.sqrt(x); }
+function sqr_inv_cdf(x) { return Math.pow(x, 1./3.); }
+function negative_inv_cdf(x) { return 1-Math.sqrt(1-x); }
+
+var inv_cdf_list = {
+    "constant": constant_inv_cdf,
+    "linear": linear_inv_cdf,
+    "sqr": sqr_inv_cdf,
+    "negative": negative_inv_cdf
+}
+
+function run() {
+    var integrator_name = document.getElementById("integrator").value;
+    var pdf_name = document.getElementById("pdf").value;
+    var times = document.getElementById("times").value;
+    var samples = document.getElementById("samples").value;
+    var f = f_list[integrator_name];
+    var pdf = pdf_list[pdf_name];
+    var inv_cdf = inv_cdf_list[pdf_name];
+    var res_list = [];
+    for (var i = 0; i < times; i++) {
+        var res = run_once(f, pdf, inv_cdf, samples);
+        res_list[i] = res['avg'];
+    }
+    var sum = 0;
+    for (var i = 0; i < res_list.length; i++) {
+        sum += res_list[i];
+    }
+    var avg = sum / res_list.length;
+    sum = 0;
+    for (var i = 0; i < res_list.length; i++) {
+        var d = res_list[i] - avg;
+        d = d*d;
+        sum += d;
+    }
+    var variance = sum / res_list.length;
+
+    document.getElementById("mean").innerHTML = avg;
+    document.getElementById("variance").innerHTML = variance;
+}
+</script>
+<p><input type="button" value="Run" onclick="run()">  </input></p>
+</div>
+<p>上面的简单例子中，积分区间都是 $[0,1]$，被积函数可以选择 $y=1, y=x, y=x^2, y=1-x$ 这几种，PDF的形状也可以在这几个函数中选择，并且要乘以归一化系数。
+每次实验我们生成若干个样本进行蒙特卡罗积分，得到一个估计值。
+点击Run按钮会重复多次实验，得到估计值的均值和方差。</p>
+<p>可以得到如下几个结论：</p>
+<ul>
+<li>当被积函数和 PDF 形状一样的时候，总是能得到完全正确的估计值，且方差是0</li>
+<li>被积函数取 $y=x^2$，PDF 分别选 $y=2x$ 和 $y=2(1-x)$，因为前者更匹配被积函数的形状，所以方差比后者要小几个数量级</li>
+<li>增加蒙特卡罗积分的样本数也能减小方差</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2022-01-16</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/reservoir-sampling/" class="prev" rel="prev" title="蓄水池采样算法"><i class="fas fa-angle-left fa-fw"></i>蓄水池采样算法</a>
+            <a href="/bridge-constructor-portal-game-review/" class="next" rel="next" title="[游戏评论] Bridge Constructor Portal">[游戏评论] Bridge Constructor Portal<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

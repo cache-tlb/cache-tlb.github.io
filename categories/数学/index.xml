@@ -1,0 +1,78 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>数学 - 分类 - Praise the Sun!</title>
+        <link>https://cache-tlb.github.io/categories/%E6%95%B0%E5%AD%A6/</link>
+        <description>数学 - 分类 - Praise the Sun!</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Tue, 14 Mar 2023 21:20:08 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E6%95%B0%E5%AD%A6/" rel="self" type="application/rss+xml" /><item>
+    <title>Wallis 乘积的几何证明方法</title>
+    <link>https://cache-tlb.github.io/wallis-product/</link>
+    <pubDate>Tue, 14 Mar 2023 21:20:08 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/wallis-product/</guid>
+    <description><![CDATA[Wallis 乘积公式表述为： $$ \frac{\pi}{2} = \frac{2}{1}\cdot\frac{2}{3}\cdot\frac{4}{3}\cdot\frac{4}{5}\cdot\frac{6}{5}\cdot\frac{6}{7}\cdots $$ 出现 $\pi$ 的地方或多或少都跟圆能扯上关系，这里介绍两个巧妙的证明方法，都只需要初等的代数和几何知识就可以理解。 第一个]]></description>
+</item><item>
+    <title>球面三角形面积公式推导</title>
+    <link>https://cache-tlb.github.io/spherical-triangle-area/</link>
+    <pubDate>Fri, 27 Jan 2023 16:19:00 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/spherical-triangle-area/</guid>
+    <description><![CDATA[问题 单位球面上有三个大圆，构成一个球面三角形，顶点为 $A,B,C$，其内角分别是 $\alpha, \beta, \gamma$。求球面三角形的立体角（即面积）。 割补法 经]]></description>
+</item><item>
+    <title>福特圆可视化</title>
+    <link>https://cache-tlb.github.io/visulization-of-ford-circle/</link>
+    <pubDate>Tue, 11 Oct 2022 22:33:10 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/visulization-of-ford-circle/</guid>
+    <description><![CDATA[福特圆 以下科普部分摘自 Wikipedia | Ford circle 福特圆是欧氏平面上的一组圆，对于任意一个最简分数 $\dfrac{p}{q}$，都对应一个福特圆，圆心在 $( \dfrac{p}{q}, \dfrac{1}{2q^2} )]]></description>
+</item><item>
+    <title>压垮骆驼的最后一根稻草</title>
+    <link>https://cache-tlb.github.io/the-straw-that-broke-the-camels-back/</link>
+    <pubDate>Sun, 25 Sep 2022 15:09:05 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/the-straw-that-broke-the-camels-back/</guid>
+    <description><![CDATA[问题 骆驼最大负重为 $1$，有一堆稻草，每一根稻草的重量都是 $(0, 1)$ 上独立的均匀分布。依次往骆驼的背上放稻草，直到总重量超过 $1$，这时骆驼就被压]]></description>
+</item><item>
+    <title>Linearly Transformed Cosines 积分部分推导</title>
+    <link>https://cache-tlb.github.io/ltc-integral/</link>
+    <pubDate>Fri, 12 Aug 2022 13:28:03 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/ltc-integral/</guid>
+    <description><![CDATA[用 LTC 计算多边形面光源对标准材质光照时需要计算一个积分式: $$ \int_{P_o}{D_o(\omega_o)}\ \mathrm{d}\omega_o = \mathrm{E}(P_o) . $$ 这里 $P_o$ 表示原多边形面光源经过线性变换后的形状在单位球面上投影的区域, 因]]></description>
+</item><item>
+    <title>球面插值函数 slerp 推导</title>
+    <link>https://cache-tlb.github.io/spherical-interpolation/</link>
+    <pubDate>Mon, 11 Jul 2022 19:56:35 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/spherical-interpolation/</guid>
+    <description><![CDATA[单位球, 球心在原点 $O$, 球面上有两点 $P_0, P_1$, 求插值函数 $P_t$, 其中$t\in[0,1]$, 满足 $P_t$ 与 $P_0, P_1$ 位于同一个大圆上, $P_{t=0} = P_0, P_{t=1}=P_1$, 且 $P_t$ 随 $t$ 均匀地从 $P_0$ 转动到 $P_1$.]]></description>
+</item><item>
+    <title>Shoelace 公式</title>
+    <link>https://cache-tlb.github.io/shoelace-formula/</link>
+    <pubDate>Mon, 20 Jun 2022 22:10:33 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/shoelace-formula/</guid>
+    <description><![CDATA[已知平面上简单多边形的顶点坐标为 $P_0, P_1, \cdots, P_{N-1}$, 求其面积. 设多边形区域为 $\Omega$, 则面积为 $$ A = \iint_\Omega {1}\ \mathrm{d}x\mathrm{d}y $$ 令 $P = 0, Q = x$, 则有 $\dfrac{\partial Q}{\partial x} - \dfrac{\partial P}{\partial y} = 1$, 根据格林公式可得]]></description>
+</item><item>
+    <title>Cubemap上每像素对应的立体角计算</title>
+    <link>https://cache-tlb.github.io/cubemap-texel-solid-angle/</link>
+    <pubDate>Mon, 30 May 2022 20:02:31 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/cubemap-texel-solid-angle/</guid>
+    <description><![CDATA[在处理环境光的重要性采样时, 具体的采样算法依赖于环境光的表达方式, 例如环境光可以用 cubemap, 全景图(panorama image), 或者球谐函数(spherica]]></description>
+</item><item>
+    <title>巴塞尔问题</title>
+    <link>https://cache-tlb.github.io/the-basel-problem/</link>
+    <pubDate>Mon, 14 Mar 2022 19:20:16 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/the-basel-problem/</guid>
+    <description><![CDATA[巴塞尔问题将自然数和圆周率这两个看似风马牛不相及的概念联系在了一起： $$ \zeta(2)= \frac{1}{1^2} + \frac{1}{2^2} + \frac{1}{3^2} + \cdots = \frac{\pi^2}{6} . $$ 这里的$\zeta(s)$是黎曼$\zeta$]]></description>
+</item><item>
+    <title>重要性采样</title>
+    <link>https://cache-tlb.github.io/importance-sampling/</link>
+    <pubDate>Sun, 16 Jan 2022 13:36:05 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/importance-sampling/</guid>
+    <description><![CDATA[蒙特卡罗积分 假设随机变量 $x$ 的概率密度函数为 $p(x)$，则以 $x$ 为自变量的函数 $g(x)$ 的期望值为 $$E[g(x)]=\int_{a}^{b}{g(x)p(x){\rm d}x} .$$ 如果要计算一个函数 $f(x)$ 的积分值 $\displaystyle I=\int_{a}^{b}{f(x){\rm d}x}$，只]]></description>
+</item></channel>
+</rss>
