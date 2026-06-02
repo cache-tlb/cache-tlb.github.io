@@ -29,7 +29,7 @@
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "https:\/\/cache-tlb.github.io\/notes-on-3d-gaussian-splatting\/"
-        },"genre": "posts","wordcount":  4085 ,
+        },"genre": "posts","wordcount":  4225 ,
         "url": "https:\/\/cache-tlb.github.io\/notes-on-3d-gaussian-splatting\/","datePublished": "2024-06-12T22:12:09+08:00","dateModified": "2024-06-12T22:12:09+08:00","publisher": {
             "@type": "Organization",
             "name": ""},"author": {
@@ -106,7 +106,7 @@
             <div class="toc-content" id="toc-content-auto"></div>
         </div><article class="page single"><h1 class="single-title animated flipInX">3D Gaussian Splatting笔记</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%9B%BE%E5%BD%A2/"><i class="far fa-folder fa-fw"></i>图形</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2024-06-12">2024-06-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4085 字&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2024-06-12">2024-06-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4225 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 9 分钟&nbsp;</div>
         </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
@@ -228,26 +228,26 @@
 <h3 id="反向过程">反向过程</h3>
 <p>入口为 <code>CudaRasterizer::Rasterizer::backward</code></p>
 <p>先从ctx里恢复前向过程的中间结果。特别是 imageState，geometryState，binningState</p>
-<p>输入数据包括： $\frac{\mathbf{d}L}{\mathbf{d}R_{p}}$， $\frac{{\rm d}L}{{\rm d}{\rm Z}_p}$，R表示渲染图像，下标p表示不同像素，c表示rgb通道。Z表示inv depth</p>
+<p>输入数据包括： $\frac{\mathbf{d}L}{\mathbf{d}R_{p}}$， $\frac{\mathbf{d}L}{\mathbf{d}{\rm Z}_p}$，R表示渲染图像，下标p表示不同像素，c表示rgb通道。Z表示inv depth</p>
 <h4 id="backwardrender"><code>BACKWARD::render</code></h4>
-<p>根据 $\frac{{\rm d}L}{{\rm d}R_{p}}$ 等计算 $\frac{{\rm d}L}{{\rm d}\mu'_k}$， $\frac{{\rm d}L}{{\rm d}\Sigma'^{-1}_k}$，$\frac{{\rm d}L}{{\rm d}{\rm o}_k}$，$\frac{{\rm d}L}{{\rm d}f_k}$，分别表示第k个gs的 2D位置，2D协方差矩阵，opacity，颜色。</p>
+<p>根据 $\frac{\mathbf{d}L}{\mathbf{d}R_{p}}$ 等计算 $\frac{\mathbf{d}L}{\mathbf{d}\mu'_k}$， $\frac{\mathbf{d}L}{\mathbf{d}\Sigma'^{-1}_k}$，$\frac{\mathbf{d}L}{\mathbf{d}{\rm o}_k}$，$\frac{\mathbf{d}L}{\mathbf{d}f_k}$，分别表示第k个gs的 2D位置，2D协方差矩阵，opacity，颜色。</p>
 <p>反向过程 tile 内 gs 按照从后往前的顺序遍历，因为记录了影响每个像素最远的 tile id，所以可以跳过更远的gs。假设当前是第 k 个gs。</p>
 <h5 id="alpha的梯度">alpha的梯度</h5>
 <p>像素的最终颜色按如下递归的形式叠加 $R=A_n=\alpha_nf_n+(1-\alpha_n)A_{n-1}$，且 $A_0$ 是常数，那么</p>
 <p>$$
 \begin{aligned}
-\frac{\rm d}{{\rm d}\alpha_k}A_n &amp;=\frac{\rm d}{{\rm d}\alpha_k}(\alpha_nf_n)+A_{n-1}\frac{\rm d}{{\rm d}\alpha_k}(1-\alpha_n)+(1-\alpha_n)\frac{\rm d}{{\rm d}\alpha_k}A_{n-1} \\ 
-&amp;=(f_n-A_{n-1})\frac{{\rm d}\alpha_n}{{\rm d}\alpha_k}+(1-\alpha_n)\frac{\rm d}{{\rm d}\alpha_k}A_{n-1} 
+\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_n &amp;=\frac{\mathbf{d}}{\mathbf{d}\alpha_k}(\alpha_nf_n)+A_{n-1}\frac{\mathbf{d}}{\mathbf{d}\alpha_k}(1-\alpha_n)+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_{n-1} \\ 
+&amp;=(f_n-A_{n-1})\frac{\mathbf{d}\alpha_n}{\mathbf{d}\alpha_k}+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_{n-1} 
 \end{aligned}
 $$</p>
 <p>这里n是最近的，1是最远的。</p>
-<p>注意到 $\frac{{\rm d}\alpha_i}{{\rm d}\alpha_k}$仅当 i==k时取值为1，否则取值为0。</p>
-<p>以及 $\frac{{\rm d}}{{\rm d}\alpha_k}A_i$ 当 i&lt;k 的时候都等于0.</p>
+<p>注意到 $\frac{\mathbf{d}\alpha_i}{\mathbf{d}\alpha_k}$仅当 i==k时取值为1，否则取值为0。</p>
+<p>以及 $\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_i$ 当 i&lt;k 的时候都等于0.</p>
 <p>例如，</p>
 <p>$$
 \begin{aligned}
-\frac{\rm d}{{\rm d}\alpha_1}A_n &amp;=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_2)(f_1-A_0)\\ 
-\frac{\rm d}{{\rm d}\alpha_2}A_n &amp;=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_3)(f_2-A_1)
+\frac{\mathbf{d}}{\mathbf{d}\alpha_1}A_n &amp;=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_2)(f_1-A_0)\\ 
+\frac{\mathbf{d}}{\mathbf{d}\alpha_2}A_n &amp;=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_3)(f_2-A_1)
 \end{aligned}
 $$</p>
 <p>在从 1 到 n遍历的过程中， $A_i$ 的值可以逐渐累加，</p>
@@ -257,7 +257,7 @@ $$</p>
 <p>$$
 \alpha_k=o_k\cdot e^{-\frac{1}{2}(X-\mu'_k)^T\Sigma_k'^{-1}(X-\mu'_k)}
 $$</p>
-<p>于是根据链式法则，$\frac{{\rm d}L}{{\rm d}o_k}=\frac{{\rm d}L}{{\rm d}R}\frac{{\rm d}R}{{\rm d}\alpha_k}\frac{{\rm d}\alpha_k}{{\rm d}o_k}$</p>
+<p>于是根据链式法则，$\displaystyle \frac{\mathbf{d}L}{\mathbf{d}o_k}=\frac{\mathbf{d}L}{\mathbf{d}R}\frac{\mathbf{d}R}{\mathbf{d}\alpha_k}\frac{\mathbf{d}\alpha_k}{\mathbf{d}o_k}$</p>
 <h5 id="means2d-的梯度">means2D 的梯度</h5>
 <p>gs点的位置只影响他的alpha，所以梯度只通过alpha的梯度传导过来。记</p>
 <p>$$
@@ -268,24 +268,24 @@ $$</p>
 $$</p>
 <p>则</p>
 <p>$$
-\frac{{\rm d}\alpha_k}{{\rm d}\mu_{k,x}'}=-\alpha_k\cdot(c_xd_x+c_yd_y),\ \ \frac{{\rm d}\alpha_k}{{\rm d}\mu_{k,y}'}=-\alpha_k\cdot(c_yd_x+c_zd_y)
+\frac{\mathbf{d}\alpha_k}{\mathbf{d}\mu_{k,x}'}=-\alpha_k\cdot(c_xd_x+c_yd_y),\ \ \frac{\mathbf{d}\alpha_k}{\mathbf{d}\mu_{k,y}'}=-\alpha_k\cdot(c_yd_x+c_zd_y)
 $$</p>
 <h5 id="cov2d的梯度">cov2D的梯度</h5>
 <p>$$
-\frac{{\rm d}\alpha_k}{{\rm d}c_x}=-\frac{1}{2}\alpha_kd_x^2,\ \ \  \frac{{\rm d}\alpha_k}{{\rm d}c_y}=-\frac{1}{2}\alpha_kd_xd_y,\ \ \ \frac{{\rm d}\alpha_k}{{\rm d}c_z}=-\frac{1}{2}\alpha_kd_y^2
+\frac{\mathbf{d}\alpha_k}{\mathbf{d}c_x}=-\frac{1}{2}\alpha_kd_x^2,\ \ \  \frac{\mathbf{d}\alpha_k}{\mathbf{d}c_y}=-\frac{1}{2}\alpha_kd_xd_y,\ \ \ \frac{\mathbf{d}\alpha_k}{\mathbf{d}c_z}=-\frac{1}{2}\alpha_kd_y^2
 $$</p>
 <h5 id="color的梯度">color的梯度</h5>
 <p>$$
 \begin{aligned}
-\frac{\rm d}{{\rm d}f_k}A_n &amp;=\frac{\rm d}{{\rm d}f_k}(\alpha_nf_n)+(1-\alpha_n)\frac{\rm d}{{\rm d}f_k}A_{n-1} \\ 
-&amp;=\alpha_n\frac{{\rm d}f_n}{{\rm d}f_k}+(1-\alpha_n)\frac{\rm d}{{\rm d}f_k}A_{n-1} \\ 
+\frac{\mathbf{d}}{\mathbf{d}f_k}A_n &amp;=\frac{\mathbf{d}}{\mathbf{d}f_k}(\alpha_nf_n)+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}f_k}A_{n-1} \\ 
+&amp;=\alpha_n\frac{\mathbf{d}f_n}{\mathbf{d}f_k}+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}f_k}A_{n-1} \\ 
 &amp;=\cdots\\ 
 &amp;=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_{k+1})\alpha_k
 \end{aligned}
 $$</p>
 <h4 id="backwardpreprocess"><code>BACKWARD::preprocess</code></h4>
 <p>这一步将 forward 过程的preprocess进行反向，先将 cov2D、means2D 的梯度传播到 cov3D，means3D，将color梯度传到 SH，将cov3D 梯度传到scale 和 rotation。</p>
-<p>主要涉及到 3D 高斯协方差矩阵相对于2D协方差矩阵的求导 $\frac{{\rm d}\Sigma}{{\rm d}\Sigma'}$，3D协方差矩阵相对于旋转的四元数的求导 $\frac{{\rm d}\Sigma}{{\rm d}q}$，公式推导见论文，这里略过</p>
+<p>主要涉及到 3D 高斯协方差矩阵相对于2D协方差矩阵的求导 $\dfrac{\mathbf{d}\Sigma}{\mathbf{d}\Sigma'}$，3D协方差矩阵相对于旋转的四元数的求导 $\dfrac{\mathbf{d}\Sigma}{\mathbf{d}q}$，公式推导见论文，这里略过</p>
 <h4 id="备注">备注</h4>
 <p>cov3D 是 3x3 的实对称矩阵，总共有 6 个自由度。scale （vec3）和 ration（quaternion）的自由度也是6，所以表达能力上是等价的。</p>
 <p>理论上，在训练过程中，可以只关注 cov3D，没必要计算 scale 和 rotation 的梯度传播。</p>

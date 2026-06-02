@@ -91,11 +91,11 @@ tensor：colors_precomp, means3D, scales, rotations, cov3Ds_precomp, radii, sh, 
 
 先从ctx里恢复前向过程的中间结果。特别是 imageState，geometryState，binningState
 
-输入数据包括： $\frac{\mathbf{d}L}{\mathbf{d}R_{p}}$， $\frac{{\rm d}L}{{\rm d}{\rm Z}_p}$，R表示渲染图像，下标p表示不同像素，c表示rgb通道。Z表示inv depth
+输入数据包括： $\frac{\mathbf{d}L}{\mathbf{d}R_{p}}$， $\frac{\mathbf{d}L}{\mathbf{d}{\rm Z}_p}$，R表示渲染图像，下标p表示不同像素，c表示rgb通道。Z表示inv depth
 
 #### `BACKWARD::render`
 
-根据 $\frac{{\rm d}L}{{\rm d}R_{p}}$ 等计算 $\frac{{\rm d}L}{{\rm d}\mu'_k}$， $\frac{{\rm d}L}{{\rm d}\Sigma'^{-1}_k}$，$\frac{{\rm d}L}{{\rm d}{\rm o}_k}$，$\frac{{\rm d}L}{{\rm d}f_k}$，分别表示第k个gs的 2D位置，2D协方差矩阵，opacity，颜色。
+根据 $\frac{\mathbf{d}L}{\mathbf{d}R_{p}}$ 等计算 $\frac{\mathbf{d}L}{\mathbf{d}\mu'_k}$， $\frac{\mathbf{d}L}{\mathbf{d}\Sigma'^{-1}_k}$，$\frac{\mathbf{d}L}{\mathbf{d}{\rm o}_k}$，$\frac{\mathbf{d}L}{\mathbf{d}f_k}$，分别表示第k个gs的 2D位置，2D协方差矩阵，opacity，颜色。
 
 反向过程 tile 内 gs 按照从后往前的顺序遍历，因为记录了影响每个像素最远的 tile id，所以可以跳过更远的gs。假设当前是第 k 个gs。
 
@@ -105,23 +105,23 @@ tensor：colors_precomp, means3D, scales, rotations, cov3Ds_precomp, radii, sh, 
 
 $$
 \begin{aligned}
-\frac{\rm d}{{\rm d}\alpha_k}A_n &=\frac{\rm d}{{\rm d}\alpha_k}(\alpha_nf_n)+A_{n-1}\frac{\rm d}{{\rm d}\alpha_k}(1-\alpha_n)+(1-\alpha_n)\frac{\rm d}{{\rm d}\alpha_k}A_{n-1} \\\ 
-&=(f_n-A_{n-1})\frac{{\rm d}\alpha_n}{{\rm d}\alpha_k}+(1-\alpha_n)\frac{\rm d}{{\rm d}\alpha_k}A_{n-1} 
+\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_n &=\frac{\mathbf{d}}{\mathbf{d}\alpha_k}(\alpha_nf_n)+A_{n-1}\frac{\mathbf{d}}{\mathbf{d}\alpha_k}(1-\alpha_n)+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_{n-1} \\\ 
+&=(f_n-A_{n-1})\frac{\mathbf{d}\alpha_n}{\mathbf{d}\alpha_k}+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_{n-1} 
 \end{aligned}
 $$
 
 这里n是最近的，1是最远的。
 
-注意到 $\frac{{\rm d}\alpha_i}{{\rm d}\alpha_k}$仅当 i==k时取值为1，否则取值为0。
+注意到 $\frac{\mathbf{d}\alpha_i}{\mathbf{d}\alpha_k}$仅当 i==k时取值为1，否则取值为0。
 
-以及 $\frac{{\rm d}}{{\rm d}\alpha_k}A_i$ 当 i<k 的时候都等于0.
+以及 $\frac{\mathbf{d}}{\mathbf{d}\alpha_k}A_i$ 当 i<k 的时候都等于0.
 
 例如， 
 
 $$
 \begin{aligned}
-\frac{\rm d}{{\rm d}\alpha_1}A_n &=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_2)(f_1-A_0)\\\ 
-\frac{\rm d}{{\rm d}\alpha_2}A_n &=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_3)(f_2-A_1)
+\frac{\mathbf{d}}{\mathbf{d}\alpha_1}A_n &=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_2)(f_1-A_0)\\\ 
+\frac{\mathbf{d}}{\mathbf{d}\alpha_2}A_n &=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_3)(f_2-A_1)
 \end{aligned}
 $$
 
@@ -137,7 +137,7 @@ $$
 \alpha_k=o_k\cdot e^{-\frac{1}{2}(X-\mu'_k)^T\Sigma_k'^{-1}(X-\mu'_k)}
 $$
 
-于是根据链式法则，$\frac{{\rm d}L}{{\rm d}o_k}=\frac{{\rm d}L}{{\rm d}R}\frac{{\rm d}R}{{\rm d}\alpha_k}\frac{{\rm d}\alpha_k}{{\rm d}o_k}$
+于是根据链式法则，$\displaystyle \frac{\mathbf{d}L}{\mathbf{d}o_k}=\frac{\mathbf{d}L}{\mathbf{d}R}\frac{\mathbf{d}R}{\mathbf{d}\alpha_k}\frac{\mathbf{d}\alpha_k}{\mathbf{d}o_k}$
 
 ##### means2D 的梯度
 gs点的位置只影响他的alpha，所以梯度只通过alpha的梯度传导过来。记
@@ -153,21 +153,21 @@ $$
 则
 
 $$
-\frac{{\rm d}\alpha_k}{{\rm d}\mu_{k,x}'}=-\alpha_k\cdot(c_xd_x+c_yd_y),\ \ \frac{{\rm d}\alpha_k}{{\rm d}\mu_{k,y}'}=-\alpha_k\cdot(c_yd_x+c_zd_y)
+\frac{\mathbf{d}\alpha_k}{\mathbf{d}\mu_{k,x}'}=-\alpha_k\cdot(c_xd_x+c_yd_y),\ \ \frac{\mathbf{d}\alpha_k}{\mathbf{d}\mu_{k,y}'}=-\alpha_k\cdot(c_yd_x+c_zd_y)
 $$
 
 ##### cov2D的梯度
 
 $$
-\frac{{\rm d}\alpha_k}{{\rm d}c_x}=-\frac{1}{2}\alpha_kd_x^2,\ \ \  \frac{{\rm d}\alpha_k}{{\rm d}c_y}=-\frac{1}{2}\alpha_kd_xd_y,\ \ \ \frac{{\rm d}\alpha_k}{{\rm d}c_z}=-\frac{1}{2}\alpha_kd_y^2
+\frac{\mathbf{d}\alpha_k}{\mathbf{d}c_x}=-\frac{1}{2}\alpha_kd_x^2,\ \ \  \frac{\mathbf{d}\alpha_k}{\mathbf{d}c_y}=-\frac{1}{2}\alpha_kd_xd_y,\ \ \ \frac{\mathbf{d}\alpha_k}{\mathbf{d}c_z}=-\frac{1}{2}\alpha_kd_y^2
 $$
 
 ##### color的梯度
 
 $$
 \begin{aligned}
-\frac{\rm d}{{\rm d}f_k}A_n &=\frac{\rm d}{{\rm d}f_k}(\alpha_nf_n)+(1-\alpha_n)\frac{\rm d}{{\rm d}f_k}A_{n-1} \\\ 
-&=\alpha_n\frac{{\rm d}f_n}{{\rm d}f_k}+(1-\alpha_n)\frac{\rm d}{{\rm d}f_k}A_{n-1} \\\ 
+\frac{\mathbf{d}}{\mathbf{d}f_k}A_n &=\frac{\mathbf{d}}{\mathbf{d}f_k}(\alpha_nf_n)+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}f_k}A_{n-1} \\\ 
+&=\alpha_n\frac{\mathbf{d}f_n}{\mathbf{d}f_k}+(1-\alpha_n)\frac{\mathbf{d}}{\mathbf{d}f_k}A_{n-1} \\\ 
 &=\cdots\\\ 
 &=(1-\alpha_n)(1-\alpha_{n-1})\cdots(1-\alpha_{k+1})\alpha_k
 \end{aligned}
@@ -176,7 +176,7 @@ $$
 #### `BACKWARD::preprocess`
 这一步将 forward 过程的preprocess进行反向，先将 cov2D、means2D 的梯度传播到 cov3D，means3D，将color梯度传到 SH，将cov3D 梯度传到scale 和 rotation。
 
-主要涉及到 3D 高斯协方差矩阵相对于2D协方差矩阵的求导 $\frac{{\rm d}\Sigma}{{\rm d}\Sigma'}$，3D协方差矩阵相对于旋转的四元数的求导 $\frac{{\rm d}\Sigma}{{\rm d}q}$，公式推导见论文，这里略过
+主要涉及到 3D 高斯协方差矩阵相对于2D协方差矩阵的求导 $\dfrac{\mathbf{d}\Sigma}{\mathbf{d}\Sigma'}$，3D协方差矩阵相对于旋转的四元数的求导 $\dfrac{\mathbf{d}\Sigma}{\mathbf{d}q}$，公式推导见论文，这里略过
 
 #### 备注
 cov3D 是 3x3 的实对称矩阵，总共有 6 个自由度。scale （vec3）和 ration（quaternion）的自由度也是6，所以表达能力上是等价的。
