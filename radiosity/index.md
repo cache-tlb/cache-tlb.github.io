@@ -23,23 +23,14 @@ $$B_i = E_i + R_i \sum_j F_{ij} B_j .\tag{*}$$
 但实际上不用这么复杂，想象光线的传播过程，先是从光源出发，到达相机，此时只有自发光表面的 $B_i$ 才有值，其他的都是零. 这些非零的项代入到右边的求和式中，又会产生更多的非零项，也就是被直接光照亮的那些表面。再把当前的 $B_i$ 向量作为已知数代入 $(*)$ 式，则是相当于又计算了光线在物体表面反弹一次的间接光照。迭代几轮便会收敛到稳定值。
  
 
-以下是一个简单demo。
+以下是一个简单[demo](./demo.html)。
 
-<center>
-    <div style=""> 
-            <canvas id="drawCanvas" style=""> </canvas>            
-            <div id="gui-container" style=""> </div>            
-    </div>
-</center>
+<iframe id="frame" width="100%" height="300" src="./demo.html" style="border: none;"></iframe>
 <script>
-    (function (){
-        const canvas = document.getElementById('drawCanvas');
-        canvas.width = window.innerWidth/1.5;
-        canvas.height = window.innerHeight*0.75;
-    })();
+    const frame = document.getElementById('frame');
+    const contentDom = document.getElementById('content');
+    frame.height = window.innerHeight*0.75;
 </script>
-<script src='./m4.js'></script>
-<script src='./webgl-utils.js'></script>
-<script type="module" src="./demo.js"></script>
+
 
 

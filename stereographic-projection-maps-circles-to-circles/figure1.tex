@@ -1,0 +1,66 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{amssymb} % for \subset
+\usepackage{pgf,tikz,pgfplots,tkz-euclide}
+\usepackage{tikz-3dplot}
+\pgfplotsset{compat=1.15}
+\usepackage{mathrsfs}
+\usepackage{amsmath}
+\allowdisplaybreaks[4]
+\usetikzlibrary{arrows,arrows.meta,angles,quotes,automata,math}
+\usetikzlibrary{calc,fadings,decorations.pathreplacing}
+\usetikzlibrary{shadings,intersections}
+\usetikzlibrary{3d}
+\usetikzlibrary{hobby}
+%\usepackage{amsthm}
+\usepackage{wrapfig}
+\usepackage{gensymb}
+\usepackage{subfigure} 
+\usepackage{physics}
+\usepackage{diagbox}
+
+\begin{document}
+
+\tdplotsetmaincoords{60}{145}
+\begin{tikzpicture}[scale=3.2,tdplot_main_coords]
+%\shade[ball color = lightgray,opacity = 0.5] (0,0,0) circle (1cm);
+\draw[line width=1pt] (0,0,0) circle (1cm);
+\begin{scope}[canvas is xy plane at z=-1]
+   \draw[blue] (0,0) circle (2cm);
+\end{scope}
+%\foreach \x in {-2,-0.75,...,2}
+%    \foreach \y in {-2,-0.75,...,2}
+%    {
+%        \draw[gray] (\x,-2,-1) -- (\x,2,-1);
+%        \draw[gray] (-2,\y,-1) -- (2,\y,-1);
+%    }
+\begin{scope}[canvas is zx plane at y=0]
+   \draw[red,dashed] (0,0) circle (1cm);
+   \draw[dashed] (-1,0) -- (1,0);
+\end{scope}
+\begin{scope}[canvas is xy plane at z=0]
+   \draw[dashed,blue] (0,0) circle (1cm);
+  \draw[dashed] (0,-1) -- (0,1);
+  \draw[dashed] (-1,0) -- (1,0);
+\end{scope}
+\begin{scope}[canvas is zy plane at x=0]
+  \draw[green,dashed] (0,0) circle (1cm);
+\end{scope}
+\coordinate (O) at (0,0,0);
+\coordinate (N) at (0,0,1);
+\fill[fill=black,draw=black,thick,fill opacity=1] (0,0,0) circle (0.6pt);
+\fill[fill=black,draw=black,thick,fill opacity=1] (0,0,1) circle (0.3pt) node[left]{$N$};
+\fill[fill=black,draw=black,thick,fill opacity=1] (0,1,0) circle (0.3pt);
+\fill[fill=black,draw=black,thick,fill opacity=1] (1,0,0) circle (0.3pt);
+%\draw[dashed] (N)--(0,-2,-1) ;
+\draw[green,dashed] (N)--(0,2,-1) ;
+%\draw[dashed] (N)--(-2,0,-1) ;
+\draw[red,dashed] (N)--(2,0,-1) ;
+\draw[green,dashed] (0,-2,-1)--(0,2,-1) ;
+\draw[red,dashed] (-2,0,-1)--(2,0,-1) ;
+\fill[fill=black,draw=black,thick,fill opacity=1] (0,2,-1,-1) circle (0.3pt);
+\fill[fill=black,draw=black,thick,fill opacity=1] (0,-2,-1) circle (0.3pt);
+\fill[fill=black,draw=black,thick,fill opacity=1] (2,0,-1) circle (0.3pt);
+\fill[fill=black,draw=black,thick,fill opacity=1] (-2,0,-1) circle (0.3pt);
+\end{tikzpicture}
+
+\end{document}

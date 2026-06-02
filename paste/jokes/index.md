@@ -632,3 +632,29 @@ Your brain has two parts: left & right. Your left brain has nothing right, your 
 
 {{< /admonition >}}
 
+---
+关于英语里如果要删掉一个字母，删掉哪个影响最小？
+[知乎回答](https://www.zhihu.com/question/625593581/answer/3269327329)
+
+{{< admonition quote >}}
+**EUROPEAN COMMISSION REACHES AGREEMENT**
+
+The European Commission have just announced an agreement whereby English will be the official language of the European Union rather than German - which was the other possibility.
+
+As part of the negotiations, Her Majesty's Government conceded that the English spelling had some room for improvement and has accepted a 5 year phase toward what would be known as 'EuroEnglish'.
+
+In the first year, 's' will replace the soft 'c'.  Sertainly this will make the sivil servants jump for joy.  The hard 'c' will be dropped in favour of the 'k'.  This should klear up konfusion and keyboards kan have one less letter.
+
+There will be growing publik enthusiasm in the sekond year when the troublesome 'ph' will be replased with the 'f'.  This will make words like 'fotograf' 20% shorter.
+ 
+In the third year, publik akseptanse of the new spelling kan be expekted to reach the stage where more komplikated changes are possible. Governments will enkourage the removal of double letters, which have always ben a deterent to akurate speling.  Also, al wil agre that the horible mes of the silent 'e's in the language is disgraseful, and they should go away.
+
+By the fourth year, peopl wil be reseptiv to steps such as replasing 'th' with 'z' and 'w'' with 'v'.
+
+During the fifz year, ze unesesary 'o' kan be dropped from vords kontaining 'ou' and similar changes vud of kors be aplid to ozer kombinations of leters.  After zis fifz yer, ve vil hav a reli sensibl riten styl.
+
+To mak it ezir to red, al nowns wil bekum Kapitalised. Zer vil be no mor Trubls of Difikultis and Evrivun vil find it ezi tu understand ech ozer.
+
+ZR DREM VIL FINALI KUM TRU!!
+{{< /admonition >}}
+

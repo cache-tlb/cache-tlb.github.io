@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>欧拉的奇迹 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="欧拉的奇迹" />
+<meta property="og:description" content="本文参考了 William Dunham 所著的 &ldquo;Euler&rsquo;s Miracle&rdquo; 一文（本地存档）. 该文分析了一种交错的调和级数. 虽然调和级数是发散的, 欧拉改变了调和级数的某些项的符号, 得到了收敛的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/eulers-miracle/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2025-03-14T23:01:02&#43;08:00" />
+<meta property="article:modified_time" content="2025-03-14T23:01:02&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="欧拉的奇迹"/>
+<meta name="twitter:description" content="本文参考了 William Dunham 所著的 &ldquo;Euler&rsquo;s Miracle&rdquo; 一文（本地存档）. 该文分析了一种交错的调和级数. 虽然调和级数是发散的, 欧拉改变了调和级数的某些项的符号, 得到了收敛的"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/eulers-miracle/" /><link rel="prev" href="https://cache-tlb.github.io/a-formula-that-generates-all-positive-rational-numbers/" /><link rel="next" href="https://cache-tlb.github.io/notes-on-4dgs/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "欧拉的奇迹",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/eulers-miracle\/"
+        },"genre": "posts","wordcount":  1166 ,
+        "url": "https:\/\/cache-tlb.github.io\/eulers-miracle\/","datePublished": "2025-03-14T23:01:02+08:00","dateModified": "2025-03-14T23:01:02+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">欧拉的奇迹</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2025-03-14">2025-03-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1166 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#欧拉交错级数">欧拉交错级数</a></li>
+        <li><a href="#leibniz-级数的乘积形式">Leibniz 级数的乘积形式</a></li>
+        <li><a href="#巴塞尔问题的乘积形式">巴塞尔问题的乘积形式</a></li>
+        <li><a href="#证明结论">证明结论</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>本文参考了 William Dunham 所著的 &ldquo;Euler&rsquo;s Miracle&rdquo; 一文（<a href="./EulersMiracle.pdf" rel="">本地存档</a>）. 该文分析了一种交错的调和级数.
+虽然调和级数是发散的, 欧拉改变了调和级数的某些项的符号, 得到了收敛的结果, 并且收敛值正好是 $ \pi $.</p>
+<h3 id="欧拉交错级数">欧拉交错级数</h3>
+<p>这里讨论的级数定义如下:
+$$
+\begin{align*}
+E &amp;= 1 + \frac{1}{2} + \frac{1}{3} + \frac{1}{4} - \frac{1}{5} + \frac{1}{6} + \frac{1}{7} + \frac{1}{8} + \frac{1}{9} - \frac{1}{10} \\ 
+&amp; + \frac{1}{11} + \frac{1}{12} - \frac{1}{13} + \frac{1}{14} - \frac{1}{15} + \frac{1}{16} - \frac{1}{17} + \frac{1}{18} + \frac{1}{19} - \frac{1}{20} \\ 
+&amp; + \frac{1}{21} + \frac{1}{22} + \frac{1}{23} + \frac{1}{24} + \frac{1}{25} - \frac{1}{26} + \frac{1}{27} + \frac{1}{28} - \frac{1}{29} - \frac{1}{30} \\ 
+&amp; + \frac{1}{31} + \frac{1}{32} + \frac{1}{33} - \frac{1}{34} - \frac{1}{35} + \cdots
+\end{align*}
+$$
+改变符号的规则为: 对于任意正整数 $ n $, 如果 $n$ 含有奇数个形如 $ 4k + 1$ 的素因子(包含重复的), 那么 $\dfrac{1}{n} $ 的符号就是负的.</p>
+<p>为了证明这个结论, 欧拉使用了 4 条已有的结论.</p>
+<ul>
+<li>Leibniz 级数: 
+$$ 1-\frac{1}{3}+\frac{1}{5}-\frac{1}{7} + \cdots =\frac{\pi}{4} $$</li>
+<li>巴塞尔问题: 
+$$ 1+\frac{1}{2^2}+\frac{1}{3^2}+\cdots = \frac{\pi^2}{6} $$</li>
+<li>几何级数的求和:
+$$ 1 + a + a^2 + a^3 + \cdots = \frac{1}{1-a}, \quad -1 &lt; a &lt; 1 $$</li>
+<li>算术基本定理或正整数唯一分解定理: 任何一个大于1的自然数, 如果它不为质数，那么它可以唯一分解成有限个质数的乘积.</li>
+</ul>
+<h3 id="leibniz-级数的乘积形式">Leibniz 级数的乘积形式</h3>
+<p>欧拉的证明过程是先将 Leibniz 级数公式与它自身的 $\dfrac{1}{3}$ 相加:
+$$
+\begin{align*}
+\frac{\pi}{4} &amp;= 1-\frac{1}{3}+\frac{1}{5}-\frac{1}{7} +\frac{1}{9} - \frac{1}{11} + \frac{1}{13} - \frac{1}{15} + \frac{1}{17} - \frac{1}{19} + \frac{1}{21} - \frac{1}{23} +\cdots \\ 
+\frac{1}{3}\cdot\frac{\pi}{4} &amp;= \frac{1}{3}-\frac{1}{9}+\frac{1}{15}-\frac{1}{21}+\cdots \\ 
+\frac{\pi}{4}(1+\frac{1}{3})&amp;=1+\frac{1}{5}-\frac{1}{7}-\frac{1}{11}+\frac{1}{13}+\frac{1}{17}-\frac{1}{19}-\frac{1}{23}+\cdots
+\end{align*}
+$$
+最后一个式子里, 分母为 3 的倍数的项被消去了. 接着再减去上面最后一个等式的 $\dfrac{1}{5}$, 得到:
+$$
+\begin{align*}
+\frac{\pi}{4}(1+\frac{1}{3})&amp;=1+\frac{1}{5}-\frac{1}{7}-\frac{1}{11}+\frac{1}{13}+\frac{1}{17}-\frac{1}{19}-\frac{1}{23}+\cdots \\ 
+\frac{1}{5}\cdot\frac{\pi}{4}(1+\frac{1}{3}) &amp;= \frac{1}{5} + \frac{1}{25} - \frac{1}{35} - \cdots \\ 
+\frac{\pi}{4}(1+\frac{1}{3})(1-\frac{1}{5})&amp;=1-\frac{1}{7}-\frac{1}{11}+\frac{1}{13}+\frac{1}{17}-\frac{1}{19}-\frac{1}{23}+\cdots
+\end{align*}
+$$
+这里, 分母是 3 和 5 的倍数的项都没了. 如此, 再加上上面式子的 $\dfrac{1}{7}$:
+$$
+\frac{\pi}{4}(1+\frac{1}{3})(1-\frac{1}{5})(1+\frac{1}{7}) = 1- \frac{1}{11}+\frac{1}{13}+\frac{1}{17}-\frac{1}{19} - \frac{1}{23} + \cdots
+$$</p>
+<p>以此类推, 每一步等式右边开头都是 $ 1\pm\dfrac{1}{p} $ 的形式, 其中 $ p $ 是一个质数. 无限重复下去, 根据 $\dfrac{1}{p}$ 在 Leibniz 级数中的正负号决定下一步乘上的是 $(1+\dfrac{1}{p})$ 还是 $(1-\dfrac{1}{p})$. Leibniz 级数中的正负号规律很容易看出来, $\dfrac{1}{4k+1}$ 是加号, $\dfrac{1}{4k+3}$ 是减号. 于是, 将上面的过程无限重复, 将得到: 
+$$
+\frac{\pi}{4}(1+\frac{1}{3})(1-\frac{1}{5})(1+\frac{1}{7})(1+\frac{1}{11})(1-\frac{1}{13})(1-\frac{1}{17})(1+\frac{1}{19}) \cdots = 1
+$$ 
+或者写成:
+$$
+(1+\frac{1}{3})(1-\frac{1}{5})(1+\frac{1}{7})(1+\frac{1}{11})(1-\frac{1}{13})(1-\frac{1}{17})(1+\frac{1}{19}) \cdots = \frac{4}{\pi}
+$$</p>
+<p>如此就把求和形式的 Leibniz 级数转成了乘积形式.</p>
+<h3 id="巴塞尔问题的乘积形式">巴塞尔问题的乘积形式</h3>
+<p>考虑下面的分式, 分母中各项里的分数的分母包含了所有质数:
+$$
+Q = \frac{1}{(1+\frac{1}{2})(1-\frac{1}{2})(1+\frac{1}{3})(1-\frac{1}{3})(1+\frac{1}{5})(1-\frac{1}{5})(1+\frac{1}{7})(1-\frac{1}{7})(1+\frac{1}{11})(1-\frac{1}{11})\cdots}
+$$</p>
+<p>欧拉将它的相邻项两两结合, 并使用几何级数展开:
+$$
+\begin{align*}
+Q &amp;= \frac{1}{1-\frac{1}{4}}\cdot\frac{1}{1-\frac{1}{9}}\cdot\frac{1}{1-\frac{1}{25}}\cdot\frac{1}{1-\frac{1}{49}}\cdot\frac{1}{1-\frac{1}{121}}\cdot\frac{1}{1-\frac{1}{169}}\cdot\cdots \\ 
+&amp;= \left(1+\frac{1}{4}+\frac{1}{4^2}+\cdots\right)\left(1+\frac{1}{9}+\frac{1}{9^2}+\cdots\right)\left(1+\frac{1}{25}+\cdots\right)\left(1+\frac{1}{49}+\cdots\right)\cdots
+\end{align*}
+$$
+可以断言, 巴塞尔问题中的任意一项 $ \dfrac{1}{N^2}$会在这个乘积中出现且仅出现一次. 这是因为 $ N $ 可以被唯一地表示成质数的乘积: $ N = \prod p_i^{k_i} $, 其中 $ p_i $ 是第 $ i $ 个质数, $ k_i $ 是自然数.
+则 $ N^2 = \prod (p_i^2)^{k_i} $. 每个 $ N $ 对应一组 ${k_i}$ 的序列, 且该序列非零项个数是有限的. 而这样的序列一一对应了上面乘积展开式中的一项. 于是
+$$Q = 1 + \frac{1}{4} + \frac{1}{9} + \frac{1}{16} + \cdots = \frac{\pi^2}{6} .$$</p>
+<p>或者写成
+$$(1+\frac{1}{2})(1-\frac{1}{2})(1+\frac{1}{3})(1-\frac{1}{3})(1+\frac{1}{5})(1-\frac{1}{5})(1+\frac{1}{7})(1-\frac{1}{7})\cdots= \frac{1}{Q} = \frac{6}{\pi^2}$$</p>
+<p>左边是 $(1\pm\frac{1}{p})$ 形式的乘积, $p$ 为质数.</p>
+<h3 id="证明结论">证明结论</h3>
+<p>得到了前述的 Leibniz 级数和巴塞尔问题的乘积形式后, 将二者相除, 再乘以 $ \dfrac{3}{2} $, 得到
+$$
+\begin{align*}
+\pi &amp;= \frac{3}{2}\left(\frac{4/\pi}{6/\pi^2}\right) \\ 
+&amp;=  \frac{3}{2}\left(\frac{(1+\frac{1}{3})(1-\frac{1}{5})(1+\frac{1}{7})(1+\frac{1}{11})(1-\frac{1}{13})(1-\frac{1}{17})(1+\frac{1}{19})\cdots}{(1+\frac{1}{2})(1-\frac{1}{2})(1+\frac{1}{3})(1-\frac{1}{3})(1+\frac{1}{5})(1-\frac{1}{5})(1+\frac{1}{7})(1-\frac{1}{7})\cdots}\right) \\ 
+&amp;= \frac{1}{1-\frac{1}{2}}\cdot\frac{1}{1-\frac{1}{3}}\cdot\frac{1}{1+\frac{1}{5}}\cdot\frac{1}{1-\frac{1}{7}}\cdot\frac{1}{1-\frac{1}{11}}\cdot\frac{1}{1+\frac{1}{13}}\cdot\frac{1}{1+\frac{1}{17}}\cdot\frac{1}{1-\frac{1}{19}}\cdots
+\end{align*}
+$$
+可以发现, 最后的式子中, 对于奇素数 $ p $, 如果 $p$ 是 $4k+1$ 的形式, 则对应 $\left(1+\dfrac{1}{p}\right)^{-1}$ 的项; 如果 $p$ 是 $4k+3$ 的形式, 则对应 $\left(1-\dfrac{1}{p}\right)^{-1}$ 的项.</p>
+<p>继续应用几何级数展开, 得到
+$$
+\begin{align*}
+\pi = &amp; \left(1+\frac{1}{2}+\frac{1}{2^2}+\cdots\right)\times\left(1+\frac{1}{3}+\frac{1}{3^2}+\cdots\right)\times\left(1-\frac{1}{5}+\frac{1}{5^2}-\cdots\right)\times\\ 
+&amp; \left(1+\frac{1}{7}+\frac{1}{7^2}+\cdots\right)\times\left(1+\frac{1}{11}+\frac{1}{11^2}+\cdots\right)\times\left(1-\frac{1}{13}+\frac{1}{13^2}-\cdots\right)\times\cdots
+\end{align*}
+$$</p>
+<p>这些乘积中的每一个级数, 有些全是加号, 有些是加减号交错的. 将乘积展开就能得到调和级数的每一项, 并且是一一对应的. 如果分母恰有奇数个 $4k+1$ 形式的素因数, 在欧拉交错级数中就是减号; 否则就是加号.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2025-03-14</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/a-formula-that-generates-all-positive-rational-numbers/" class="prev" rel="prev" title="一个递推公式推出所有正有理数"><i class="fas fa-angle-left fa-fw"></i>一个递推公式推出所有正有理数</a>
+            <a href="/notes-on-4dgs/" class="next" rel="next" title="4DGS笔记">4DGS笔记<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

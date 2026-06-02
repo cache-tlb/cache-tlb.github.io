@@ -1,0 +1,64 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>demo - 标签 - Praise the Sun!</title>
+        <link>https://cache-tlb.github.io/tags/demo/</link>
+        <description>demo - 标签 - Praise the Sun!</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Wed, 09 Oct 2024 22:37:49 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/tags/demo/" rel="self" type="application/rss+xml" /><item>
+    <title>二维向量场的可视化</title>
+    <link>https://cache-tlb.github.io/visualization-of-2d-vector-fields/</link>
+    <pubDate>Wed, 09 Oct 2024 22:37:49 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/visualization-of-2d-vector-fields/</guid>
+    <description><![CDATA[在图形渲染领域经常需要处理 2D 向量场，例如有些游戏会用 2D 流体模拟营造出 3D 流体效果，例如 fluid ninja。为了 debug 速度场，就需要合适的 2D 向量场的可视化]]></description>
+</item><item>
+    <title>全景图的多视角拼接</title>
+    <link>https://cache-tlb.github.io/panorama-stitching/</link>
+    <pubDate>Sun, 28 Apr 2024 13:39:01 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/panorama-stitching/</guid>
+    <description><![CDATA[借助 UE5 进行虚拟拍摄已经越来越普及，UE官方提供的 MovieRenderQueue 插件可以满足大部分拍摄需求。然而对于全景图的拍摄需要进行额外的处理，因为全景图无法仅通过渲]]></description>
+</item><item>
+    <title>全景图渲染的常见问题</title>
+    <link>https://cache-tlb.github.io/caveats-of-rendering-panoramas/</link>
+    <pubDate>Tue, 27 Feb 2024 22:38:39 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/caveats-of-rendering-panoramas/</guid>
+    <description><![CDATA[全景图是用2D平面图像表示球面图像的一种形式，例如世界地图。渲染全景图只需要准备一个球体模型，算好顶点UV，将2D图像作为纹理贴在球体表面即]]></description>
+</item><item>
+    <title>多边形的Laplacian平滑</title>
+    <link>https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/</link>
+    <pubDate>Tue, 09 Jan 2024 19:29:40 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/</guid>
+    <description><![CDATA[多年以前在微博上看到一个优美的结论，但是没有解释背后的原理。最近又看到了，有了一些思路，在此给出推导过程。 Conclusion 画个随机多边形，连接各条边的中点]]></description>
+</item><item>
+    <title>漫谈Cubemap插值</title>
+    <link>https://cache-tlb.github.io/cubemap-interpolation/</link>
+    <pubDate>Sat, 12 Aug 2023 20:16:03 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/cubemap-interpolation/</guid>
+    <description><![CDATA[Cubemap 是一种常见的表示球面信息的数据结构。因为球面和正方体表面是同胚的，所以用正方体的6个面存储球面上的数据也是自然而然的想法。Cube的每个面]]></description>
+</item><item>
+    <title>Radiosity 辐射度方法</title>
+    <link>https://cache-tlb.github.io/radiosity/</link>
+    <pubDate>Fri, 26 May 2023 21:22:20 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/radiosity/</guid>
+    <description><![CDATA[谈及全局光照，绕不开一个重要的方程，即渲染方程（Render Equation），如下是其中一个简化版本： $$ L_o(x, \omega_o) = L_e(x, \omega_o) + \int_\Omega f_r(x,\omega_i\to\omega_o) L_i(x,\omega_i) (\omega_i\cdot n) \ \mathrm{d}\omega_i $$ $L_o$ 表示]]></description>
+</item><item>
+    <title>透视矫正插值公式的推导</title>
+    <link>https://cache-tlb.github.io/perspective-correct-interpolation/</link>
+    <pubDate>Fri, 11 Nov 2022 19:12:20 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/perspective-correct-interpolation/</guid>
+    <description><![CDATA[前言 众所周知（？） vertex shader 里顶点属性转换成 pixel shader 里逐像素属性需要经过插值，具体来说，是根据像素所在三角形三个顶点的属性，以像素点的重心坐标为权重进]]></description>
+</item><item>
+    <title>福特圆可视化</title>
+    <link>https://cache-tlb.github.io/visulization-of-ford-circle/</link>
+    <pubDate>Tue, 11 Oct 2022 22:33:10 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/visulization-of-ford-circle/</guid>
+    <description><![CDATA[福特圆 以下科普部分摘自 Wikipedia | Ford circle 福特圆是欧氏平面上的一组圆，对于任意一个最简分数 $\dfrac{p}{q}$，都对应一个福特圆，圆心在 $( \dfrac{p}{q}, \dfrac{1}{2q^2} )]]></description>
+</item></channel>
+</rss>

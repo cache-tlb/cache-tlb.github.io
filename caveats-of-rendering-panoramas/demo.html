@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+<head> <meta charset=utf-8 />
+<style>
+/* 重置页面样式：让 body 占满 iframe 视口 */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 防止滚动条 */
+}
+/* canvas 样式：显示尺寸匹配父容器 */
+#drawCanvas {
+    width: 100%;
+    height: 100%;
+    display: block; /* 消除底部间隙 */
+}
+/* .lil-gui { 
+	--width: 150px;
+	--name-width: 50%;
+} */
+</style>
+
+<title>test</title>
+<script src='./m4.js'></script>
+<script src='./webgl-utils.js'></script>
+</head>
+
+<body>
+<canvas id="drawCanvas" > </canvas>
+<div id="gui-container" style="position: absolute;transform: translate(10px, -30px);"> </div>            
+<input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(this);">
+<script id="color-vertex-shader" type="x-shader/x-vertex">
+attribute vec3 a_position;
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform mat4 u_world;
+varying vec2 v_texcoord;
+
+void main() {
+    vec3 pos = a_position;
+    gl_Position = u_projection * u_view * u_world * vec4(pos, 1.0);
+    v_texcoord = a_position.xz * 0.5 + 0.5;
+}
+</script>
+
+<script id="color-fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec2 v_texcoord;
+
+void main() {
+    vec2 uv = v_texcoord.xy;
+    uv = fract(uv * 8.0);
+    vec3 color = vec3(0.5, 0.5, 0.5);
+    bool t1 = uv.x > 0.5;
+    bool t2 = uv.y > 0.5;
+    if (t1 == t2) {
+        color = vec3(0.25, 0.25, 0.25);
+    } else {
+        color = vec3(0.75, 0.75, 0.75);
+    }
+    gl_FragColor = vec4(pow(color, vec3(0.454545)), 1.0);         
+}
+
+</script>
+
+<script id="sky-vertex-shader" type="x-shader/x-vertex"> #version 300 es
+in vec3 a_position;
+uniform mat4 u_projection;
+uniform mat4 u_view;
+out vec3 v_positionWS;
+
+void main() {
+    vec3 positionVS = mat3(u_view) * (a_position);
+    gl_Position = u_projection * vec4(positionVS, 1.0);
+    v_positionWS = a_position;
+}
+</script>
+
+<script id="sky-fragment-shader" type="x-shader/x-fragment"> #version 300 es
+precision highp float;
+in vec3 v_positionWS;
+uniform sampler2D u_texture;
+uniform vec4 u_textureSize;
+uniform float u_fixUv;
+uniform float u_useMip0;
+uniform float u_showMiplevel;
+uniform float u_showIsotropy;
+uniform float u_mipBias;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 view_dir = normalize(v_positionWS).xzy;
+
+    vec2 uv = vec2(atan( view_dir.y, view_dir.x) * 0.1591549, 0.5 + atan( -view_dir.z,  sqrt(  view_dir.x *  view_dir.x + view_dir.y * view_dir.y ) ) * 0.3183099);
+    uv.y = clamp(uv.y, 0.0, 1.0);
+    float fwx = fwidth(uv.x);
+    float fwy = fwidth(uv.y);
+    /*if (u_fixUv > 0.5 && fwx > 0.1) {
+        if (uv.x >= 0.0) uv.x -= 1.0;
+    }*/
+    if (u_fixUv > 0.5) {
+        float old_u = uv.x;
+        if (uv.x >= 0.0) uv.x -= 1.0;
+        float fwx2 = fwidth(uv.x);
+        if (fwx < fwx2) uv.x = old_u;
+    }
+    vec3 ret1 = textureLod(u_texture, uv, 0.0).rgb;
+    vec3 ret2 = texture(u_texture, uv, u_mipBias ).rgb;
+
+    vec3 ret;
+    if (u_useMip0 > 0.5)
+        ret = ret1;
+    else
+        ret = ret2;
+    
+    fwx = fwidth(uv.x);
+    if (u_showMiplevel > 0.5)
+        ret = vec3(fwx);
+    if (u_showIsotropy > 0.5)
+        ret = vec3(fwy / fwx * 0.5);
+    
+    fragColor = vec4(ret, 1.0);
+}
+</script>
+
+
+<script>
+function degreeToRad(degree) { return degree*Math.PI/180.0; }
+
+class Camera {
+    constructor() {
+        this.forward = [0,0,-1];    // -z
+        this.right = [1,0,0];       // x
+        this.position = [0,0,0];
+    }
+    moveForward(distance) {
+        this.position = m4.addVectors( this.position, m4.scaleVector(this.forward, distance) );
+    }
+    moveRight(distance) {
+        this.position = m4.addVectors( this.position, m4.scaleVector(this.right, distance) );
+    }
+    getViewMatrix() {
+        var target = m4.addVectors(this.position, this.forward);
+        var transform = m4.lookAt(this.position, target, [0,1,0]);
+        return m4.inverse(transform);
+    }
+}
+
+class UECameraControl {
+    constructor(camera) {
+        this.camera = camera;
+        this.moveSpeed = 2;
+        this.rotateSpeed = 1;
+        this.isMoveForward = false;
+        this.isMoveBackward = false;
+        this.isMoveLeft = false;
+        this.isMoveRight = false;
+        this.yaw = 0;
+        this.pitch = 0;
+        this.maxPitch = 88;
+        this.isLocked = true;
+    }
+    update(delta_t) {
+        this.updateCameraPosition(delta_t);
+        this.updateCameraRotation(delta_t);
+    }
+    updateCameraPosition(delta_t){
+        var distance = delta_t * this.moveSpeed;
+        if (this.isMoveForward && !this.isMoveBackward) {
+            this.camera.moveForward(distance);
+        }
+        if (!this.isMoveForward && this.isMoveBackward) {
+            this.camera.moveForward(-distance);
+        }
+        if (this.isMoveLeft && !this.isMoveRight) {
+            this.camera.moveRight(-distance);
+        }
+        if (!this.isMoveLeft && this.isMoveRight) {
+            this.camera.moveRight(distance);
+        }
+    }
+    updateCameraRotation(delta_t){
+        // yaw, pitch to forward & right
+        var sin_pitch = Math.sin(degreeToRad(this.pitch));
+        var sin_yaw = Math.sin(degreeToRad(this.yaw));
+        var cos_yaw = Math.cos(degreeToRad(this.yaw));
+        var xz_len = Math.sqrt(1.0 - sin_pitch*sin_pitch);
+        var fwd = [-xz_len*sin_yaw, sin_pitch, -xz_len*cos_yaw];
+        var right = [cos_yaw, 0, -sin_yaw];
+        camera.forward = fwd;
+        camera.right = right;
+    }
+
+    onKeyDown ( event ) {
+        if (this.isLocked) return;
+        switch ( event.code ) {
+            case 'ArrowUp':
+            case 'KeyW': this.isMoveForward = true; break;
+            case 'ArrowLeft':
+            case 'KeyA': this.isMoveLeft = true; break;
+            case 'ArrowDown':
+            case 'KeyS': this.isMoveBackward = true; break;
+            case 'ArrowRight':
+            case 'KeyD': this.isMoveRight = true; break;
+        }
+    };
+    onKeyUp ( event ) {
+        switch ( event.code ) {
+            case 'ArrowUp':
+            case 'KeyW': this.isMoveForward = false; break;
+            case 'ArrowLeft':
+            case 'KeyA': this.isMoveLeft = false; break;
+            case 'ArrowDown':
+            case 'KeyS': this.isMoveBackward = false; break;
+            case 'ArrowRight':
+            case 'KeyD': this.isMoveRight = false; break;
+        }
+    };
+    onPointerMove( event ) {
+        if (this.isLocked) return;
+        const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+        const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+        this.yaw -= movementX * 0.05 * this.rotateSpeed;
+        this.yaw = this.yaw % 360;
+        this.pitch -= movementY * 0.05 * this.rotateSpeed;
+        this.pitch = Math.max( -this.maxPitch, Math.min( this.maxPitch, this.pitch ) );
+    }
+    onPointerDown(event) {
+        if (event.button == 2) {
+            this.isLocked = false;
+        }
+    }
+    onPointerUp(event) {
+        if (event.button == 2) {
+            this.isLocked = true;
+        }
+    }
+    onContextmenu( event ) {
+        event.preventDefault();
+    }
+
+    registerEventHandlers(domElement) {
+        domElement.addEventListener( 'mouseup', this.onPointerUp.bind(this) );
+        domElement.addEventListener( 'mousemove', this.onPointerMove.bind(this) );
+        domElement.addEventListener( 'mousedown', this.onPointerDown.bind(this) );
+        domElement.addEventListener( 'contextmenu', this.onContextmenu.bind(this) );
+        window.addEventListener( 'keydown', this.onKeyDown.bind(this) );
+        window.addEventListener( 'keyup', this.onKeyUp.bind(this) );
+    }
+}
+
+var drawCanvas = document.getElementById('drawCanvas');
+const gl = drawCanvas.getContext("webgl2");
+
+var panoTexture = null;
+var panoImgTexture = null;
+var textureWidth = 2048;
+var textureHeight = 1024;
+var colorProgramInfo = null;
+var planeBufferInfo = null;
+var cubeBufferInfo = null;
+var skyProgramInfo = null;
+var camera = null;
+var cameraControl = null;
+
+var useMipmap = true;
+var fixUv = true;
+var fixClampY = true;
+var useRealImg = true;
+var useIsotropic = false;
+var showFloor = true;
+var showMiplevel = false;
+var showIsotropy = false;
+var mipBias = -0.7;
+
+const anisotropicExt = 
+        gl.getExtension("EXT_texture_filter_anisotropic") ||
+        gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
+        gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
+const maxAnisotropic = anisotropicExt ? gl.getParameter(anisotropicExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT) : 1.0;
+
+function hueToRgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+}
+function hslToRgb(h, s, l) {
+    let r, g, b;
+
+    if (s === 0) {
+        r = g = b = l; // achromatic
+    } else {
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hueToRgb(p, q, h + 1/3);
+        g = hueToRgb(p, q, h);
+        b = hueToRgb(p, q, h - 1/3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+function initTexture() {
+    if (panoTexture != null) {
+        gl.deleteTexture(panoTexture);
+    }
+    panoTexture = gl.createTexture();
+    var data = new Uint8Array(textureWidth*textureHeight*4);
+    for (var i = 0; i < textureHeight; i++) {
+        for (var j = 0; j < textureWidth; j++) {
+            var pix_idx = i*textureWidth + j;
+            var h = j*1.0/textureWidth, s = i*1.0/textureWidth, v = 0.5;
+            var rgb = hslToRgb(h,s,v);
+            data[pix_idx*4 + 0] = rgb[0];
+            data[pix_idx*4 + 1] = rgb[1];
+            data[pix_idx*4 + 2] = rgb[2];
+            data[pix_idx*4 + 3] = 255;
+        }
+    }
+
+    fillTextureData(panoTexture, textureWidth, textureHeight, data);
+    loadRealPano("./panorama_4.webp");
+}
+
+function loadRealPano(src) {
+    if (panoImgTexture != null) {
+        gl.deleteTexture(panoImgTexture);        
+    }
+    panoImgTexture = gl.createTexture();
+    var img = new Image();
+    img.src = src;
+    img.addEventListener('load', function() {
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+        gl.bindTexture(gl.TEXTURE_2D, panoImgTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        setTexState(panoImgTexture, fixClampY, useIsotropic);        
+    });
+}
+
+function setFixUv(value) {
+    fixUv = value;
+}
+
+function setTexState(texture, clampY, useIsotropic) {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    if (clampY) {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    } else {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    }
+    if (useIsotropic) {
+        gl.texParameterf(gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropic);
+    }  else {
+        gl.texParameterf(gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, 1.0);
+    }
+    gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
+function setFixClampY(value) {
+    fixClampY = value;
+    setTexState(panoTexture, fixClampY, useIsotropic);
+    setTexState(panoImgTexture, fixClampY, useIsotropic);
+}
+
+function setUseIsotropic(value) {
+    useIsotropic = value;
+    setTexState(panoTexture, fixClampY, useIsotropic);
+    setTexState(panoImgTexture, fixClampY, useIsotropic);
+}
+
+function fillTextureData(texture, width, height, data) {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
+function initScene() {
+    gl.clearColor(0, 0, 0, 1);
+    gl.clearDepth(1.0);
+
+    initTexture();
+
+    planeBufferInfo = webglUtils.createBufferInfoFromArrays(gl, {
+        position: [
+            -1,  0,  1,  
+             1,  0,  1,  
+             1, 0,  -1,  
+            -1, 0,  -1
+        ],
+        indices: [0,1,2,2,3,0],
+
+    });
+    cubeBufferInfo = webglUtils.createBufferInfoFromArrays(gl, {
+        position: [
+            -1,  1,  1,  
+             1,  1,  1,  
+             1, -1,  1,  
+            -1, -1,  1, 
+             1,  1, -1,  
+            -1,  1, -1,  
+            -1, -1, -1,  
+             1, -1, -1, 
+        ],  
+        indices: [0,1,2,2,3,0,1,4,7,7,2,1,4,5,6,6,7,4,5,0,3,3,6,5,5,4,1,1,0,5,3,2,7,7,6,3],
+    });
+    colorProgramInfo = webglUtils.createProgramInfo(gl, ['color-vertex-shader', 'color-fragment-shader']);
+    skyProgramInfo = webglUtils.createProgramInfo(gl, ['sky-vertex-shader', 'sky-fragment-shader']);
+
+    camera = new Camera();
+    camera.position = [0,5,10];
+
+    cameraControl = new UECameraControl(camera);
+    cameraControl.registerEventHandlers(window);
+
+}
+
+function logicUpdate(delta_t) {
+    cameraControl.update(delta_t);
+
+}
+
+function render(delta_t) {
+    var viewMatrix = camera.getViewMatrix();
+    var fov = degreeToRad(45.);
+    var aspect = drawCanvas.width / drawCanvas.height;
+    var near = 0.1;
+    var far = 100.0;
+    var projectionMatrix = m4.perspective(fov, aspect, near, far)
+    var worldMatrix =  m4.scaling(10,10,10);
+
+    gl.viewport(0, 0, drawCanvas.width, drawCanvas.height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // sky
+    gl.disable(gl.DEPTH_TEST);
+    gl.useProgram(skyProgramInfo.program);
+    webglUtils.setUniforms(skyProgramInfo, {
+        u_view: viewMatrix,
+        u_projection: projectionMatrix,
+        u_cameraPos: camera.position,
+        u_texture: useRealImg ? panoImgTexture : panoTexture,
+        u_textureSize: [textureWidth, textureHeight, 1./textureWidth, 1./textureHeight],
+        u_fixUv: fixUv ? 1.0 : 0.0,
+        u_useMip0: useMipmap ? 0.0 : 1.0,
+        u_showMiplevel: showMiplevel ? 1.0 : 0.0,
+        u_showIsotropy: showIsotropy ? 1.0 : 0.0,
+        u_mipBias: mipBias,
+    });
+    webglUtils.setBuffersAndAttributes(gl, skyProgramInfo, cubeBufferInfo);
+    webglUtils.drawBufferInfo(gl, cubeBufferInfo);
+    gl.enable(gl.DEPTH_TEST);
+
+
+    // model
+    if (showFloor)
+    {
+        gl.useProgram(colorProgramInfo.program);
+        webglUtils.setUniforms(colorProgramInfo, {
+            u_view: viewMatrix,
+            u_projection: projectionMatrix,
+            u_world: worldMatrix,
+        });
+        webglUtils.setBuffersAndAttributes(gl, colorProgramInfo, planeBufferInfo);
+        webglUtils.drawBufferInfo(gl, planeBufferInfo);
+    }
+}
+
+var last_time = null;
+
+function frameLoop() {
+    var current_time = Date.now();
+    var delta_t = 1./30.;
+    if (last_time != null) {
+        delta_t = (current_time - last_time)/1000.0;
+    }
+    logicUpdate(delta_t);
+    render(delta_t);
+    last_time = current_time;
+    window.requestAnimationFrame(frameLoop);
+}
+
+function resizeCanvas() {
+    const displayWidth = drawCanvas.clientWidth;
+    const displayHeight = drawCanvas.clientHeight;
+
+    drawCanvas.width = displayWidth;
+    drawCanvas.height = displayHeight;
+}
+
+initScene();
+frameLoop();
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+</script>
+
+<script>
+function handleFileSelect(input) {
+    // 检查是否选中了文件
+    if (!input.files || input.files.length === 0) {
+        alert("请选择一张图片！");
+        return;
+    }
+
+    // 获取第一个选中的图片文件（如需多选可遍历files数组）
+    const file = input.files[0];
+      
+    // 验证文件类型是否为图片
+    if (!file.type.startsWith('image/')) {
+        alert("请选择有效的图片文件！");
+        input.value = ''; // 清空选择
+        return;
+    }
+
+    // 创建FileReader实例，用于读取文件为base64
+    const reader = new FileReader();
+
+    // 读取完成后的回调（核心：获取base64并传递给自定义函数）
+    reader.onload = function(e) {
+        // e.target.result 就是图片的base64字符串（DataURL格式）
+        const base64Str = e.target.result;
+        
+        loadRealPano(base64Str);
+    };
+
+    // 读取失败的回调
+    reader.onerror = function() {
+        alert("图片读取失败，请重试！");
+        input.value = ''; // 清空选择
+    };
+
+    // 以DataURL（base64）格式读取文件
+    reader.readAsDataURL(file);
+
+    // 清空input值，确保重复选择同一文件也能触发change事件
+    input.value = '';
+}
+</script>
+
+<script type="module">
+import { GUI } from './lil-gui.js';
+function setupGUI()
+{
+    const gui = new GUI( {
+        // width: 200,
+    });
+    gui.title('control');
+
+    const params = {
+        use_mipmap: useMipmap,
+        mip_bias: mipBias,
+        fix_uv: fixUv,
+        fix_clamp_y: fixClampY,
+        use_isotropic: useIsotropic,
+        show_floor: showFloor,
+        vis_mode: 0,
+        look_at_u0: function () {
+            cameraControl.yaw = 90;
+        },
+        look_at_v0: function () {
+            cameraControl.pitch = 80;
+        },
+        look_at_v1: function () {
+            cameraControl.pitch = -80;
+        },
+        upload_pano: function() {
+            document.getElementById('file-input').click();
+        },
+    };
+    gui.add( params, 'use_mipmap').name('use mipmap').onChange( value => {
+        useMipmap = value;
+    });
+    gui.add( params, 'mip_bias', -16, 16, 0.1).name('mip bias').onChange( value => {
+        mipBias = value;
+    });
+    gui.add( params, 'fix_uv').name('fix u').onChange( value => {
+        setFixUv(value);
+    });
+    gui.add( params, 'fix_clamp_y').name('fix warp T').onChange( value => {
+        setFixClampY(value);
+    });
+    gui.add( params, 'use_isotropic').name('use isotropic').onChange( value => {
+        setUseIsotropic(value);
+    });
+    gui.add( params, 'show_floor').name('show checkerboard').onChange( value => {
+        showFloor = value;
+    });
+    gui.add( params, 'vis_mode', {'fwidth(u)':1, 'Anisotropy': 2, 'Synthetic pano': 3, 'Real Pano': 0}).name('visulization mode').onChange( value => {
+        useRealImg = false;
+        showIsotropy = false;
+        showMiplevel = false;
+        switch (value) {
+        case 1: showMiplevel = true; break;
+        case 2: showIsotropy = true; break;
+        case 0: useRealImg = true; break;          
+        case 3: useRealImg = false; break;
+        default: break;
+        }
+    });
+    gui.add( params, 'look_at_u0').name('look at: u=0/u=1');
+    gui.add( params, 'look_at_v0').name('look at: top(v=0)');
+    gui.add( params, 'look_at_v1').name('look at: bottom(v=1)');
+    gui.add( params, 'upload_pano').name('try a local image');
+    gui.domElement.style.fontFamily='var(--font-family-mono)';
+    
+}
+
+setupGUI();
+
+</script>
+
+</body>
+</html>

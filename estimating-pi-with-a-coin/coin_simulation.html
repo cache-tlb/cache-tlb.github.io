@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>硬币投掷模拟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        select, button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        select {
+            background: #e9ecef;
+            color: #333;
+            border: 2px solid #667eea;
+            min-width: 120px;
+        }
+
+        select:hover {
+            background: #dee2e6;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: 2px solid #667eea;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.pause {
+            background: #ff9800;
+            border-color: #ff9800;
+        }
+
+        button.pause:hover {
+            background: #e68900;
+        }
+
+        button:disabled {
+            background: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .histogram-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .fraction-label {
+            min-width: 60px;
+            font-weight: 600;
+            color: #333;
+            font-family: monospace;
+            font-size: 0.95em;
+            text-align: right;
+        }
+
+        .histogram-bar {
+            display: flex;
+            align-items: center;
+            height: 25px;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.8), rgba(102, 126, 234, 0.4));
+            border-radius: 3px;
+            padding-left: 8px;
+            color: white;
+            font-size: 0.85em;
+            font-weight: 600;
+            min-width: 30px;
+        }
+
+        .count-label {
+            min-width: 50px;
+            text-align: right;
+            color: #333;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .info-panel {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #4caf50;
+            font-size: 0.95em;
+            color: #333;
+        }
+
+        .info-item {
+            margin: 8px 0;
+        }
+
+        .info-item strong {
+            color: #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            select, button {
+                width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪙 硬币投掷模拟</h1>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="threadCount">线程数：</label>
+                <select id="threadCount">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4" selected>4</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button id="startBtn" onclick="startSimulation()">开始</button>
+                <button id="pauseBtn" class="pause" onclick="togglePause()" disabled>暂停</button>
+                <button id="resetBtn" onclick="resetSimulation()">重置</button>
+            </div>
+
+            <div class="control-group">
+                <span id="status" style="color: #999; font-weight: 600;"></span>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">平均值</div>
+                <div class="stat-value" id="avgValue">0.000</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">样本数</div>
+                <div class="stat-value" id="sampleCount">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">活跃线程</div>
+                <div class="stat-value" id="activeThreads">0</div>
+            </div>
+        </div>
+
+        <div class="chart-container" id="histogramContainer">
+            <!-- 直方图将在这里动态生成 -->
+        </div>
+
+        <div class="info-panel">
+            <div class="info-item">
+                <strong>规则说明：</strong> 连续投掷硬币，直到正面次数 > 反面次数，记录正面出现的比例
+            </div>
+            <div class="info-item">
+                <strong>示例：</strong> 投掷结果为"反、反、正、正、正"，记录值为 3/5 = 0.600
+            </div>
+            <div class="info-item">
+                <strong>直方图：</strong> 统计出现次数前20的样本的比例
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let workers = [];
+        let isRunning = false;
+        let isPaused = false;
+        let fractionMap = new Map(); // 存储分数和其频次
+        let collectionInterval = null;
+
+        // 求最大公约数
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        // 将分数化简为最简形式
+        function simplifyFraction(numerator, denominator) {
+            const g = gcd(numerator, denominator);
+            return { num: numerator / g, den: denominator / g };
+        }
+
+        // 创建 Worker 代码字符串
+        const workerCode = `
+            function gcd(a, b) {
+                return b === 0 ? a : gcd(b, a % b);
+            }
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            function simplifyFraction(numerator, denominator) {
+                const g = gcd(numerator, denominator);
+                return { num: numerator / g, den: denominator / g };
+            }
+
+            async function runOneRound() {
+                let heads = 0;
+                let tails = 0;
+
+                while (heads <= tails) {
+                    if (Math.random() < 0.5) {
+                        heads++;
+                    } else {
+                        tails++;
+                    }
+                    if (isPaused) {
+                        return null; // 如果暂停了，返回 null 表示不处理结果
+                    }
+                    if ((heads + tails) % 10000000 == 0) {
+                        await sleep(0); // Allow other operations to run
+                    }
+                }
+
+                const fraction = simplifyFraction(heads, heads + tails);
+                return fraction;
+            }
+
+            let isPaused = false;
+            let isRunning = false;
+
+            self.onmessage = function(e) {
+                const { command } = e.data;
+                
+                if (command === 'start') {
+                    if (!isRunning) {
+                        isRunning = true;
+                    }
+                    isPaused = false;
+                    simulateLoop();
+                } else if (command === 'pause') {
+                    isPaused = true;
+                } else if (command === 'resume') {
+                    if (isPaused) {
+                        isPaused = false;
+                        simulateLoop();
+                    }
+                } else if (command === 'stop') {
+                    self.close();
+                }
+            };
+
+            async function simulateLoop() {
+                while (isRunning && !isPaused) {
+                    const result = await runOneRound();
+                    if (result === null) continue; // 跳过无效结果
+                    self.postMessage({ 
+                        result: result,
+                        type: 'fraction'
+                    });
+                }
+                console.log('Worker paused');            
+            }
+        `;
+
+        function initializeWorkers(count) {
+            // 清理旧的 workers
+            workers.forEach(w => w.terminate());
+            workers = [];
+
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            const workerUrl = URL.createObjectURL(blob);
+
+            for (let i = 0; i < count; i++) {
+                const worker = new Worker(workerUrl);
+                worker.onmessage = function(e) {
+                    if (e.data.result !== undefined) {
+                        const { num, den } = e.data.result;
+                        const key = num + '/' + den;
+                        
+                        if (fractionMap.has(key)) {
+                            fractionMap.set(key, fractionMap.get(key) + 1);
+                        } else {
+                            fractionMap.set(key, 1);
+                        }
+                    }
+                };
+                workers.push(worker);
+            }
+        }
+
+        function startSimulation() {
+            if (isRunning) return;
+
+            const threadCount = parseInt(document.getElementById('threadCount').value);
+            initializeWorkers(threadCount);
+
+            isRunning = true;
+            isPaused = false;
+            fractionMap.clear();
+
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('threadCount').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            updateStatus();
+
+            workers.forEach(worker => {
+                worker.postMessage({ command: 'start' });
+            });
+
+            // 每秒收集一次结果并更新显示
+            if (collectionInterval) clearInterval(collectionInterval);
+            collectionInterval = setInterval(updateDisplay, 1000);
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const btn = document.getElementById('pauseBtn');
+            btn.textContent = isPaused ? '继续' : '暂停';
+            
+            workers.forEach(worker => {
+                worker.postMessage({ command: isPaused ? 'pause' : 'resume' });
+            });
+
+            updateStatus();
+        }
+
+        function resetSimulation() {
+            isRunning = false;
+            isPaused = false;
+
+            if (collectionInterval) clearInterval(collectionInterval);
+
+            workers.forEach(w => w.terminate());
+            workers = [];
+            fractionMap.clear();
+
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('threadCount').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '暂停';
+
+            updateDisplay();
+            updateStatus();
+        }
+
+        function calculateAverage() {
+            if (fractionMap.size === 0) return 0;
+
+            let totalNumerator = 0;
+            let totalCount = 0;
+
+            for (const [key, count] of fractionMap) {
+                const [num, den] = key.split('/').map(Number);
+                totalNumerator += (num / den) * count;
+                totalCount += count;
+            }
+
+            return totalCount === 0 ? 0 : (totalNumerator / totalCount);
+        }
+
+        function updateDisplay() {
+            if (isPaused) return; // 如果暂停了，不更新显示
+
+            const totalSamples = Array.from(fractionMap.values()).reduce((a, b) => a + b, 0);
+
+            if (fractionMap.size === 0) {
+                document.getElementById('avgValue').textContent = '0.000';
+                document.getElementById('sampleCount').textContent = '0';
+                document.getElementById('activeThreads').textContent = workers.length;
+                renderHistogram([]);
+                return;
+            }
+
+            // 计算平均值
+            const avg = calculateAverage()*4.0;
+            document.getElementById('avgValue').textContent = avg.toFixed(20);
+            document.getElementById('sampleCount').textContent = totalSamples;
+            document.getElementById('activeThreads').textContent = workers.length;
+
+            // 获取所有分数并按频次排序，取前20个
+            const entries = Array.from(fractionMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 20);
+
+            // 渲染直方图
+            renderHistogram(entries);
+        }
+
+        function renderHistogram(entries) {
+            const container = document.getElementById('histogramContainer');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无数据</div>';
+                return;
+            }
+
+            const maxCount = Math.max(...entries.map(e => e[1]));
+
+            let html = '';
+            entries.forEach(([fraction, count]) => {
+                const barWidth = Math.max(20, (count / maxCount) * 300);
+                html += `
+                    <div class="histogram-item">
+                        <div class="fraction-label">${fraction}</div>
+                        <div class="histogram-bar" style="width: ${barWidth}px;">
+                            ${count}
+                        </div>
+                        <div class="count-label">${count}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updateStatus() {
+            let status = '';
+            if (isRunning) {
+                status = isPaused ? '⏸️ 已暂停' : '▶️ 运行中...';
+            } else {
+                status = '停止';
+            }
+            document.getElementById('status').textContent = status;
+        }
+
+        // 初始化显示
+        updateDisplay();
+    </script>
+</body>
+</html>

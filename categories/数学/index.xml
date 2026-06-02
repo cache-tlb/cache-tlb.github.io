@@ -4,75 +4,75 @@
         <link>https://cache-tlb.github.io/categories/%E6%95%B0%E5%AD%A6/</link>
         <description>数学 - 分类 - Praise the Sun!</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
-            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Tue, 14 Mar 2023 21:20:08 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E6%95%B0%E5%AD%A6/" rel="self" type="application/rss+xml" /><item>
-    <title>Wallis 乘积的几何证明方法</title>
-    <link>https://cache-tlb.github.io/wallis-product/</link>
-    <pubDate>Tue, 14 Mar 2023 21:20:08 &#43;0800</pubDate>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Sat, 14 Mar 2026 23:06:29 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E6%95%B0%E5%AD%A6/" rel="self" type="application/rss+xml" /><item>
+    <title>抛硬币求 pi</title>
+    <link>https://cache-tlb.github.io/estimating-pi-with-a-coin/</link>
+    <pubDate>Sat, 14 Mar 2026 23:06:29 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/wallis-product/</guid>
-    <description><![CDATA[Wallis 乘积公式表述为： $$ \frac{\pi}{2} = \frac{2}{1}\cdot\frac{2}{3}\cdot\frac{4}{3}\cdot\frac{4}{5}\cdot\frac{6}{5}\cdot\frac{6}{7}\cdots $$ 出现 $\pi$ 的地方或多或少都跟圆能扯上关系，这里介绍两个巧妙的证明方法，都只需要初等的代数和几何知识就可以理解。 第一个]]></description>
+    <guid>https://cache-tlb.github.io/estimating-pi-with-a-coin/</guid>
+    <description><![CDATA[正文 古有 Buffon 投针求 $\pi$，今又有抛硬币估算$\pi$，方法如下：启动一次随机过程，投掷一枚公平的硬币，直到第一次遇到投出正面次数大于投出反]]></description>
 </item><item>
-    <title>球面三角形面积公式推导</title>
-    <link>https://cache-tlb.github.io/spherical-triangle-area/</link>
-    <pubDate>Fri, 27 Jan 2023 16:19:00 &#43;0800</pubDate>
+    <title>欧拉的奇迹</title>
+    <link>https://cache-tlb.github.io/eulers-miracle/</link>
+    <pubDate>Fri, 14 Mar 2025 23:01:02 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/spherical-triangle-area/</guid>
-    <description><![CDATA[问题 单位球面上有三个大圆，构成一个球面三角形，顶点为 $A,B,C$，其内角分别是 $\alpha, \beta, \gamma$。求球面三角形的立体角（即面积）。 割补法 经]]></description>
+    <guid>https://cache-tlb.github.io/eulers-miracle/</guid>
+    <description><![CDATA[本文参考了 William Dunham 所著的 &ldquo;Euler&rsquo;s Miracle&rdquo; 一文（本地存档）. 该文分析了一种交错的调和级数. 虽然调和级数是发散的, 欧拉改变了调和级数的某些项的符号, 得到了收敛的]]></description>
 </item><item>
-    <title>福特圆可视化</title>
-    <link>https://cache-tlb.github.io/visulization-of-ford-circle/</link>
-    <pubDate>Tue, 11 Oct 2022 22:33:10 &#43;0800</pubDate>
+    <title>一个递推公式推出所有正有理数</title>
+    <link>https://cache-tlb.github.io/a-formula-that-generates-all-positive-rational-numbers/</link>
+    <pubDate>Sun, 05 Jan 2025 23:35:32 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/visulization-of-ford-circle/</guid>
-    <description><![CDATA[福特圆 以下科普部分摘自 Wikipedia | Ford circle 福特圆是欧氏平面上的一组圆，对于任意一个最简分数 $\dfrac{p}{q}$，都对应一个福特圆，圆心在 $( \dfrac{p}{q}, \dfrac{1}{2q^2} )]]></description>
+    <guid>https://cache-tlb.github.io/a-formula-that-generates-all-positive-rational-numbers/</guid>
+    <description><![CDATA[一个递推公式 定义运算符 $[x]$ 表示 $x$ 的整数部分, 即 $[x] = \max \{ y \in \mathbb{Z} : y \le x \}$. 又定义运算符 $\{x\}$ 表示 $x$ 的小数部分, 即 $\{x\} = x - [x]$. 函数 $f(x)$ 定义如下: $$ f(x) = \frac{1}{[x] - \{x\}]]></description>
 </item><item>
-    <title>压垮骆驼的最后一根稻草</title>
-    <link>https://cache-tlb.github.io/the-straw-that-broke-the-camels-back/</link>
-    <pubDate>Sun, 25 Sep 2022 15:09:05 &#43;0800</pubDate>
+    <title>反直觉的概率问题-之二</title>
+    <link>https://cache-tlb.github.io/a-counterintuitive-probability-problem-ii/</link>
+    <pubDate>Fri, 22 Nov 2024 19:48:06 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/the-straw-that-broke-the-camels-back/</guid>
-    <description><![CDATA[问题 骆驼最大负重为 $1$，有一堆稻草，每一根稻草的重量都是 $(0, 1)$ 上独立的均匀分布。依次往骆驼的背上放稻草，直到总重量超过 $1$，这时骆驼就被压]]></description>
+    <guid>https://cache-tlb.github.io/a-counterintuitive-probability-problem-ii/</guid>
+    <description><![CDATA[一个普通的指针式时钟，上有一只虫子初始在 12 点，虫子每一步会顺时针或逆时针移动到相邻的数字上，每一步的运动方向随机且相互独立。当虫子刚好到达过]]></description>
 </item><item>
-    <title>Linearly Transformed Cosines 积分部分推导</title>
-    <link>https://cache-tlb.github.io/ltc-integral/</link>
-    <pubDate>Fri, 12 Aug 2022 13:28:03 &#43;0800</pubDate>
+    <title>球极投影保圆性质的证明</title>
+    <link>https://cache-tlb.github.io/stereographic-projection-maps-circles-to-circles/</link>
+    <pubDate>Tue, 10 Sep 2024 22:33:57 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/ltc-integral/</guid>
-    <description><![CDATA[用 LTC 计算多边形面光源对标准材质光照时需要计算一个积分式: $$ \int_{P_o}{D_o(\omega_o)}\ \mathrm{d}\omega_o = \mathrm{E}(P_o) . $$ 这里 $P_o$ 表示原多边形面光源经过线性变换后的形状在单位球面上投影的区域, 因]]></description>
+    <guid>https://cache-tlb.github.io/stereographic-projection-maps-circles-to-circles/</guid>
+    <description><![CDATA[球极投影是将球面上一点映射到平面的一种投影方式，设单位球面的球心在原点，$N=(0,0,1)$ 是北极点，球面上任一点 $P$ 与 $N$ 连线，与平面 $z=-1$ 交于]]></description>
 </item><item>
-    <title>球面插值函数 slerp 推导</title>
-    <link>https://cache-tlb.github.io/spherical-interpolation/</link>
-    <pubDate>Mon, 11 Jul 2022 19:56:35 &#43;0800</pubDate>
+    <title>曲线族包络线问题的通解</title>
+    <link>https://cache-tlb.github.io/general-solution-of-the-envelope-for-a-family-of-curves/</link>
+    <pubDate>Sun, 21 Jul 2024 14:45:36 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/spherical-interpolation/</guid>
-    <description><![CDATA[单位球, 球心在原点 $O$, 球面上有两点 $P_0, P_1$, 求插值函数 $P_t$, 其中$t\in[0,1]$, 满足 $P_t$ 与 $P_0, P_1$ 位于同一个大圆上, $P_{t=0} = P_0, P_{t=1}=P_1$, 且 $P_t$ 随 $t$ 均匀地从 $P_0$ 转动到 $P_1$.]]></description>
+    <guid>https://cache-tlb.github.io/general-solution-of-the-envelope-for-a-family-of-curves/</guid>
+    <description><![CDATA[序 笔者在近二十余年来遇到了一些求包络线的问题, 每个问题都可以用完全不同的思路解, 同时也存在通用的解法, 在此记录. 定速抛体 一个喷泉有一个小的半]]></description>
 </item><item>
-    <title>Shoelace 公式</title>
-    <link>https://cache-tlb.github.io/shoelace-formula/</link>
-    <pubDate>Mon, 20 Jun 2022 22:10:33 &#43;0800</pubDate>
+    <title>反直觉的概率问题</title>
+    <link>https://cache-tlb.github.io/a-counterintuitive-probability-problem/</link>
+    <pubDate>Thu, 23 May 2024 15:04:37 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/shoelace-formula/</guid>
-    <description><![CDATA[已知平面上简单多边形的顶点坐标为 $P_0, P_1, \cdots, P_{N-1}$, 求其面积. 设多边形区域为 $\Omega$, 则面积为 $$ A = \iint_\Omega {1}\ \mathrm{d}x\mathrm{d}y $$ 令 $P = 0, Q = x$, 则有 $\dfrac{\partial Q}{\partial x} - \dfrac{\partial P}{\partial y} = 1$, 根据格林公式可得]]></description>
+    <guid>https://cache-tlb.github.io/a-counterintuitive-probability-problem/</guid>
+    <description><![CDATA[Problem 现有一个理想的经典6面骰子。 假设今天运气很奇怪，投掷出现的结果全是奇数点(只出现了1,3,5)。 问：投出 1 点的平均等待次数是多少(算上成功]]></description>
 </item><item>
-    <title>Cubemap上每像素对应的立体角计算</title>
-    <link>https://cache-tlb.github.io/cubemap-texel-solid-angle/</link>
-    <pubDate>Mon, 30 May 2022 20:02:31 &#43;0800</pubDate>
+    <title>Leibniz级数的几何意义</title>
+    <link>https://cache-tlb.github.io/leibniz-formula/</link>
+    <pubDate>Thu, 14 Mar 2024 22:49:37 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/cubemap-texel-solid-angle/</guid>
-    <description><![CDATA[在处理环境光的重要性采样时, 具体的采样算法依赖于环境光的表达方式, 例如环境光可以用 cubemap, 全景图(panorama image), 或者球谐函数(spherica]]></description>
+    <guid>https://cache-tlb.github.io/leibniz-formula/</guid>
+    <description><![CDATA[Leibniz 级数定义如下的交错级数： $$ S = 1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \cdots = \sum_{k=0}^{\infty} { \frac{(-1)^k}{2k+1} }.$$ 它收敛到 $\displaystyle \frac{\pi}{4}$。每个带有 $\pi$ 的公式跟圆都有千丝万缕的联系，]]></description>
 </item><item>
-    <title>巴塞尔问题</title>
-    <link>https://cache-tlb.github.io/the-basel-problem/</link>
-    <pubDate>Mon, 14 Mar 2022 19:20:16 &#43;0800</pubDate>
+    <title>多边形的Laplacian平滑</title>
+    <link>https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/</link>
+    <pubDate>Tue, 09 Jan 2024 19:29:40 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/the-basel-problem/</guid>
-    <description><![CDATA[巴塞尔问题将自然数和圆周率这两个看似风马牛不相及的概念联系在了一起： $$ \zeta(2)= \frac{1}{1^2} + \frac{1}{2^2} + \frac{1}{3^2} + \cdots = \frac{\pi^2}{6} . $$ 这里的$\zeta(s)$是黎曼$\zeta$]]></description>
+    <guid>https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/</guid>
+    <description><![CDATA[多年以前在微博上看到一个优美的结论，但是没有解释背后的原理。最近又看到了，有了一些思路，在此给出推导过程。 Conclusion 画个随机多边形，连接各条边的中点]]></description>
 </item><item>
-    <title>重要性采样</title>
-    <link>https://cache-tlb.github.io/importance-sampling/</link>
-    <pubDate>Sun, 16 Jan 2022 13:36:05 &#43;0800</pubDate>
+    <title>能否拯救西西弗斯</title>
+    <link>https://cache-tlb.github.io/can-sisyphus-be-saved/</link>
+    <pubDate>Mon, 30 Oct 2023 22:37:11 &#43;0800</pubDate>
     <author>作者</author>
-    <guid>https://cache-tlb.github.io/importance-sampling/</guid>
-    <description><![CDATA[蒙特卡罗积分 假设随机变量 $x$ 的概率密度函数为 $p(x)$，则以 $x$ 为自变量的函数 $g(x)$ 的期望值为 $$E[g(x)]=\int_{a}^{b}{g(x)p(x){\rm d}x} .$$ 如果要计算一个函数 $f(x)$ 的积分值 $\displaystyle I=\int_{a}^{b}{f(x){\rm d}x}$，只]]></description>
+    <guid>https://cache-tlb.github.io/can-sisyphus-be-saved/</guid>
+    <description><![CDATA[我是在微博上看到这个有趣的问题，在此记录。 Problem 从地上到山顶有 1001 个台阶, 有些台阶上有岩石(每一台阶上岩石至多一块). 西西弗斯可以拿任何一块岩石放]]></description>
 </item></channel>
 </rss>

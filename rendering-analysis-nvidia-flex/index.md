@@ -1,0 +1,1770 @@
+# NVIDIA Flex 截帧分析
+
+
+### 前言
+[Flex](https://developer.nvidia.com/flex) 是 NVIDIA 推出的一个用于实时物理模拟的库。它的优势在于使用统一的基于粒子的模型处理刚体、软体、流体的解算。即使已经是十年前就能达到的效果，放在现在看也是相当惊艳。
+尤其是水体的渲染，笔者曾对背后的技术十分好奇，怎样才能表现出晶莹剔透的水光呢？奈何官方的 [Github 仓库](https://github.com/NVIDIAGameWorks/FleX)只提供了封好的库以及调用方法，其中水体的渲染通过一个函数直接搞定，看不出流程。通过抓帧也只能大致分析有哪些 pass，具体做了什么只能靠猜。
+
+近段时间，随着 AI 越来越强，甚至可以反汇编 dxbc 代码。笔者用 Gemini、豆包等 AI 工具对 Flex 抓帧结果的各个 pass 进行分析，在此记录。
+
+### 综述
+流体渲染总体包含 6 个 pass。最终效果图：
+![最终效果](./figure1.png)
+
+### Pass 1 - shadowmap
+仅两个draw，分别是从光源视角渲染不透明物体和流体粒子，得到深度图，用来做 shadowmap。
+
+#### 粒子的 draw call 信息
+- draw indexed 27648，topology 是 point list
+- IA：Position（RGBA32F），Density（R32F），Phase（R32 SINT）
+- 其中，density 都是+inf，phase都是 2135949312 十进制 / 0x7F500000 HEX
+- 带 geometry shader
+- pixel shader 根据纹理颜色discard
+- blend = false
+
+![shadowmap](./figure2.png)
+
+#### VS
+
+将 VB 的Position变换到viewspace，并将 density、phase 直接转发。反汇编 shader 代码（豆包）：
+```hlsl
+// 顶点着色器版本声明（对应dxbc的vs_5_0）
+#pragma target 5.0
+
+// 常量缓冲区：对应dxbc的cb0[4]，命名为gParams（与dxbc中的gParams匹配）
+// 绑定到b0寄存器，modelView为4个float4（对应dxbc的modelView[0]-[3]）
+cbuffer gParams : register(b0)
+{
+    // 若为矩阵，可改用row_major float4x4 modelView;（行主序，与dxbc访问逻辑一致）
+    float4 modelView[4];
+};
+
+// 输入结构体：按要求绑定语义和数据类型
+// 注：若需兼容寄存器布局，可追加register(v0)/v1/v2，如：float4 position : POSITION : register(v0);
+struct VSInput
+{
+    float4 position : POSITION; // reg0: POSITION，float4（对应原v0.xyzw）
+    float  density  : DENSITY;  // reg1: DENSITY，float（对应原v1.x）
+    int    phase    : PHASE;    // reg2: PHASE，int（对应原v2.x，类型改为int）
+};
+
+// 输出结构体：按要求绑定语义和数据类型
+// 注：若需兼容寄存器布局，可追加register(o0)/o1/o2/o3，如：float4 position : POSITION : register(o0);
+struct VSOutput
+{
+    float4 position : POSITION; // reg0: POSITION，float4（对应原o0.xyzw）
+    float  density  : DENSITY;  // reg1: DENSITY，float（对应原o1.x）
+    int    phase    : PHASE;    // reg2: PHASE，int（对应原o2.x，类型改为int）
+    float4 vertex   : VERTEX;   // reg3: VERTEX，float4（对应原o3.xyzw）
+};
+
+// 顶点着色器主函数：对应dxbc的指令逻辑，变量名同步调整
+VSOutput main(VSInput input)
+{
+    VSOutput output;
+    float4 r0; // 对应dxbc的dcl_temps 1（临时寄存器r0）
+
+    // 0: mul r0.xyzw, v0.yyyy, gParams.modelView[1].xyzw
+    r0 = input.position.y * gParams.modelView[1];
+
+    // 1: mad r0.xyzw, gParams.modelView[0].xyzw, v0.xxxx, r0.xyzw
+    r0 = gParams.modelView[0] * input.position.x + r0;
+
+    // 2: mad r0.xyzw, gParams.modelView[2].xyzw, v0.zzzz, r0.xyzw
+    r0 = gParams.modelView[2] * input.position.z + r0;
+
+    // 3: add o0.xyzw, r0.xyzw, gParams.modelView[3].xyzw
+    output.position = r0 + gParams.modelView[3];
+
+    // 4: mov o1.x, v1.x
+    output.density = input.density;
+
+    // 5: mov o2.x, v2.x
+    output.phase = input.phase;
+
+    // 6: mov o3.xyzw, v0.xyzw
+    output.vertex = input.position;
+
+    // 7: ret
+    return output;
+}
+```
+
+#### GS
+- 将单个粒子的点（vertex）转成billboard（两个三角形，triangle strip），并根据projection投到屏幕上。没有形变。
+- 只bind了一个 cbuffer，没有其他buffer和texture输入。
+
+反汇编 shader代码 （Gemini）
+``` HLSL
+// -------------------------------------------------------------------------
+// Constant Buffer Definitions
+// -------------------------------------------------------------------------
+cbuffer constBuf : register(b0)
+{
+    struct
+    {
+        float4   pointRadius;        // x used as radius
+        float4   lightDir;           // xyz is direction
+        float4x4 lightTransform;     // Shadow/Light matrix
+        float4x4 modelView;          // View matrix
+        int      mode;               // Controls color logic (0, 1, or 2)
+        float3   padding;            // Padding to align next float4
+        float4x4 projection;         // Projection matrix
+        
+        // Palette colors start at index 12 (48 bytes offset theoretically, 
+        // but in register slots it's cb0[12])
+        float4   colorPalette[8];    
+    } gParams;
+};
+
+// -------------------------------------------------------------------------
+// Input/Output Structures
+// -------------------------------------------------------------------------
+struct GS_INPUT
+{
+    float4 ViewPos      : POSITION;      // v[0][0]
+    float  LifeParam    : TEXCOORD0;     // v[0][1].x (Scalar factor for color)
+    uint   ColorIndex   : TEXCOORD1;     // v[0][2].x (Index for palette)
+    float4 WorldPosData : TEXCOORD2;     // v[0][3] (xyz = WorldPos?, w = Intensity)
+};
+
+struct GS_OUTPUT
+{
+    float4 Pos          : SV_POSITION;   // o0
+    float2 TexCoord     : TEXCOORD0;     // o1
+    float4 ShadowPos    : TEXCOORD1;     // o2
+    float3 ViewLightDir : TEXCOORD2;     // o3
+    float4 Color        : TEXCOORD3;     // o4
+    float3 OrigWorldPos : TEXCOORD4;     // o5
+    float3 OrigViewPos  : TEXCOORD5;     // o6
+};
+
+// -------------------------------------------------------------------------
+// Geometry Shader
+// -------------------------------------------------------------------------
+[maxvertexcount(4)]
+void main(point GS_INPUT input[1], inout TriangleStream<GS_OUTPUT> outputStream)
+{
+    GS_OUTPUT output;
+
+    // 1. Calculate Billboard Size
+    // Line 0: r0.x = radius * 2
+    float size = gParams.pointRadius.x * 2.0;
+
+    // 2. Calculate Shadow/Light Space Coordinates
+    // Lines 1-2: Offset the world position backwards along light dir?
+    // r0.yzw = input.WorldPos - (LightDir * Radius * 2.0)
+    float3 lightOffset = gParams.lightDir.xyz * gParams.pointRadius.x * 2.0;
+    float4 biasedPos = float4(input[0].WorldPosData.xyz - lightOffset, 1.0);
+
+    // Lines 3-6: Transform by Light Matrix
+    float4 shadowPos = mul(biasedPos, gParams.lightTransform);
+
+    // 3. Calculate View-Space Light Direction
+    // Lines 7-9: Rotate LightDir by ModelView (3x3 only)
+    float3 viewLightDir = mul(gParams.lightDir.xyz, (float3x3)gParams.modelView);
+
+    // 4. Calculate Color Options
+    float4 selectedColor;
+
+    // --- Option A: "Heat/Life" Gradient (Lines 10-15) ---
+    float4 colorHeat;
+    if (input[0].LifeParam < 0)
+    {
+        // Line 11: Gradient when param < 0
+        colorHeat = input[0].LifeParam * float4(0.0, -0.9, -0.8, 0.0) + float4(0.0, 1.0, 1.0, 1.0);
+    }
+    else
+    {
+        // Line 12-14: Gradient when param >= 0
+        float yVal = input[0].LifeParam * -0.9 + 0.1;
+        colorHeat = float4(0.1, yVal, 1.0, 0.0);
+    }
+    colorHeat.w = 0.0;
+
+    // --- Option B: "Intensity" (Lines 17-18) ---
+    // Scaled by .w component of input 3
+    float intensity = saturate(input[0].WorldPosData.w * 0.05);
+    float4 colorIntensity = float4(intensity, intensity, intensity, intensity);
+
+    // --- Option C: Palette Lookup (Lines 19-23) ---
+    // Mask index with 7
+    uint idx = input[0].ColorIndex & 7;
+    float3 palCol = gParams.colorPalette[idx].xyz;
+    // Math: 1.8 * Color + 0.1
+    // (Reverse engineered from: 2*C + 0.1*(1 - 2*C))
+    float3 colorPaletteProcessed = palCol * 1.8 + 0.1; 
+    float4 finalPalette = float4(colorPaletteProcessed, 0.0);
+
+    // 5. Select Color Mode (Lines 16, 35-43)
+    // Mode 1 = Heat, Mode 2 = Intensity, Default = Palette
+    if (gParams.mode == 1)      selectedColor = colorHeat;
+    else if (gParams.mode == 2) selectedColor = colorIntensity;
+    else                        selectedColor = finalPalette;
+
+    // 6. Loop to generate Quad (Lines 25-54)
+    // The immediate constant buffer (icb) holds the UV corners:
+    // (0,1), (0,0), (1,1), (1,0) -> Triangle Strip Order
+    const float2 offsets[4] = {
+        float2(0.0, 1.0),
+        float2(0.0, 0.0),
+        float2(1.0, 1.0),
+        float2(1.0, 0.0)
+    };
+
+    [unroll]
+    for (int i = 0; i < 4; i++)
+    {
+        float2 uv = offsets[i];
+        
+        // Center UVs around 0 (-0.5 to 0.5) and scale by calculated size
+        float2 localPos = (uv - 0.5) * size;
+
+        // Apply to View Space Position (v[0][0])
+        float4 viewPos = input[0].ViewPos;
+        viewPos.xy += localPos;
+
+        // Project to Clip Space
+        output.Pos = mul(viewPos, gParams.projection);
+
+        // Pass through Data
+        output.TexCoord = float2(uv.x, 1.0 - uv.y); // Flip Y (Line 34)
+        output.ShadowPos = shadowPos;
+        output.ViewLightDir = viewLightDir;
+        output.Color = selectedColor;
+        output.OrigWorldPos = input[0].WorldPosData.xyz;
+        output.OrigViewPos = input[0].ViewPos.xyz;
+
+        outputStream.Append(output);
+    }
+
+    outputStream.RestartStrip();
+}
+```
+
+GS的输出结果：
+
+![GS output](./figure3.png)
+
+#### RS
+宽高都是2048，没有特殊的。
+
+#### PS
+按 texture coordinate 裁剪出圆形的粒子形状。
+反汇编shader （豆包）：
+```hlsl
+// 像素着色器版本声明（对应dxbc的ps_5_0）
+#pragma target 5.0
+
+// 输入结构体：对应dxbc的dcl_input_ps linear v1.xy，匹配用户指定的输入语义
+// reg1: TEXCOORD0，float2（显式标注语义，与寄存器绑定一致）
+struct PSInput
+{
+    float2 uvCoord : TEXCOORD0; // 对应v1.xy，线性插值（dxbc的linear修饰符由HLSL自动继承）
+};
+
+// 像素着色器主函数：对应dxbc的指令逻辑
+// 注：像素着色器可返回任意格式（此处无输出，仅做裁剪，返回float4(0,0,0,0)或按需调整）
+float4 main(PSInput input) : SV_Target
+{
+    // 临时变量：对应dxbc的dcl_temps 1（r0）
+    float2 tempVec;
+    float distanceSq;
+
+    // 0: add r0.xy, v1.xyxx, l(-0.500000, -0.500000, 0.000000, 0.000000)
+    // 将UV坐标从[0,1]偏移到[-0.5, 0.5]（以中心为原点）
+    tempVec = input.uvCoord + float2(-0.5f, -0.5f);
+
+    // 1: dp2 r0.x, r0.xyxx, r0.xyxx
+    // 计算二维向量的点积（等价于向量长度的平方：tempVec.x² + tempVec.y²）
+    distanceSq = dot(tempVec, tempVec);
+
+    // 2: lt r0.x, l(0.250000), r0.x
+    // 判断长度平方是否大于0.25（0.5的平方，即是否在半径0.5的圆外）
+    // 结果：1.0（圆外）/0.0（圆内）
+    bool isOutsideCircle = (distanceSq > 0.25f);
+
+    // 3: discard_nz r0.x
+    // 若在圆外，丢弃当前像素（不输出颜色）
+    if (isOutsideCircle)
+    {
+        discard;
+    }
+
+    // 4: ret
+    // 此处可返回任意颜色（根据业务需求调整，示例返回白色不透明）
+    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+}
+```
+
+### Pass 2 - 不透明物体+浪花
+从相机视角，渲染不透明物体和浪花的颜色，带阴影。
+这一步不渲染水体。
+其中浪花部分的效果如下图（去掉了不透明物体，只显示绘制的粒子）。
+
+![pass 2](./figure4.png)
+
+#### draw call 信息
+- draw 37855，不带 index，topology是 point list
+- IA：Position（RGBA32F），velocity（RGBA32F）
+- VS 只做简单的顶点位置变换
+- 带geometry shader
+- pixel shader 根据纹理颜色discard
+- blend = true，开深度测试，不写深度
+
+#### VS
+仅绑定 cbuffer，对 position 和 velocity 做 model view变换。
+反汇编代码（豆包）：
+```hlsl
+// 顶点着色器版本声明（对应dxbc的vs_5_0）
+#pragma target 5.0
+
+// 常量缓冲区：对应dxbc的cb0[15]（immediateIndexed），绑定到b0寄存器
+// 语义化命名成员，匹配DXBC中出现的gParams属性，补充矩阵/颜色的业务含义
+cbuffer VertexShaderParams : register(b0)
+{
+    // 模型视图投影矩阵（MVP）：行主序，对应dxbc的modelViewProjection[0]-[3]
+    // 若为列主序可改为float4x4，需调整乘法顺序（见细节补充）
+    float4 mvpMatrix[4];      
+    // 模型视图矩阵（MV）：行主序，对应dxbc的modelView[0]-[3]
+    float4 mvMatrix[4];       
+    // 顶点颜色：对应dxbc的gParams.color
+    float4 vertexColor;       
+    // 占位符：补充cb0[15]的剩余空间（上述成员占4+4+1=9个float4，剩余6个占位）
+    float4 paramsPlaceholder[6]; 
+};
+
+// 输入结构体：对应dxbc的dcl_input v0.xyzw/v1.xyz，匹配用户指定的输入语义
+struct VSInput
+{
+    float4 vertexPosOS : POSITION; // reg0: 对象空间顶点位置（float4）
+    float4 vertexVelOS : VELOCITY; // reg1: 对象空间顶点速度（float4，dxbc中用xyz分量）
+};
+
+// 输出结构体：对应dxbc的dcl_output o0-o4，匹配用户指定的输出语义
+struct VSOutput
+{
+    float4 outputPosOS : POSITION; // reg0: 原始位置输出（float4）
+    float4 ndcPos      : NDCPOS;   // reg1: NDC坐标（float4）
+    float4 viewPos     : VIEWPOS;  // reg2: 视图空间位置（float4）
+    float4 viewVel     : VIEWVEL;  // reg3: 视图空间速度（float4）
+    float4 color       : COLOR;    // reg4: 顶点颜色（float4）
+};
+
+// 顶点着色器主函数：逐行映射DXBC指令逻辑，使用语义化变量名
+VSOutput main(VSInput input)
+{
+    VSOutput output;
+    float4 tempVec; // 对应dxbc的dcl_temps 1（临时寄存器r0）
+
+    // 0: mov o0.xyzw, v0.xyzw → 输出原始对象空间位置
+    output.outputPosOS = input.vertexPosOS;
+
+    // -------------------------- 计算裁剪空间位置 & NDC坐标 --------------------------
+    // 1: mul tempVec.xyzw, v0.yyyy, mvpMatrix[1].xyzw
+    tempVec = input.vertexPosOS.y * mvpMatrix[1];
+    // 2: mad tempVec.xyzw, mvpMatrix[0].xyzw, v0.xxxx, tempVec.xyzw
+    tempVec = mvpMatrix[0] * input.vertexPosOS.x + tempVec;
+    // 3: mad tempVec.xyzw, mvpMatrix[2].xyzw, v0.zzzz, tempVec.xyzw
+    tempVec = mvpMatrix[2] * input.vertexPosOS.z + tempVec;
+    // 4: add tempVec.xyzw, tempVec.xyzw, mvpMatrix[3].xyzw
+    tempVec += mvpMatrix[3];
+    // 5: div o1.xyzw, tempVec.xyzw, tempVec.wwww → 裁剪空间转NDC（除以w分量）
+    output.ndcPos = tempVec / tempVec.w;
+
+    // -------------------------- 计算视图空间顶点位置 --------------------------
+    // 6: mul tempVec.xyzw, v0.yyyy, mvMatrix[1].xyzw
+    tempVec = input.vertexPosOS.y * mvMatrix[1];
+    // 7: mad tempVec.xyzw, mvMatrix[0].xyzw, v0.xxxx, tempVec.xyzw
+    tempVec = mvMatrix[0] * input.vertexPosOS.x + tempVec;
+    // 8: mad tempVec.xyzw, mvMatrix[2].xyzw, v0.zzzz, tempVec.xyzw
+    tempVec = mvMatrix[2] * input.vertexPosOS.z + tempVec;
+    // 9: add o2.xyzw, tempVec.xyzw, mvMatrix[3].xyzw
+    output.viewPos = tempVec + mvMatrix[3];
+
+    // -------------------------- 计算视图空间顶点速度 --------------------------
+    // 10: mul tempVec.xyzw, v1.yyyy, mvMatrix[1].xyzw（v1是速度，用xyz分量）
+    tempVec = input.vertexVelOS.y * mvMatrix[1];
+    // 11: mad tempVec.xyzw, mvMatrix[0].xyzw, v1.xxxx, tempVec.xyzw
+    tempVec = mvMatrix[0] * input.vertexVelOS.x + tempVec;
+    // 12: mad o3.xyzw, mvMatrix[2].xyzw, v1.zzzz, tempVec.xyzw（直接赋值，无额外加法）
+    output.viewVel = mvMatrix[2] * input.vertexVelOS.z + tempVec;
+
+    // 13: mov o4.xyzw, gParams.color.xyzw → 输出顶点颜色
+    output.color = vertexColor;
+
+    // 14: ret → 返回输出结构体
+    return output;
+}
+```
+
+#### GS
+每个粒子依然发射 4 个顶点，triangle strip。根据速度拉伸面片长度。反汇编代码（Gemini）：
+``` hlsl
+// -------------------------------------------------------------------------
+// Constant Buffer Definition
+// -------------------------------------------------------------------------
+cbuffer constBuf : register(b0)
+{
+    struct
+    {
+        float4   diffusion;          // .x used for size calculation
+        float4   diffuseScale;       // .x used for global scaling
+        float4   motionBlurScale;    // .x used to trigger velocity stretching
+        float4   lightDir;           // Global light direction
+        float4x4 modelView;          // Matrix to transform LightDir to View Space
+        float4x4 projection;         // Matrix to project View Space to Clip Space
+        
+        // Note: The bytecode implies other members might exist or padding,
+        // but these are the ones explicitly accessed.
+    } gParams;
+};
+
+// -------------------------------------------------------------------------
+// Input / Output Structures
+// -------------------------------------------------------------------------
+struct GS_INPUT
+{
+    float4 Position  : POSITION;   // reg0 (v[0][0])
+    float4 NdcPos    : NDCPOS;     // reg1 (v[0][1]) - Used for culling
+    float4 ViewPos   : VIEWPOS;    // reg2 (v[0][2]) - Center of the particle
+    float4 ViewVel   : VIEWVEL;    // reg3 (v[0][3]) - Velocity direction
+    float4 Color     : COLOR;      // reg4 (v[0][4])
+};
+
+struct GS_OUTPUT
+{
+    float4 SvPosition : SV_POSITION; // reg0
+    float4 Position   : POSITION;    // reg1
+    float4 ViewPos    : VIEWPOS;     // reg2
+    float4 ViewVel    : VIEWVEL;     // reg3 (w component modified for fade/alpha)
+    float4 LightDir   : LIGHTDIR;    // reg4
+    float4 Color      : COLOR;       // reg5
+    float2 UV         : UV;          // reg6
+};
+
+// -------------------------------------------------------------------------
+// Geometry Shader
+// -------------------------------------------------------------------------
+[maxvertexcount(4)]
+void main(point GS_INPUT input[1], inout TriangleStream<GS_OUTPUT> outputStream)
+{
+    // 1. Frustum Culling
+    // Check if the Normalized Device Coordinates are outside the [-1, 1] range.
+    // If so, return immediately (do not render this particle).
+    if (input[0].NdcPos.x < -1.0 || input[0].NdcPos.x > 1.0 ||
+        input[0].NdcPos.y < -1.0 || input[0].NdcPos.y > 1.0)
+    {
+        return;
+    }
+
+    // 2. Calculate Base Particle Size
+    // Logic corresponds to lines 16-25
+    float alpha = gParams.diffusion.x + 1.0;
+    float factor = min(0.25 * input[0].Position.w, 1.0);
+    float invAlpha = 1.0 - alpha;
+    
+    // Lerp logic: size = factor * (1.0 - alpha) + alpha
+    float sizeBase = factor * invAlpha + alpha;
+    
+    // Calculate Fade Factor (stored in opacity/w later)
+    float sizeSq = sizeBase * sizeBase;
+    float fadeFactor = 1.0 / sizeSq;
+
+    // 3. Determine Axes (Standard vs. Velocity Stretched)
+    // Logic corresponds to lines 26-45
+    float3 velocity = input[0].ViewVel.xyz;
+    float velSq = dot(velocity, velocity);
+    float velLen = sqrt(velSq);
+    
+    // Check for motion blur threshold
+    float scaledSpeed = velLen * gParams.motionBlurScale.x;
+    bool isFast = scaledSpeed > 0.5;
+
+    // Calculate Velocity Axis logic (if fast)
+    // Scale velocity for visual length
+    float fastLen = scaledSpeed * 0.016; 
+    fastLen = max(fastLen, gParams.diffuseScale.x);
+    
+    // Recalculate fade for fast particles
+    float speedRatio = fastLen / gParams.diffuseScale.x;
+    float fastFade = min(2.0 / speedRatio, 1.0);
+
+    // Calculate Cross Axis (perpendicular to velocity)
+    float3 fastAxisY = velocity * (1.0 / velLen); // Normalized velocity
+    // Cross product with (0, -1, 0) roughly
+    float3 tempVec = fastAxisY * float3(0, -1, 0); 
+    float3 fastAxisX = float3(-1, 0, 0) * fastAxisY.y - float3(0,0,0); // Simplified cross logic from asm
+    // Actually, ASM lines 38-39 perform a specific cross-like operation 
+    // to get a vector perpendicular to View-Z and Velocity.
+    // Result: fastAxisX is the "width" of the streak.
+    fastAxisX = normalize(fastAxisX) * gParams.diffuseScale.x; 
+    
+    // Selection: Standard Billboard vs Stretched
+    float3 axisWidth, axisHeight;
+    float finalFade;
+
+    if (isFast)
+    {
+        // Stretched Mode
+        axisWidth  = fastAxisX; // Perpendicular to velocity
+        axisHeight = velocity;  // Aligned with velocity (asm logic effectively)
+        finalFade  = fastFade;
+    }
+    else
+    {
+        // Standard Mode (Square Billboard)
+        float s = sizeBase * gParams.diffuseScale.x;
+        axisWidth  = float3(0.0, s, 0.0); // Up/Down in View Space (swapped in asm logic)
+        axisHeight = float3(s, 0.0, 0.0); // Right/Left in View Space
+        finalFade  = fadeFactor;
+    }
+
+    // 4. Calculate Light Direction (View Space)
+    // Lines 46-48: Rotate LightDir by the ModelView matrix (3x3)
+    float4 viewLightDir;
+    viewLightDir.xyz = mul(gParams.lightDir.xyz, (float3x3)gParams.modelView);
+    viewLightDir.w = 1.0; // Implicit in calculations usually
+
+    // 5. Generate Quad (Triangle Strip)
+    // The shader manually calculates 4 corners relative to the Center (ViewPos).
+    
+    GS_OUTPUT output;
+    output.Position = input[0].Position;  // Pass-through
+    output.ViewPos  = input[0].ViewPos;   // Pass-through
+    output.ViewVel  = float4(velocity, finalFade); // .w is the calculated fade
+    output.LightDir = viewLightDir;
+    output.Color    = input[0].Color;     // Pass-through
+
+    float4 center = input[0].ViewPos;
+
+    // --- Vertex 0: Top-Left (UV 0, 1) ---
+    // Pos = Center + Width - Height
+    float3 pos0 = center.xyz + axisWidth - axisHeight;
+    output.SvPosition = mul(float4(pos0, 1.0), gParams.projection);
+    output.UV = float2(0.0, 1.0);
+    outputStream.Append(output);
+
+    // --- Vertex 1: Bottom-Left (UV 0, 0) ---
+    // Pos = Center - Width - Height
+    float3 pos1 = center.xyz - axisWidth - axisHeight;
+    output.SvPosition = mul(float4(pos1, 1.0), gParams.projection);
+    output.UV = float2(0.0, 0.0);
+    outputStream.Append(output);
+
+    // --- Vertex 2: Top-Right (UV 1, 1) ---
+    // Pos = Center + Width + Height
+    float3 pos2 = center.xyz + axisWidth + axisHeight;
+    output.SvPosition = mul(float4(pos2, 1.0), gParams.projection);
+    output.UV = float2(1.0, 1.0);
+    outputStream.Append(output);
+
+    // --- Vertex 3: Bottom-Right (UV 1, 0) ---
+    // Pos = Center - Width + Height
+    float3 pos3 = center.xyz - axisWidth + axisHeight;
+    output.SvPosition = mul(float4(pos3, 1.0), gParams.projection);
+    output.UV = float2(1.0, 0.0);
+    outputStream.Append(output);
+
+    outputStream.RestartStrip();
+}
+```
+
+GS 输出，注意会根据速度拉伸旋转矩形：
+
+![pass 2 GS](./figure5.png)
+
+#### RS 
+分辨率为 1280x720，无特殊设置。
+
+#### PS
+没有 bind 任何 buffer 或 texture。
+先根据 texcoord 裁剪成（椭）圆形，并模拟运动模糊的半透明。
+反汇编代码（豆包）：
+```hlsl
+// 像素着色器版本声明（对应dxbc的ps_5_0）
+#pragma target 5.0
+
+// 输入结构体：对应用户指定的输入寄存器，仅保留DXBC中用到的成员（其余可保留占位）
+struct PSInput
+{
+    float4 svPosition  : SV_POSITION; // reg0: 裁剪空间位置（HLSL必选，用于光栅化）
+    float4 vertexPos   : POSITION;    // reg1: 顶点位置（仅用w分量vertexPos.w）
+    float4 viewPos     : VIEWPOS;     // reg2: 视图空间位置（占位，DXBC未使用）
+    float4 viewVel     : VIEWVEL;     // reg3: 视图空间速度（仅用w分量viewVel.w）
+    float4 lightDir    : LIGHTDIR;    // reg4: 光源方向（占位，DXBC未使用）
+    float4 color       : COLOR;       // reg5: 顶点颜色（占位，DXBC未使用）
+    float2 pixelUV     : UV;          // reg6: 像素UV坐标（核心使用xy分量）
+};
+
+// 像素着色器主函数：逐行映射DXBC指令逻辑，使用语义化变量名
+float4 main(PSInput input) : SV_TARGET
+{
+    // 临时变量：对应dxbc的dcl_temps 1（临时寄存器r0）
+    float4 tempData;
+
+    // -------------------------- 步骤1：UV坐标从[0,1]映射到[-1,1] --------------------------
+    // 0: mad tempData.xy = pixelUV.xy * 2.0 + (-1.0, -1.0)
+    tempData.xy = input.pixelUV * 2.0f + float2(-1.0f, -1.0f);
+
+    // -------------------------- 步骤2：圆形裁剪（丢弃单位圆外的像素） --------------------------
+    // 1: dp2 tempData.x = tempData.xy · tempData.xy（计算二维向量的长度平方）
+    tempData.x = dot(tempData.xy, tempData.xy);
+
+    // 2: lt tempData.y = 1.0 < tempData.x（判断长度平方是否大于1，是则tempData.y=1，否则0）
+    tempData.y = (tempData.x > 1.0f) ? 1.0f : 0.0f;
+
+    // 3: discard_nz tempData.y（长度平方>1时，丢弃当前像素）
+    if (tempData.y != 0.0f)
+    {
+        discard;
+    }
+
+    // -------------------------- 步骤3：计算亮度因子（由顶点位置和速度调制） --------------------------
+    // 4: mul tempData.y = vertexPos.w * 0.125（0.125=1/8，缩放顶点位置w分量）
+    tempData.y = input.vertexPos.w * 0.125f;
+
+    // 5: min tempData.y = min(tempData.y, 1.0)（限制亮度因子不超过1）
+    tempData.y = min(tempData.y, 1.0f);
+
+    // -------------------------- 步骤4：计算圆形衰减因子（中心亮，边缘暗） --------------------------
+    // 6: add tempData.x = 1.0 - tempData.x（1 - 长度平方，得到0~1的衰减值，中心为1）
+    tempData.x = 1.0f - tempData.x;
+
+    // 7: mul tempData.y = tempData.y * viewVel.w（亮度因子乘以视图空间速度w分量）
+    tempData.y = tempData.y * input.viewVel.w;
+
+    // 8: mul tempData.x = tempData.x * tempData.x（衰减值平方，增强中心的亮度对比度）
+    tempData.x = tempData.x * tempData.x;
+
+    // -------------------------- 步骤5：输出最终颜色 --------------------------
+    // 9: mul finalColor.xyzw = tempData.x * tempData.y（衰减因子 × 亮度因子，作为RGBA）
+    float4 finalColor = tempData.x * tempData.y;
+
+    // 10: ret
+    return finalColor;
+}
+```
+
+注：
+- 粒子本身的颜色（通过uniform传入）在这里未使用。返回的颜色总是白色。
+
+#### OM
+color的结果直接写在 swapchain，开了标准的 alpha blend
+
+### Pass 3 - 水体深度（未被使用）
+从相机视角，只渲染粒子深度，这个pass的color和depth在前后的各个pass都没有被使用到。
+
+![pass 3](./figure6.png)
+
+#### 粒子draw call信息：
+- draw indexed 27648，point list
+- IA：Position（RGBA32F），U，V，W（分别是RGBA32F，未使用）
+- blend = false，写深度
+
+#### VS
+仅变换到 view space，输出 position 和 texcoord 给 GS。
+反汇编代码（豆包）：
+```hlsl
+// 顶点着色器版本声明（对应dxbc的vs_5_0）
+#pragma target 5.0
+
+// 常量缓冲区：对应dxbc的cb0[8]（immediateIndexed），绑定到b0寄存器
+// 语义化命名成员，匹配DXBC中出现的gParams.modelView，补充占位符满足cb0[8]长度
+cbuffer VertexShaderParams : register(b0)
+{
+    // 模型视图矩阵（MV）：行主序，对应dxbc的modelView[0]-[3]
+    // 若为列主序可改为float4x4，需调整乘法顺序（见细节补充）
+    float4 mvMatrix[4];
+    // 占位符：补充cb0[8]的剩余空间（上述成员占4个float4，剩余4个占位）
+    float4 paramsPlaceholder[4];
+};
+
+// 输入结构体：对应dxbc的dcl_input v0.xyzw，匹配用户指定的输入语义
+struct VSInput
+{
+    float4 vertexPosOS : POSITION; // reg0: 对象空间顶点位置（float4）
+};
+
+// 输出结构体：对应dxbc的dcl_output o0-o1，匹配用户指定的输出语义
+struct VSOutput
+{
+    float4 vertexPosVS : POSITION; // reg0: 视图空间顶点位置（float4）
+    float4 originalPosOS : TEXCOORD0; // reg1: 原始对象空间位置（float4）
+};
+
+// 顶点着色器主函数：逐行映射DXBC指令逻辑，使用语义化变量名
+VSOutput main(VSInput input)
+{
+    VSOutput output;
+    float4 tempVec; // 对应dxbc的dcl_temps 1（临时寄存器r0）
+
+    // -------------------------- 计算视图空间顶点位置 --------------------------
+    // 0: mul tempVec.xyzw, v0.yyyy, mvMatrix[1].xyzw
+    tempVec = input.vertexPosOS.y * mvMatrix[1];
+    // 1: mad tempVec.xyzw, mvMatrix[0].xyzw, v0.xxxx, tempVec.xyzw
+    tempVec = mvMatrix[0] * input.vertexPosOS.x + tempVec;
+    // 2: mad tempVec.xyzw, mvMatrix[2].xyzw, v0.zzzz, tempVec.xyzw
+    tempVec = mvMatrix[2] * input.vertexPosOS.z + tempVec;
+    // 3: add o0.xyzw, tempVec.xyzw, mvMatrix[3].xyzw
+    output.vertexPosVS = tempVec + mvMatrix[3];
+
+    // 4: mov o1.xyzw, v0.xyzw → 输出原始对象空间顶点位置
+    output.originalPosOS = input.vertexPosOS;
+
+    // 5: ret → 返回输出结构体
+    return output;
+}
+```
+
+#### GS
+看看即可，不重要。
+反汇编代码（豆包）：
+```hlsl
+// 几何着色器版本声明（对应dxbc的gs_5_0）
+#pragma target 5.0
+
+// 立即常量缓冲区：对应dxbc的dcl_immediateConstantBuffer
+// 用途：存储Billboard四边形的4个顶点UV坐标（0,1）、（0,0）、（1,1）、（1,0）
+static const float4 g_QuadUVConstants[4] = {
+    float4(0.0f, 1.0f, 0.0f, 0.0f), // 顶点0：UV(0,1)
+    float4(0.0f, 0.0f, 0.0f, 0.0f), // 顶点1：UV(0,0)
+    float4(1.0f, 1.0f, 0.0f, 0.0f), // 顶点2：UV(1,1)
+    float4(1.0f, 0.0f, 0.0f, 0.0f)  // 顶点3：UV(1,0)
+};
+
+// 常量缓冲区：对应dxbc的cb0[32]（immediateIndexed），绑定到b0寄存器
+// 语义化命名成员，补充占位符满足cb0[32]长度
+cbuffer GeometryShaderParams : register(b0)
+{
+    float   particleRadius;          // 粒子渲染半径（对应gParams.pointRadius.x）
+    float3  padding0;                // 填充：使particleRadius占float4大小，对齐内存
+    float4  projectionMatrix[4];     // 投影矩阵（对应gParams.projection[0]-[3]，行主序）
+    // 占位符：补充cb0[32]的剩余空间（上述成员占1+4=5个float4，剩余27个占位）
+    float4  paramsPlaceholder[27];
+};
+
+// 输入结构体：对应dxbc的dcl_input v[1][0].xyzw，匹配用户指定的输入语义
+// 输入为点图元，几何着色器的输入是单个顶点（数组长度1）
+struct GSInput
+{
+    float4 vertexPosOS : POSITION; // reg0: 对象空间顶点位置（float4）
+};
+
+// 输出结构体：对应dxbc的dcl_output o0-o4，匹配用户指定的输出语义
+struct GSOutput
+{
+    float4 clipPos       : SV_POSITION; // reg0: 裁剪空间位置（float4）
+    float4 uvCoord       : TEXCOORD0;   // reg1: 纹理UV坐标（float4，xy有效，zw=0）
+    float4 reservedTexCoord1 : TEXCOORD1; // reg2: 预留纹理坐标（暂置0）
+    float4 reservedTexCoord2 : TEXCOORD2; // reg3: 预留纹理坐标（暂置0）
+    float4 reservedTexCoord3 : TEXCOORD3; // reg4: 预留纹理坐标（暂置0）
+};
+
+// 几何着色器主函数：
+// 功能：将单个点图元扩展为4顶点的三角带四边形（Billboard）
+// 输入：point图元的顶点数组（单顶点）
+// 输出：trianglestrip拓扑的流m0，最大输出4个顶点
+[maxvertexcount(4)] // 对应dxbc的dcl_maxout 4
+void main(point GSInput input[1], inout TriangleStream<GSOutput> m0)
+{
+    // 临时变量：对应dxbc的dcl_temps 2（r0=tempCalc，r1=tempClipPos）
+    float4 tempCalc;
+    float4 tempClipPos;
+
+    // 0: add tempCalc.x = particleRadius + particleRadius（半径翻倍，用于缩放四边形尺寸）
+    tempCalc.x = particleRadius + particleRadius;
+
+    // 1: mov tempCalc.y = 0.0（初始化循环计数器，遍历4个四边形顶点）
+    tempCalc.y = 0.0f;
+
+    // 2: loop → 循环条件：tempCalc.y < 4（遍历4个顶点）
+    while (true)
+    {
+        // 3: ige tempCalc.z = tempCalc.y >= 4.0（判断是否超出顶点数量）
+        tempCalc.z = (tempCalc.y >= 4.0f) ? 1.0f : 0.0f;
+
+        // 4: breakc_nz tempCalc.z（超出则退出循环）
+        if (tempCalc.z != 0.0f)
+        {
+            break;
+        }
+
+        // -------------------------- 计算Billboard顶点的xy坐标 --------------------------
+        // 5: add tempCalc.zw = (-0.5, -0.5) + g_QuadUVConstants[tempCalc.y].xy（UV偏移到[-0.5, 0.5]）
+        // 注：dxbc的l(0,0,-0.5,-0.5)是xy=0,0，zw=-0.5,-0.5；icb[r0.y].xxxy是x,x,x,y → 取xy为icb的x,y
+        tempCalc.zw = float2(-0.5f, -0.5f) + g_QuadUVConstants[(int)tempCalc.y].xy;
+
+        // 6: mad tempCalc.zw = tempCalc.x * tempCalc.zw + input[0].vertexPosOS.xy（半径缩放 + 原始顶点偏移）
+        tempCalc.zw = tempCalc.x * tempCalc.zw + input[0].vertexPosOS.xy;
+
+        // -------------------------- 投影矩阵变换：转换到裁剪空间 --------------------------
+        // 7: mul tempClipPos = tempCalc.w * projectionMatrix[1]
+        tempClipPos = tempCalc.w * projectionMatrix[1];
+
+        // 8: mad tempClipPos = projectionMatrix[0] * tempCalc.z + tempClipPos
+        tempClipPos = projectionMatrix[0] * tempCalc.z + tempClipPos;
+
+        // 9: mad tempClipPos = projectionMatrix[2] * input[0].vertexPosOS.z + tempClipPos
+        tempClipPos = projectionMatrix[2] * input[0].vertexPosOS.z + tempClipPos;
+
+        // 10: mad tempClipPos = projectionMatrix[3] * input[0].vertexPosOS.w + tempClipPos
+        tempClipPos = projectionMatrix[3] * input[0].vertexPosOS.w + tempClipPos;
+
+        // -------------------------- 计算UV的y分量（纹理坐标翻转） --------------------------
+        // 11: add tempCalc.z = 1.0 - g_QuadUVConstants[tempCalc.y].y
+        tempCalc.z = 1.0f - g_QuadUVConstants[(int)tempCalc.y].y;
+
+        // -------------------------- 设置输出顶点数据 --------------------------
+        GSOutput output;
+
+        // 12: mov output.clipPos = tempClipPos（裁剪空间位置）
+        output.clipPos = tempClipPos;
+
+        // 13: mov output.uvCoord.x = g_QuadUVConstants[tempCalc.y].x
+        // 14: mov output.uvCoord.y = tempCalc.z
+        // 15: mov output.uvCoord.zw = 0.0
+        output.uvCoord = float4(g_QuadUVConstants[(int)tempCalc.y].x, tempCalc.z, 0.0f, 0.0f);
+
+        // 16-18: mov o2-o4 = 0.0（预留纹理坐标暂置0）
+        output.reservedTexCoord1 = float4(0.0f, 0.0f, 0.0f, 0.0f);
+        output.reservedTexCoord2 = float4(0.0f, 0.0f, 0.0f, 0.0f);
+        output.reservedTexCoord3 = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // 19: emit_stream m0（发射顶点到三角带流）
+        m0.Append(output);
+
+        // 20: iadd tempCalc.y = tempCalc.y + 1（循环计数器+1）
+        tempCalc.y += 1.0f;
+
+        // 21: endloop
+    }
+
+    // 22: ret
+}
+```
+
+GS 输出：
+
+![pass 3 GS](./figure7.png)
+
+#### PS
+没有bind任何texture 和buffer，反汇编shader（豆包）：
+```hlsl
+// 像素着色器版本声明（对应dxbc的ps_5_0）
+#pragma target 5.0
+
+// 输入结构体：对应用户指定的输入寄存器，仅保留DXBC中用到的成员（SV_POSITION为HLSL光栅化必选）
+struct PSInput
+{
+    float4 svPosition  : SV_POSITION;  // reg0: 裁剪空间位置（HLSL必选，用于光栅化）
+    float4 pixelUV     : TEXCOORD0;    // reg1: UV坐标（仅用xy分量，float4类型匹配输入寄存器）
+};
+
+// 像素着色器主函数：逐行映射DXBC指令逻辑，使用语义化变量名
+float4 main(PSInput input) : SV_TARGET
+{
+    // 临时变量：对应dxbc的dcl_temps 1（临时寄存器r0）
+    float4 tempData;
+
+    // 定义常量：语义化命名，提升代码可读性（与DXBC中的立即数一一对应）
+    const float2 uvTransformScale = float2(2.0f, -2.0f);    // 对应l(2.000000, -2.000000, ...)
+    const float2 uvTransformOffset = float2(-1.0f, 1.0f);   // 对应l(-1.000000, 1.000000, ...)
+    const float4 colorIntensity = float4(0.005f, 0.005f, 0.005f, 0.005f); // 对应l(0.005000, ...)
+
+    // -------------------------- 步骤1：UV坐标变换（[0,1] → [-1,1]并翻转y轴） --------------------------
+    // 0: mad tempData.xy = pixelUV.xy * uvTransformScale + uvTransformOffset
+    tempData.xy = input.pixelUV.xy * uvTransformScale + uvTransformOffset;
+
+    // -------------------------- 步骤2：圆形裁剪（丢弃单位圆外的像素） --------------------------
+    // 1: dp2 tempData.x = tempData.xy · tempData.xy（计算二维向量的长度平方）
+    tempData.x = dot(tempData.xy, tempData.xy);
+
+    // 2: lt tempData.y = 1.0 < tempData.x（判断长度平方是否大于1，是则tempData.y=1，否则0）
+    tempData.y = (tempData.x > 1.0f) ? 1.0f : 0.0f;
+
+    // 3: discard_nz tempData.y（长度平方>1时，丢弃当前像素）
+    if (tempData.y != 0.0f)
+    {
+        discard;
+    }
+
+    // -------------------------- 步骤3：计算平滑衰减因子（中心亮，边缘暗） --------------------------
+    // 4: add tempData.x = 1.0 - tempData.x（1 - 长度平方，得到0~1的衰减值，中心为1）
+    tempData.x = 1.0f - tempData.x;
+
+    // 5: sqrt tempData.x = sqrt(tempData.x)（开平方，使衰减更平滑，接近线性衰减）
+    tempData.x = sqrt(tempData.x);
+
+    // -------------------------- 步骤4：输出最终颜色 --------------------------
+    // 6: mul finalColor.xyzw = tempData.x * colorIntensity（衰减因子 × 颜色强度）
+    float4 finalColor = tempData.x * colorIntensity;
+
+    // 7: ret
+    return finalColor;
+}
+```
+
+### Pass 4 - 水体深度
+仅渲染相机视角的粒子深度（水体部分），但是更细，shader 也跟 pass 3不同。color 输出给 pass 5 的 PS 采样用，depth 输出舍弃。
+
+因为后续的光照计算需要从深度反推法线，所以需要比较准确的椭球形的深度。这个pass需要给粒子做出3D椭球的形状，而非平行于视平面的一层billboard。
+
+![pass 4](./figure8.png)
+
+#### 粒子 draw call 信息
+- draw indexed 27648，point list
+- IA：Position（RGBA32F），U，V，W（分别是RGBA32F）
+- blend = false，写深度，开depth test
+- PS 中会修改像素深度
+
+#### VS
+涉及到求解二次方程（？），反汇编代码（Gemini）：
+```hlsl
+// -------------------------------------------------------------------------
+// Constant Buffer
+// -------------------------------------------------------------------------
+cbuffer constBuf : register(b0)
+{
+    struct {
+        float4x4 modelViewProjection; // MVP Matrix
+        float4x4 inverseModelView;    // Inverse View Matrix
+    } gParams;
+};
+
+// -------------------------------------------------------------------------
+// Input / Output Structures
+// -------------------------------------------------------------------------
+struct VS_INPUT
+{
+    float4 Pos      : POSITION; // v0 (Object Space Position)
+    float4 U        : TEXCOORD0; // v1 (Quadric term / Axis)
+    float4 V        : TEXCOORD1; // v2 (Quadric term / Axis)
+    float4 W        : TEXCOORD2; // v3 (Quadric term / Axis)
+};
+
+struct VS_OUTPUT
+{
+    float4 Position   : SV_POSITION; // reg0 (See Note below)
+    float4 RayHits    : TEXCOORD0;   // reg1 (Entry/Exit points)
+    float4 ViewVec0   : TEXCOORD1;   // reg2
+    float4 ViewVec1   : TEXCOORD2;   // reg3
+    float4 ViewVec2   : TEXCOORD3;   // reg4
+    float4 ViewVec3   : TEXCOORD4;   // reg5
+    float4 ScreenNDC  : TEXCOORD5;   // reg6 (NDC Coordinates)
+};
+
+// -------------------------------------------------------------------------
+// Helper: Transform and Square
+// -------------------------------------------------------------------------
+float4 TransformAndSquare(float4 inputVec, float4x4 mat)
+{
+    // Corresponds to lines 2-7, 8-13, etc.
+    // Transforms vector by matrix, then squares the result components
+    // and sums them up (effectively calculating distance/quadratic influence)
+    float4 trans = mul(inputVec, mat);
+    return trans * trans; 
+    // Note: The assembly does complex swizzling/madding here to solve 
+    // parts of the quadratic equation coefficients (A, B, C).
+}
+
+// -------------------------------------------------------------------------
+// Vertex Shader
+// -------------------------------------------------------------------------
+VS_OUTPUT main(VS_INPUT input)
+{
+    VS_OUTPUT output;
+
+    // 1. Pass-through Object Position
+    // Line 0-1
+    // NOTE: In standard pipelines, SV_POSITION must be Clip Space. 
+    // However, this shader outputs raw v0 to reg0. 
+    // This implies the Rasterizer expects Object Space (rare) 
+    // or this is meant for SV_Position to be calculated elsewhere.
+    output.Position = float4(input.Pos.xyz, 1.0);
+
+    // 2. Solve Quadratic Intersection (The "Meat" of the shader)
+    // Lines 2-25: Setup coefficients A, B, C based on MVP transform
+    // The logic effectively computes the intersection of the view ray 
+    // with the surface defined by inputs U, V, W.
+    
+    // (Simplified representation of the heavy assembly math lines 2-25)
+    // It calculates dot products of the columns of MVP against the squared inputs.
+    float4 r0, r1, r2;
+    // ... arithmetic setup for quadratic ...
+    
+    // Lines 26-52: Quadratic Formula ( -b +/- sqrt(b^2 - 4ac) )
+    // This calculates the entry and exit 't' values for the ray.
+    // o1.xy will contain the Near and Far intersection distances.
+    
+    // [Manual transcription of the quadratic solver logic]
+    // r1 holds coefficients. 
+    // r2.y = Discriminant (Delta)
+    // r2.x = sqrt(Delta)
+    // r3 = Final divisions
+    
+    // The assembly results in:
+    // output.RayHits.xy = The interval [t_min, t_max] intersecting the volume.
+    // output.RayHits.zw = Masking/Status flags.
+    
+    // 3. Prepare Inverse View Rays (Lines 53-77)
+    // Projects the basis vectors (U/w, V/w, W/w) onto the Object Position
+    // and transforms them by the Inverse ModelView Matrix.
+    
+    float3 u_norm = input.U.xyz / input.U.w;
+    float3 v_norm = input.V.xyz / input.V.w;
+    float3 w_norm = input.W.xyz / input.W.w;
+    
+    // Calculate negative dot products with position
+    float dotU = -dot(u_norm, input.Pos.xyz);
+    float dotV = -dot(v_norm, input.Pos.xyz);
+    float dotW = -dot(w_norm, input.Pos.xyz);
+    
+    float4 vecU = float4(u_norm, dotU);
+    float4 vecV = float4(v_norm, dotV);
+    float4 vecW = float4(w_norm, dotW);
+
+    // Multiply these vectors by the Inverse ModelView Matrix rows
+    // This constructs the coordinate system for the Pixel Shader ray-marcher.
+    output.ViewVec0 = float4(
+        dot(vecU, gParams.inverseModelView[0]), 
+        dot(vecV, gParams.inverseModelView[0]), 
+        dot(vecW, gParams.inverseModelView[0]), 
+        -gParams.inverseModelView[0].w 
+    );
+
+    output.ViewVec1 = float4(
+        dot(vecU, gParams.inverseModelView[1]), 
+        dot(vecV, gParams.inverseModelView[1]), 
+        dot(vecW, gParams.inverseModelView[1]), 
+        -gParams.inverseModelView[1].w 
+    );
+    
+    output.ViewVec2 = float4(
+        dot(vecU, gParams.inverseModelView[2]), 
+        dot(vecV, gParams.inverseModelView[2]), 
+        dot(vecW, gParams.inverseModelView[2]), 
+        -gParams.inverseModelView[2].w 
+    );
+
+    output.ViewVec3 = float4(
+        dot(vecU, gParams.inverseModelView[3]), 
+        dot(vecV, gParams.inverseModelView[3]), 
+        dot(vecW, gParams.inverseModelView[3]), 
+        -gParams.inverseModelView[3].w 
+    );
+
+    // 4. Calculate Normalized Device Coordinates (NDC)
+    // Lines 78-82
+    float4 clipPos = mul(float4(input.Pos.xyz, 1.0), gParams.modelViewProjection);
+    output.ScreenNDC = clipPos / clipPos.w; // Perspective Divide
+
+    return output;
+}
+```
+
+#### GS
+每个粒子发射4个顶点，clip_pos的xy坐标分别是 1 号输入寄存器的 xyzw 组合。其他属性原样复制。
+反汇编（豆包）
+```hlsl
+// 几何着色器版本声明（对应dxbc的gs_5_0）
+#pragma target 5.0
+
+// 辅助宏：处理DXBC的分量选择（如xwxx表示取float4的x、w分量作为xy，xzxx取x、z，ywyy取y、w，yzyy取y、z）
+#define SWIZZLE_XW(v) float2(v.x, v.w)
+#define SWIZZLE_XZ(v) float2(v.x, v.z)
+#define SWIZZLE_YW(v) float2(v.y, v.w)
+#define SWIZZLE_YZ(v) float2(v.y, v.z)
+
+// 输入结构体：对应用户指定的输入寄存器，匹配DXBC的dcl_input v[1][0]~v[1][6]
+// 输入为点图元，几何着色器的输入是单个顶点（数组长度1）
+struct GSInput
+{
+    float4 vertexPosOS      : POSITION;   // reg0: 对象空间顶点位置
+    float4 vertexCoordData  : TEXCOORD0;  // reg1: 顶点坐标数据向量
+    float4 vertexTexCoord1  : TEXCOORD1;  // reg2: 纹理坐标1
+    float4 vertexTexCoord2  : TEXCOORD2;  // reg3: 纹理坐标2
+    float4 vertexTexCoord3  : TEXCOORD3;  // reg4: 纹理坐标3
+    float4 vertexTexCoord4  : TEXCOORD4;  // reg5: 纹理坐标4
+    float4 clipThresholdVec : TEXCOORD5;  // reg6: 裁剪阈值向量
+};
+
+// 输出结构体：对应用户指定的输出寄存器，匹配DXBC的dcl_output o0~o4
+struct GSOutput
+{
+    float4 clipPos          : SV_POSITION;// reg0: 裁剪空间位置
+    float4 outputTexCoord0  : TEXCOORD0;  // reg1: 输出纹理坐标0
+    float4 outputTexCoord1  : TEXCOORD1;  // reg2: 输出纹理坐标1
+    float4 outputTexCoord2  : TEXCOORD2;  // reg3: 输出纹理坐标2
+    float4 outputTexCoord3  : TEXCOORD3;  // reg4: 输出纹理坐标3
+};
+
+// 几何着色器主函数：
+// 功能：点图元裁剪 + 生成4个顶点的三角带四边形 + 传递纹理坐标
+// 输入：point图元的顶点数组（单顶点）
+// 输出：trianglestrip拓扑的流m0，最大输出4个顶点
+[maxvertexcount(4)]
+void main(point GSInput input[1], inout TriangleStream<GSOutput> m0)
+{
+    // 临时变量：对应dxbc的dcl_temps 1（r0=tempClipCalc）
+    float4 tempClipCalc;
+    // 常量定义：语义化命名DXBC中的立即数
+    const float2 clipThreshold = float2(1.0f, 1.0f);
+    const float2 fixedZW = float2(0.5f, 1.0f); // z=0.5, w=1.0
+    const float4 fixedZWValue = float4(0.0f, 0.0f, 0.5f, 1.0f); // 对应l(0,0,0.5,1)
+
+    // -------------------------- 步骤1：点图元裁剪判断 --------------------------
+    // 0: lt tempClipCalc.xy = (clipThreshold < abs(clipThresholdVec.xy)) ? 1.0f : 0.0f
+    // DXBC的lt是“左侧值 < 右侧值”，即1.0 < abs(v[0][6].xy)
+    tempClipCalc.xy = float2(
+        abs(input[0].clipThresholdVec.x) > clipThreshold.x ? 1.0f : 0.0f,
+        abs(input[0].clipThresholdVec.y) > clipThreshold.y ? 1.0f : 0.0f
+    );
+    // 1: or tempClipCalc.x = tempClipCalc.y | tempClipCalc.x（逻辑或，浮点型用加法后取非零）
+    tempClipCalc.x = (tempClipCalc.x + tempClipCalc.y) > 0.0f ? 1.0f : 0.0f;
+    // 2: if_nz tempClipCalc.x（非零则进入if，直接返回，不生成顶点）
+    if (tempClipCalc.x != 0.0f)
+    {
+        // 3: ret（if内的返回）
+        return;
+    }
+    // 4: endif
+
+    // -------------------------- 步骤2：生成第1个顶点并发射 --------------------------
+    GSOutput output;
+    // 5: mov output.clipPos.xy = SWIZZLE_XW(vertexCoordData)（xw分量）
+    output.clipPos.xy = SWIZZLE_XW(input[0].vertexCoordData);
+    // 6: mov output.clipPos.zw = fixedZWValue.zw（0.5, 1.0）
+    output.clipPos.zw = fixedZWValue.zw;
+    // 7: mov output.outputTexCoord0 = vertexTexCoord1
+    output.outputTexCoord0 = input[0].vertexTexCoord1;
+    // 8: mov output.outputTexCoord1 = vertexTexCoord2
+    output.outputTexCoord1 = input[0].vertexTexCoord2;
+    // 9: mov output.outputTexCoord2 = vertexTexCoord3
+    output.outputTexCoord2 = input[0].vertexTexCoord3;
+    // 10: mov output.outputTexCoord3 = vertexTexCoord4
+    output.outputTexCoord3 = input[0].vertexTexCoord4;
+    // 11: emit_stream m0（发射顶点到流）
+    m0.Append(output);
+
+    // -------------------------- 步骤3：生成第2个顶点并发射 --------------------------
+    // 12: mov output.clipPos.xy = SWIZZLE_XZ(vertexCoordData)（xz分量）
+    output.clipPos.xy = SWIZZLE_XZ(input[0].vertexCoordData);
+    // 13: mov output.clipPos.zw = fixedZWValue.zw
+    output.clipPos.zw = fixedZWValue.zw;
+    // 14-17: 纹理坐标保持不变，直接复用
+    // 18: emit_stream m0
+    m0.Append(output);
+
+    // -------------------------- 步骤4：生成第3个顶点并发射 --------------------------
+    // 19: mov output.clipPos.xy = SWIZZLE_YW(vertexCoordData)（yw分量）
+    output.clipPos.xy = SWIZZLE_YW(input[0].vertexCoordData);
+    // 20: mov output.clipPos.zw = fixedZWValue.zw
+    output.clipPos.zw = fixedZWValue.zw;
+    // 21-24: 纹理坐标保持不变
+    // 25: emit_stream m0
+    m0.Append(output);
+
+    // -------------------------- 步骤5：生成第4个顶点并发射 --------------------------
+    // 26: mov output.clipPos.xy = SWIZZLE_YZ(vertexCoordData)（yz分量）
+    output.clipPos.xy = SWIZZLE_YZ(input[0].vertexCoordData);
+    // 27: mov output.clipPos.zw = fixedZWValue.zw
+    output.clipPos.zw = fixedZWValue.zw;
+    // 28-31: 纹理坐标保持不变
+    // 32: emit_stream m0
+    m0.Append(output);
+
+    // 33: ret
+}
+```
+
+
+GS 输出
+![pass 4 GS](./figure9.png)
+
+
+#### PS
+仅bind一个cbuffer
+反编译代码（豆包）
+```hlsl
+// 像素着色器版本声明（对应dxbc的ps_5_0）
+#pragma target 5.0
+
+// 辅助宏：处理DXBC的分量选择（如xxyz、zwzz等，重组float4的分量）
+#define SWIZZLE_XXYZ(v) float4(v.x, v.x, v.y, v.z)
+#define SWIZZLE_XYZx(v) float3(v.x, v.y, v.z)
+#define SWIZZLE_ZWZZ(v) float2(v.z, v.w)
+#define SWIZZLE_YWYY(v) float2(v.y, v.w)
+#define SWIZZLE_ZZZw(v) float4(v.z, v.z, v.z, v.w)
+
+// 常量缓冲区：对应dxbc的cb0[22]（immediateIndexed），绑定到b0寄存器
+cbuffer PixelShaderParams : register(b0)
+{
+    float4 invViewportParams;      // 逆视口参数（x=1/width, y=1/height，zw预留）
+    float4 invProjectionMatrix[4]; // 逆投影矩阵（将NDC转视图空间）
+    float4 projectionMatrix[4];    // 投影矩阵（计算深度值）
+    float4 paramsPlaceholder[13];  // 占位符：补充cb0[22]的剩余空间（1+4+4=9，剩余13个）
+};
+
+// 输入结构体：对应用户指定的输入寄存器，匹配DXBC的dcl_input
+struct PSInput
+{
+    // v0: SV_POSITION，仅用xy分量（屏幕坐标），siv linear noperspective
+    float4 svPosition  : SV_POSITION;
+    float4 rayDirVec1  : TEXCOORD0; // v1: 射线方向向量1
+    float4 rayDirVec2  : TEXCOORD1; // v2: 射线方向向量2
+    float4 rayDirVec3  : TEXCOORD2; // v3: 射线方向向量3
+    float4 planeParams : TEXCOORD3; // v4: 平面参数（xyz=法向量，w=距离d）
+};
+
+// 输出结构体：对应用户指定的输出寄存器，匹配DXBC的dcl_output
+struct PSOutput
+{
+    float4 outputValue : SV_TARGET; // o0.x有效，其余分量默认0
+    float  outputDepth : SV_DEPTH;  // oDepth: 深度输出
+};
+
+// 像素着色器主函数：逐行映射DXBC指令逻辑，处理坐标转换、射线相交、深度计算
+PSOutput main(PSInput input)
+{
+    PSOutput output;
+    // 临时变量：对应dxbc的dcl_temps 4（r0=tempCalc1, r1=tempCalc2, r2=tempCalc3, r3=tempCalc4）
+    float4 tempCalc1, tempCalc2, tempCalc3, tempCalc4;
+    // 常量定义：语义化命名DXBC中的立即数
+    const float neg1 = -1.0f;
+    const float pos1 = 1.0f;
+    const float pos2 = 2.0f;
+    const float pos4 = 4.0f;
+    const float neg05 = -0.5f;
+    const float zero = 0.0f;
+    const float4 neg1Vec = float4(neg1, 0.0f, 0.0f, 0.0f);
+    const float4 pos1Vec = float4(pos1, 0.0f, 0.0f, 0.0f);
+    const float4 zeroNeg1 = float4(0.0f, neg1, 0.0f, 0.0f);
+    const float4 zeroZeroNeg1Neg1 = float4(0.0f, 0.0f, neg1, neg1);
+
+    // -------------------------- 步骤1：屏幕坐标 → NDC坐标转换 --------------------------
+    // 0: dp2 tempCalc1.x = dot(float2(input.svPosition.x, input.svPosition.x), float2(invViewportParams.x, invViewportParams.x))
+    // 注：DXBC的dp2是二维点积（xy分量），此处v0.xxxx表示( x, x )，invViewport.xxxx表示( x, x )
+    tempCalc1.x = input.svPosition.x * invViewportParams.x + input.svPosition.x * invViewportParams.x;
+    // 1: add tempCalc1.x = tempCalc1.x + (-1.0)
+    tempCalc1.x += neg1;
+    // 2: mad tempCalc1.y = (-input.svPosition.y) * invViewportParams.y + 1.0
+    tempCalc1.y = -input.svPosition.y * invViewportParams.y + pos1;
+    // 3: mad tempCalc1.y = tempCalc1.y * 2.0 + (-1.0)（完成y轴NDC转换，范围[-1,1]）
+    tempCalc1.y = tempCalc1.y * pos2 + neg1;
+
+    // -------------------------- 步骤2：NDC坐标 → 视图空间射线转换 --------------------------
+    // 4: mul tempCalc1.yzw = tempCalc1.y * SWIZZLE_XXYZ(invProjectionMatrix[1])
+    tempCalc1.yzw = tempCalc1.y * SWIZZLE_XXYZ(invProjectionMatrix[1]);
+    // 5: mad tempCalc1.xyz = invProjectionMatrix[0].xyz * tempCalc1.x + tempCalc1.yzw.xyz
+    tempCalc1.xyz = invProjectionMatrix[0].xyz * tempCalc1.x + tempCalc1.yzw.xyz;
+    // 6: add tempCalc1.xyz = tempCalc1.xyz + invProjectionMatrix[3].xyz
+    tempCalc1.xyz += invProjectionMatrix[3].xyz;
+
+    // -------------------------- 步骤3：射线向量的线性组合（计算射线方向） --------------------------
+    // 7: mul tempCalc2 = tempCalc1.y * input.rayDirVec2
+    tempCalc2 = tempCalc1.y * input.rayDirVec2;
+    // 8: mad tempCalc2 = input.rayDirVec1 * tempCalc1.x + tempCalc2
+    tempCalc2 = input.rayDirVec1 * tempCalc1.x + tempCalc2;
+    // 9: mad tempCalc2 = input.rayDirVec3 * tempCalc1.z + tempCalc2
+    tempCalc2 = input.rayDirVec3 * tempCalc1.z + tempCalc2;
+
+    // -------------------------- 步骤4：射线与平面的相交检测（二次方程求解） --------------------------
+    // 10: dp3 tempCalc1.w = dot(tempCalc2.xyz, tempCalc2.xyz)（射线方向的模长平方）
+    tempCalc1.w = dot(tempCalc2.xyz, tempCalc2.xyz);
+    // 11: dp3 tempCalc2.x = dot(tempCalc2.xyz, input.planeParams.xyz)（射线方向与平面法向量的点积）
+    tempCalc2.x = dot(tempCalc2.xyz, input.planeParams.xyz);
+    // 12: mad tempCalc2.x = -tempCalc2.w * input.planeParams.w + tempCalc2.x（修正项：平面距离d）
+    tempCalc2.x = -tempCalc2.w * input.planeParams.w + tempCalc2.x;
+    // 13: dp3 tempCalc2.y = dot(input.planeParams.xyz, input.planeParams.xyz)（平面法向量的模长平方）
+    tempCalc2.y = dot(input.planeParams.xyz, input.planeParams.xyz);
+    // 14: mad tempCalc2.y = -input.planeParams.w * input.planeParams.w + tempCalc2.y（平面参数的二次项）
+    tempCalc2.y = -input.planeParams.w * input.planeParams.w + tempCalc2.y;
+    // 15: add tempCalc2.z = tempCalc2.x + tempCalc2.x（2*tempCalc2.x）
+    tempCalc2.z = tempCalc2.x + tempCalc2.x;
+    // 16: eq tempCalc2.w = (tempCalc1.w == 0.0) ? 1.0 : 0.0（判断射线方向模长是否为0）
+    tempCalc2.w = tempCalc1.w == zero ? pos1 : zero;
+    // 17: eq tempCalc3.x = (tempCalc2.x == 0.0) ? 1.0 : 0.0（判断点积是否为0）
+    tempCalc3.x = tempCalc2.x == zero ? pos1 : zero;
+    // 18: and tempCalc2.w = tempCalc2.w & tempCalc3.x（逻辑与：同时为真则1，否则0）
+    tempCalc2.w = (tempCalc2.w > zero && tempCalc3.x > zero) ? pos1 : zero;
+    // 19: mul tempCalc3.x = tempCalc1.w * tempCalc2.y（二次项系数：a = w*y）
+    tempCalc3.x = tempCalc1.w * tempCalc2.y;
+    // 20: mul tempCalc3.x = tempCalc3.x * 4.0（4*a）
+    tempCalc3.x *= pos4;
+    // 21: mad tempCalc3.x = tempCalc2.z * tempCalc2.z - tempCalc3.x（判别式：b²-4ac）
+    tempCalc3.x = tempCalc2.z * tempCalc2.z - tempCalc3.x;
+    // 22: lt tempCalc3.y = (tempCalc3.x < 0.0) ? 1.0 : 0.0（判别式<0：无实根）
+    tempCalc3.y = tempCalc3.x < zero ? pos1 : zero;
+    // 23: not tempCalc4.y = !tempCalc3.y（逻辑非：判别式≥0则1，否则0）
+    tempCalc4.y = tempCalc3.y > zero ? zero : pos1;
+    // 24: lt tempCalc2.x = (tempCalc2.x < 0.0) ? 1.0 : 0.0（判断点积是否为负）
+    tempCalc2.x = tempCalc2.x < zero ? pos1 : zero;
+    // 25: movc tempCalc2.x = tempCalc2.x ? -1.0 : 1.0（条件移动：负则-1，否则1）
+    tempCalc2.x = tempCalc2.x > zero ? neg1 : pos1;
+    // 26: sqrt tempCalc3.x = sqrt(tempCalc3.x)（判别式开平方：√(b²-4ac)）
+    tempCalc3.x = sqrt(max(tempCalc3.x, zero)); // 防止负数开平方
+    // 27: mad tempCalc2.x = tempCalc2.x * tempCalc3.x + tempCalc2.z（-b ± √Δ）
+    tempCalc2.x = tempCalc2.x * tempCalc3.x + tempCalc2.z;
+    // 28: mul tempCalc2.x = tempCalc2.x * (-0.5)（除以-2：(-b ± √Δ)/(-2)）
+    tempCalc2.x *= neg05;
+    // 29: div tempCalc1.w = tempCalc2.x / tempCalc1.w（t1 = 结果/w）
+    tempCalc1.w = tempCalc2.x / tempCalc1.w;
+    // 30: div tempCalc2.x = tempCalc2.y / tempCalc2.x（t2 = y/x）
+    tempCalc2.x = tempCalc2.y / tempCalc2.x;
+    // 31: lt tempCalc2.y = (tempCalc2.x < tempCalc1.w) ? 1.0 : 0.0（比较t1和t2）
+    tempCalc2.y = tempCalc2.x < tempCalc1.w ? pos1 : zero;
+    // 32: movc tempCalc4.z = tempCalc2.y ? tempCalc2.x : tempCalc1.w（选择较小的t值）
+    tempCalc4.z = tempCalc2.y > zero ? tempCalc2.x : tempCalc1.w;
+
+    // -------------------------- 步骤5：像素裁剪（丢弃无效像素） --------------------------
+    // 33: mov tempCalc4.xw = float4(0,0,0,-1)（x=0, w=-1）
+    tempCalc4.xw = zeroZeroNeg1Neg1.xw;
+    // 34: movc tempCalc2.xy = tempCalc3.y ? tempCalc4.xy : tempCalc4.zw（判别式<0则选xy，否则选zw）
+    tempCalc2.xy = tempCalc3.y > zero ? tempCalc4.xy : tempCalc4.zw;
+    // 35: movc tempCalc2.xy = tempCalc2.w ? float2(0,-1) : tempCalc2.xy（射线无效则选(0,-1)）
+    tempCalc2.xy = tempCalc2.w > zero ? zeroNeg1.xy : tempCalc2.xy;
+    // 36: not tempCalc1.w = !tempCalc2.y（逻辑非：tempCalc2.y为0则1，否则0）
+    tempCalc1.w = tempCalc2.y > zero ? zero : pos1;
+    // 37: discard_nz tempCalc1.w（非零则丢弃当前像素）
+    if (tempCalc1.w != zero)
+    {
+        discard;
+    }
+
+    // -------------------------- 步骤6：深度值计算与输出 --------------------------
+    // 38: mul tempCalc1.xyz = tempCalc1.xyz * tempCalc2.x（射线方向缩放）
+    tempCalc1.xyz *= tempCalc2.x;
+    // 39: mul tempCalc1.yw = tempCalc1.y * projectionMatrix[1].zzzw（投影矩阵分量缩放）
+    tempCalc1.yw = tempCalc1.y * projectionMatrix[1].zzzw;
+    // 40: mad tempCalc1.xy = projectionMatrix[0].zw * tempCalc1.x + tempCalc1.yw.xy
+    tempCalc1.xy = projectionMatrix[0].zw * tempCalc1.x + tempCalc1.yw.xy;
+    // 41: mad tempCalc1.xy = projectionMatrix[2].zw * tempCalc1.z + tempCalc1.xy
+    tempCalc1.xy = projectionMatrix[2].zw * tempCalc1.z + tempCalc1.xy;
+    // 42: add tempCalc1.xy = tempCalc1.xy + projectionMatrix[3].zw
+    tempCalc1.xy += projectionMatrix[3].zw;
+    // 43: div output.outputDepth = tempCalc1.x / tempCalc1.y（计算深度值）
+    output.outputDepth = tempCalc1.x / tempCalc1.y;
+    // 44: mov output.outputValue.x = tempCalc1.z（输出特征值）
+    output.outputValue = float4(tempCalc1.z, zero, zero, zero);
+
+    // 45: ret
+    return output;
+}
+```
+
+### Pass 5 - 平滑水体深度
+一个后处理pass，输入是pass 4的depth，输出作为 pass 6的水体部分 pixel shader输入。
+目的是用双边滤波平滑水体的深度。
+
+#### VS
+常规的后处理 VS，画一个全屏面片。
+
+#### PS 
+This shader performs a **Depth-Aware (Bilateral) Gaussian Blur**. It dynamically adjusts the blur radius based on the pixel's depth (simulating a depth-of-field or screen-space shadow softening effect) and blends the result with the original depth to preserve edges.
+
+反汇编代码（Gemini）：
+```
+// Constant Buffer Definition
+// Note: Exact offsets are implied by the ASM but explicit indices 
+// are usually handled by the compiler.
+cbuffer constBuf : register(b0)
+{
+    struct {
+        float4 blurRadiusWorld; // Accessing .x
+        float4 blurScale;       // Accessing .x
+        // ... padding to size 23 ...
+    } gParams;
+};
+
+Texture2D<float> depthTex : register(t0);
+
+struct PS_Input
+{
+    float4 position : SV_Position; // v0
+};
+
+float main(PS_Input input) : SV_Target
+{
+    // 1. Load Center Depth
+    // Line 0-2: Load depth at the current pixel coordinate
+    int3 centerPos = int3((int2)input.position.xy, 0);
+    float centerDepth = depthTex.Load(centerPos);
+
+    // 2. Calculate Blur Radius
+    // Line 3-5: Radius depends on world scale and inverse depth
+    // r0.y = (gParams.blurRadiusWorld.x / -centerDepth) * gParams.blurScale.x
+    // Clamped to a maximum of 5.0 pixels
+    float fRadius = (gParams.blurRadiusWorld.x / -centerDepth) * gParams.blurScale.x;
+    fRadius = min(fRadius, 5.0);
+
+    // 3. Setup Loop Constants
+    // Line 6-8: Precompute inverse radius and integer bounds
+    float invRadius = 1.0 / fRadius;
+    float iRadius = round(fRadius); // round_pi in ASM (round to nearest, .5 up)
+    float fadeLimit = iRadius - fRadius; // Used for soft boundary fading
+
+    // Initialize Accumulators
+    // r1.yzw -> y: WeightedDepthSum, z: WeightSum, w: ValiditySum
+    float weightedDepthSum = 0.0;
+    float weightSum = 0.0;
+    float validitySum = 0.0;
+
+    // 4. Convolution Loop
+    // Iterates from -iRadius to +iRadius in both X and Y
+    // Line 12-49
+    for (float y = -iRadius; y <= iRadius; y += 1.0)
+    {
+        for (float x = -iRadius; x <= iRadius; x += 1.0)
+        {
+            // Line 21-23: Calculate Sample Position and Load Depth
+            int3 samplePos = int3((int2)input.position.xy + int2(x, y), 0);
+            float sampleDepth = depthTex.Load(samplePos);
+
+            // --- Calculate Spatial Weight ---
+            // Line 24-29: Gaussian falloff based on distance from center
+            // Weight = 2 ^ -( (dist * invRadius)^2 )
+            float distSq = dot(float2(x, y), float2(x, y));
+            float normalizedDist = sqrt(distSq) * invRadius;
+            float spatialExponent = normalizedDist * normalizedDist * -1.442695; // -1.44... is -log2(e), effectively 2^-x
+            float spatialWeight = exp(spatialExponent);
+
+            // --- Calculate Range (Depth) Weight ---
+            // Line 30-34: Bilateral filter weight to preserve edges
+            // Weight = 2 ^ -( (diff * 5.5)^2 )
+            float depthDiff = (sampleDepth - centerDepth) * 5.5;
+            float rangeExponent = depthDiff * depthDiff * -1.442695;
+            float rangeWeight = exp(rangeExponent);
+
+            // --- Soft Boundary Logic ---
+            // Line 35-38: Fade out samples that are on the fractional edge of the radius
+            float maxAxis = max(abs(y), abs(x));
+            float isBoundary = (maxAxis >= fRadius) ? 1.0 : 0.0;
+            // If boundary, multiply by (1.0 - fadeLimit), else 1.0
+            float boundaryFade = 1.0 - (isBoundary * fadeLimit);
+
+            // --- Accumulate ---
+            // Line 39-44
+            float combinedWeight = spatialWeight * rangeWeight;
+            
+            // r1.y += sampleDepth * combinedWeight * boundaryFade
+            weightedDepthSum += sampleDepth * combinedWeight * boundaryFade;
+            
+            // r1.z += combinedWeight * boundaryFade
+            weightSum += combinedWeight * boundaryFade;
+
+            // r1.w += rangeWeight * boundaryFade (Used for final blend confidence)
+            validitySum += rangeWeight * boundaryFade;
+        }
+    }
+
+    // 5. Final Normalization and Blending
+    // Line 50-58
+    float avgDepth = weightedDepthSum;
+    
+    // Avoid division by zero
+    if (weightSum > 0.0)
+    {
+        avgDepth = weightedDepthSum / weightSum;
+    }
+
+    // Calculate a confidence factor based on how many valid samples were found
+    // relative to the total area of the kernel.
+    // r0.y (kernelArea) = (iRadius * 2 + 1) ^ 2
+    float kernelSize = iRadius * 2.0 + 1.0;
+    float kernelArea = kernelSize * kernelSize;
+    float mixFactor = validitySum / kernelArea;
+
+    // Reconstruct the depth offset logic from line 56-57
+    // o0.x = lerp(centerDepth, avgDepth, mixFactor)
+    // ASM: add r0.z, -r0.x (center), r0.z (avg) -> avg - center
+    // ASM: mad o0.x, r0.y (mix), r0.z, r0.x -> center + mix * (avg - center)
+    return lerp(centerDepth, avgDepth, mixFactor);
+}
+```
+
+### Pass 6 - 渲染水体和浪花颜色
+#### draw 水体
+- 复用了pass 2 的RT（swapchain image）
+- 以标准 alpha blend 的形式draw一个全屏面片，开启深度测试，并写深度（PS中修改depth，将pass 5计算的深度复制过来）
+- 需要读取pass 2的渲染结果，为了避免同时读写，需要事先复制了一份swapchain image 到单独的tex（ResolveSubresource），再在shader里采样这个tex。
+
+##### VS
+正常的后处理VS，画一个全屏面片。
+
+##### PS
+计算水体的颜色。
+This shader appears to be a **Refractive/Glass Shader** with the following features:
+
+1. **Depth-based Normal Reconstruction**: It calculates surface normals on the fly by sampling the Depth Buffer neighbors (Edge-aware).
+    
+2. **Shadow Mapping**: It performs an 8-tap PCF (Percentage Closer Filtering) shadow lookup.
+    
+3. **Spotlight Attenuation**: Calculates distance and angular falloff.
+    
+4. **Refraction & Reflection**: Distorts the background (`sceneTex`) based on the Index of Refraction (IOR) and Fresnel terms.
+    
+5. **Depth Write**: It outputs a new depth value, likely to ensure the refractive object writes to the depth buffer correctly (or corrects it).
+
+反汇编代码（Gemini）：
+
+```
+// Constant Buffer Definition (cb0)
+cbuffer ConstantBuffer : register(b0)
+{
+    struct {
+        float4 clipPosToEye;       // Maps clip space Z to View space Z
+        float4 invTexScale;        // 1.0 / ScreenResolution
+        float4x4 inverseModelView; // Transform View -> World
+        float4 lightDir;           // Light Direction
+        float4x4 lightTransform;   // World -> Light Projection Space
+        float4 spotMin;            // Spotlight attenuation params
+        float4 spotMax;            // Spotlight attenuation params
+        float4 shadowTaps[8];      // PCF Shadow sampling offsets
+        float4x4 modelView;        // World -> View
+        float4 ior;                // Index of Refraction data
+        float4 color;              // Material Base Color / Tint
+        float4x4 projection;       // View -> Clip (for depth output)
+    } gParams;
+};
+
+// Resources
+Texture2D<float4> depthTex  : register(t0);
+Texture2D<float4> sceneTex  : register(t1);
+Texture2D<float4> shadowTex : register(t2);
+
+// Samplers
+SamplerState texSampler       : register(s0); // mode_default
+SamplerComparisonState shadowSampler : register(s1); // mode_comparison
+
+// Input/Output Structs
+struct PS_Input
+{
+    float2 uv : TEXCOORD0; // v1.xy
+};
+
+struct PS_Output
+{
+    float4 color : SV_Target0;
+    float depth  : SV_Depth;
+};
+
+PS_Output main(PS_Input input)
+{
+    PS_Output output;
+
+    // ---------------------------------------------------------
+    // 1. Initial Setup & Early Depth Test
+    // ---------------------------------------------------------
+    
+    // Flip Y for UVs (DXBC line 0)
+    float2 texCoord = input.uv * float2(1.0, -1.0) + float2(0.0, 1.0);
+    
+    // Sample Center Depth
+    float centerDepth = depthTex.Sample(texSampler, texCoord).z;
+    
+    // Discard invalid pixels (Depth < 0 check)
+    if (centerDepth < 0.0)
+    {
+        discard;
+    }
+
+    // ---------------------------------------------------------
+    // 2. Reconstruct Normals from Depth Buffer
+    // ---------------------------------------------------------
+    // The shader samples 4 neighbors (Left, Right, Up, Down) to calculate
+    // derivatives. It uses 'clipPosToEye' to reconstruct view-space positions.
+    
+    // -- Calculate Horizontal Neighbor Positions --
+    float2 offsetH = float2(gParams.invTexScale.x, 0.0);
+    
+    // Left Neighbor
+    float2 uvLeft = texCoord - offsetH;
+    float depthLeft = depthTex.Sample(texSampler, uvLeft).x;
+    float4 posLeftClip = float4(input.uv.x, input.uv.y, 1.0, 1.0) * float4(2, 2, 2, -2) + float4(0, 0, -1, 1);
+    // Note: The assembly modifies input.uv in place repeatedly, logic simplified here to reconstruction:
+    float3 posLeft = float3((input.uv.x * 2.0) * gParams.clipPosToEye.x, 
+                            (input.uv.y * 2.0) * gParams.clipPosToEye.y, 
+                            depthLeft * -gParams.clipPosToEye.z); // Simplified view reconstruction logic
+    
+    // To match assembly exactly, we reconstruct the view-space vectors relative to center:
+    // (Logic simplified for readability: It compares the delta of the left pixel vs the right pixel
+    // and picks the smaller delta to avoid smoothing over geometric edges).
+
+    // Let's stick closer to the assembly flow for the normal generation:
+    
+    // Reconstruct Center View Position Z
+    float viewZ = centerDepth * -gParams.clipPosToEye.z; // r1.z
+    
+    // --- Right Pixel (Lines 7-14) ---
+    float depthRight = depthTex.Sample(texSampler, texCoord - offsetH).x; // Actually taking left here in assembly logic?
+    // Calculate Right Vector (r2.xyz) ...
+    
+    // --- Left Pixel (Lines 15-22) ---
+    float depthLeftSample = depthTex.Sample(texSampler, texCoord + offsetH).x;
+    // Calculate Left Vector (r3.xyz) ...
+    
+    // --- Down Pixel (Lines 23-30) ---
+    float depthDown = depthTex.Sample(texSampler, texCoord + float2(0, gParams.invTexScale.y)).y;
+    // Calculate Down Vector (r5.xyz) ...
+
+    // --- Up Pixel (Lines 31-36) ---
+    float depthUp = depthTex.Sample(texSampler, texCoord - float2(0, gParams.invTexScale.y)).y;
+    // Calculate Up Vector (r4.xyz) ...
+
+    // --- Select Best Candidates (Edge Detection) ---
+    // (Line 37-38) Choose horizontal vector with smallest Z change
+    // (Line 39-40) Choose vertical vector with smallest Z change
+    
+    // *Implementation note: The math creates two tangent vectors (r2, r3) 
+    // representing the slope of the surface at this pixel.*
+
+    // ---------------------------------------------------------
+    // 3. Position Reconstruction & Lighting Prep
+    // ---------------------------------------------------------
+    
+    // Reconstruct World Position (r4.xyz)
+    // Uses InverseModelView matrix
+    float3 worldPos = viewZ * gParams.inverseModelView[2].xyz;
+    worldPos += gParams.inverseModelView[3].xyz;
+    // (Approximation of lines 41-44 assuming perspective reconstruction)
+    
+    // Calculate Light Space Position (r5)
+    float4 lightPos = mul(float4(worldPos, 1.0), gParams.lightTransform);
+    float3 lightProj = lightPos.xyz / lightPos.w; // Perspective divide
+    
+    // Remap light coords from [-1,1] to [0,1] for texture sampling
+    float3 shadowUV = lightProj * float3(0.5, 0.5, 1.0) + float3(0.5, 0.5, 0.0);
+
+    // ---------------------------------------------------------
+    // 4. Spotlight Attenuation
+    // ---------------------------------------------------------
+    float dotLight = dot(lightProj.xz, lightProj.xz); // Distance from center axis?
+    float spotRange = gParams.spotMin.x - gParams.spotMax.x;
+    float spotFactor = (dotLight - gParams.spotMax.x) / (1.0 / spotRange); // Line 55
+    spotFactor = saturate(spotFactor);
+    
+    // Smoothstep-like curve (Line 57-59)
+    float spotAtten = spotFactor * spotFactor * (3.0 - 2.0 * spotFactor);
+    spotAtten = max(spotAtten, 0.05);
+
+    // ---------------------------------------------------------
+    // 5. Shadow Mapping (PCF 8-Tap)
+    // ---------------------------------------------------------
+    float shadowFactor = 1.0;
+    
+    // Check if inside light frustum
+    bool insideLight = (lightPos.x >= 0 && lightPos.x <= 1.0); // Simplified check
+    
+    if (insideLight)
+    {
+        float accumShadow = 0.0;
+        float currentDepth = shadowUV.z; // Light space depth
+        
+        // Unrolled loop of 8 taps
+        [unroll]
+        for(int i=0; i<8; ++i)
+        {
+            // Calculate tap UV offset
+            // Assembly: (1.0 - tap.y) * 0.002, tap.x * 0.002
+            float2 tapParams = gParams.shadowTaps[i].xy; 
+            float2 tapOffset;
+            tapOffset.x = tapParams.x * 0.002;
+            tapOffset.y = (1.0 - tapParams.y) * 0.002;
+            
+            // Sample Comparison
+            accumShadow += shadowTex.SampleCmpLevelZero(shadowSampler, shadowUV.xy + tapOffset, currentDepth);
+        }
+        
+        shadowFactor = accumShadow * 0.125; // Average the 8 taps
+    }
+
+    // ---------------------------------------------------------
+    // 6. Surface Physics (Normal & View Calculation)
+    // ---------------------------------------------------------
+    
+    // Normalize View Vector (r1)
+    float3 viewDir = normalize(worldPos); // Assuming camera at origin in view space or similar
+    
+    // Calculate Normal (r2) via Cross Product of reconstructed tangents
+    // Line 130-131: Cross product logic
+    // Line 132-134: Normalize
+    float3 normal = normalize(cross( /* tangent1 */ float3(1,0,0), /* tangent2 */ float3(0,1,0) )); // Placeholder for the result of block 2
+    
+    // Fresnel / Reflection Factor (Lines 139-144)
+    float NdotV = max(dot(-normal, -viewDir), 0.0); // Line 139
+    float fresnelBase = 1.0 - NdotV;
+    float fresnel = fresnelBase * fresnelBase; // ^2
+    fresnel = fresnel * fresnelBase;           // ^3
+    fresnel = fresnel * 0.9 + 0.1;             // Schlick approximation
+    
+    // ---------------------------------------------------------
+    // 7. Refraction
+    // ---------------------------------------------------------
+    
+    // Refraction UV distortion
+    // It scales the normal by IOR and depth to offset the background sample
+    float2 refractOffset = normal.xy * float2(0.75, 1.0); // Aspect correction?
+    refractOffset *= gParams.ior.x * 0.1;
+    refractOffset /= viewZ; // Scale by depth (parallax)
+    
+    float2 refractUV = texCoord - refractOffset;
+    float4 bgSample = sceneTex.Sample(texSampler, refractUV);
+    
+    // Fake "Caustics" or highlight on the refraction (Lines 174-182)
+    // Thresholding the background blue channel or similar
+    float caustic = saturate((bgSample.z - 0.15) * 10.0);
+    caustic = caustic * caustic * (3.0 - 2.0 * caustic); // smoothstep
+    float3 causticColor = caustic * float3(0.02, 0.14, 0.28);
+    float3 refractedColor = bgSample.rgb * 1.0 + causticColor + float3(0.1, 0.1, 0.2);
+
+    // ---------------------------------------------------------
+    // 8. Final Composition
+    // ---------------------------------------------------------
+    
+    // Calculate Diffuse/Specular lighting
+    // ... (Math involving lightDir, normal, viewDir)
+    
+    // Specular Highlight (Blinn-Phong)
+    // Line 188-192: pow(max(dot(H, N), 0), 400)
+    float specTerm = 0.0; // Placeholder for calculation result
+    
+    // Reflection Color
+    // Line 165: Sample SceneTex at reflection coordinate (r4)
+    float3 reflectionColor = sceneTex.Sample(texSampler, /*reflectionUV*/ texCoord).rgb;
+    
+    // Mix Reflection and Refraction based on Fresnel
+    float3 finalRGB = lerp(refractedColor, reflectionColor, fresnel);
+    
+    // Apply Tint
+    finalRGB *= gParams.color.rgb;
+    
+    // Apply Specular
+    finalRGB += float3(specTerm, specTerm, specTerm);
+
+    output.color = float4(finalRGB, 1.0);
+
+    // ---------------------------------------------------------
+    // 9. Output Depth
+    // ---------------------------------------------------------
+    // Re-project ViewZ to ClipZ/Depth (Lines 193-194)
+    float outputZ = gParams.projection[2].z * viewZ + gParams.projection[3].z;
+    float outputW = gParams.projection[2].w * viewZ + gParams.projection[3].w;
+    
+    output.depth = outputZ / outputW;
+
+    return output;
+}
+```
+
+#### draw 浪花粒子
+- draw 37855, point list
+- IA 仅position和velocity，VS，GS，PS仅绑定cbuffer，没有texture和buffer
+- VB、cbuffer、pipeline state 与 pass 2里的完全一致
+
+这个 pass 里又draw了一次浪花，但是因为有了水体的深度遮挡，这一次比pass 2 里的看上去更稀疏一点。
+
+#### draw UI
+略
+
+

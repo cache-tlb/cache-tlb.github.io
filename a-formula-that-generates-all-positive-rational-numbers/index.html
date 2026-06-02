@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>一个递推公式推出所有正有理数 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="一个递推公式推出所有正有理数" />
+<meta property="og:description" content="一个递推公式 定义运算符 $[x]$ 表示 $x$ 的整数部分, 即 $[x] = \max \{ y \in \mathbb{Z} : y \le x \}$. 又定义运算符 $\{x\}$ 表示 $x$ 的小数部分, 即 $\{x\} = x - [x]$. 函数 $f(x)$ 定义如下: $$ f(x) = \frac{1}{[x] - \{x\}" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/a-formula-that-generates-all-positive-rational-numbers/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2025-01-05T23:35:32&#43;08:00" />
+<meta property="article:modified_time" content="2025-01-05T23:35:32&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="一个递推公式推出所有正有理数"/>
+<meta name="twitter:description" content="一个递推公式 定义运算符 $[x]$ 表示 $x$ 的整数部分, 即 $[x] = \max \{ y \in \mathbb{Z} : y \le x \}$. 又定义运算符 $\{x\}$ 表示 $x$ 的小数部分, 即 $\{x\} = x - [x]$. 函数 $f(x)$ 定义如下: $$ f(x) = \frac{1}{[x] - \{x\}"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/a-formula-that-generates-all-positive-rational-numbers/" /><link rel="prev" href="https://cache-tlb.github.io/tips-for-git/" /><link rel="next" href="https://cache-tlb.github.io/eulers-miracle/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "一个递推公式推出所有正有理数",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/a-formula-that-generates-all-positive-rational-numbers\/"
+        },"genre": "posts","wordcount":  1855 ,
+        "url": "https:\/\/cache-tlb.github.io\/a-formula-that-generates-all-positive-rational-numbers\/","datePublished": "2025-01-05T23:35:32+08:00","dateModified": "2025-01-05T23:35:32+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">一个递推公式推出所有正有理数</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2025-01-05">2025-01-05</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1855 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 4 分钟&nbsp;</div>
+        </div><div class="content" id="content"><h3 id="一个递推公式">一个递推公式</h3>
+<p>定义运算符 $[x]$ 表示 $x$ 的整数部分, 即 $[x] = \max \{ y \in \mathbb{Z} : y \le x \}$. 又定义运算符 $\{x\}$ 表示 $x$ 的小数部分, 即 $\{x\} = x - [x]$. 函数 $f(x)$ 定义如下:
+$$ f(x) = \frac{1}{[x] - \{x\} + 1} ,$$
+令 $a_1 = f(0)$, $a_{n+1} = f(a_n)$, 则 $a_1 = 1, a_2 = \dfrac{1}{2}, a_3 = 2, a_3 = \dfrac{1}{3}, a_4 = \dfrac{3}{2}$, 等等. 如此将得到所有正有理数的集合 $\mathbb{Q}^+$, 既无重复也无遗漏.</p>
+<p>证明分为三部分: 1. 数列 $a_n$ 每一项都是正有理数; 2. 数列 $a_n$ 没有重复元素; 3. 任意一个正有理数都在数列 $a_n$ 中出现过.</p>
+<h4 id="数列-a_n-每一项都是正有理数">数列 $a_n$ 每一项都是正有理数</h4>
+<p>由归纳法容易证明. 因为 $a_1 = 1$ 是正有理数. 而若 $a_k$ 是正有理数, 则 $[a_k]$ 是非负整数, 于是 $\{a_k\}= a_k - [a_k]$ 也是有理数, 且$\{a_k\} \in [0,1)$, 从而 $[a_k] - \{a_k\} + 1$ 是正有理数, $a_{k+1} = \dfrac{1}{[a_k] - \{a_k\} + 1}$ 也是正有理数.</p>
+<p>这就证明了 $a_n$ 每一项都是正有理数.</p>
+<h4 id="数列-a_n-没有重复元素">数列 $a_n$ 没有重复元素</h4>
+<p>先证明 $f(x)$ 是单射, 即 $f(x) = f(y) \Rightarrow x = y$.</p>
+<p>事实上, 若 $f(x) = f(y)$, 则 $[x] - \{x\} + 1 = [y] - \{y\} + 1$, 或写成 $[x] - [y] = \{x\} - \{y\}$. 因为 $\{x\},\{y\}\in [0,1)$, 所以 $\{x\} - \{y\} \in (-1,1)$, 而 $[x] - [y]$ 是整数, 所以只能是 $[x] - [y] = \{x\} - \{y\} = 0$. 
+这表明 $x,y$的整数部分和小数部分分别相等, 所以$x=y$.</p>
+<p>然后用反证法证明每个数在数列 $a_n$ 中最多出现一次. 若存在 $ m &gt; n$ 使得 $a_m = a_n$, 即 $f(a_{m-1}) = f(a_{n-1})$, 由 $f(x)$ 是单射, 得 $a_{m-1} = a_{n-1}$, 进而依次可得 $a_{m-2} = a_{n-2}, \cdots, a_{m-n+1} = a_1$. 最后这个等式写成 $f(a_{m-n}) = f(0)$, 意味着 $a_{m-n} = 0$. 前面证明了数列的所有项都是正有理数, 不可能等于0, 因此矛盾.</p>
+<h4 id="任意一个正有理数都在数列-a_n-中出现过">任意一个正有理数都在数列 $a_n$ 中出现过</h4>
+<p>先定义两个函数 $g(x)$ 和 $h(x)$ 如下:
+$$
+\begin{align*}
+g(x) &amp;= \frac{x}{1+x} \\ 
+h(x) &amp;= 1+x
+\end{align*}
+$$
+对于任意正整数 $m,n$ 有
+$$
+\begin{align*}
+g(\frac{n}{m}) &amp;= \frac{n}{m+n} \\ 
+h(\frac{n}{m}) &amp;= \frac{n+m}{m}
+\end{align*}
+$$
+对于一个分数, $g(x)$的作用是将分子不变, 而分母加上分子, $h(x)$ 的作用是将分母不变, 而分子加上分母. 他们的反函数分别是:
+$$
+\begin{align*}
+g^{-1}(\frac{n}{m}) &amp;= \frac{n}{m-n} \\ 
+h^{-1}(\frac{n}{m}) &amp;= \frac{n-m}{m}
+\end{align*}
+$$</p>
+<p>对任意正有理数 $\dfrac{n}{m}$, 其中 $m,n$ 互质, 进行如下操作: 如果 $n &lt; m$, 则计算 $g^{-1}(\dfrac{n}{m})$; 如果 $ n &gt; m$, 则计算 $h^{-1}(\dfrac{n}{m})$. 即每次保持分子分母中的较小者, 并将较大者减去较小者. 例如对 $\dfrac{5}{7}$ 进行操作之后依次可以得到
+$$
+\frac{5}{7} \rightarrow \frac{5}{2}  \rightarrow \frac{3}{2} \rightarrow \frac{1}{2} \rightarrow \frac{1}{1}
+$$
+进行一次操作后, 分子分母仍然是互质的, 且分子分母之和是单调减小的, 所以经过有限次操作(应用 $g^{-1}$ 和 $h^{-1}$), 总是会得到$\dfrac{1}{1}$. 说明对任意正有理数, 可以 $a_1 = 1$ 作为初始值, 通过有限次的 $g$ 和 $h$ 得到.</p>
+<p>下面证明 $g$ 和 $h$ 满足: $g(a_n) = a_{2n}, h(a_n) = a_{2n+1}$.</p>
+<p>用数学归纳法, $n=1$ 时, $g(a_1) = g(1) = \dfrac{1}{2} = a_2$, 成立. 若 $n=k$ 时成立, 即$g(a_k) = a_{2k}$, 那么 $n=k+1$ 时, 
+$$
+g(a_{k+1}) = g(f(a_k)) = \frac{f(a_k)}{1+f(a_k)} = \frac{1}{2 + [a_k] - \{a_k\}} ,
+$$
+注意到 $[a_k+1] = [a_k] + 1$, $\{a_k+1\} = \{a_k\}$, 所以
+$$
+g(a_{k+1}) = \frac{1}{2+[a_k] - \{a_k\}} = \frac{1}{1+[a_k+1] - \{a_k+1\}} = f(a_k+1) .
+$$
+另一方面, 由归纳假设$a_{2k} = g(a_k)$, 可得
+$$
+a_{2(k+1)} = a_{2k+2} = f(f(a_{2k})) = f(f(g(a_k))) = f\left(\frac{1}{[g(a_k)] - \{g(a_k)\} + 1}\right),
+$$
+注意到 $x\ge 0$ 时, $g(x)=\dfrac{1}{1+x} \in [0,1)$, 所以 $[g(a_k)] = 0, \{g(a_k)\} = g(a_k)$, 于是
+$$
+a_{2(k+1)} = f\left(\frac{1}{-g(a_k) + 1}\right) = f\left(\frac{1}{1 - \frac{a_k}{1+a_k} }\right) = f(1+a_k)
+$$</p>
+<p>因为 $a_{2(k+1)}$ 和 $g(a_{k+1})$ 都等于 $f(a_k+1)$, 所以 $a_{2(k+1)} = g(a_{k+1})$, 这就证明了归纳假设对于 $n=k+1$ 也成立.</p>
+<p>类似的可以用归纳法证明 $h(a_n) = a_{2n+1}$. 当 $n = 1$ 时, $h(a_1) = h(1) = 2 = a_3$. 若 $n=k$ 时 $h(a_k) = a_{2k+1}$,  则 $n=k+1$ 时, 
+$$
+h(a_{k+1}) = h(f(a_k)) = f(a_k)+1 = a_{k+1} + 1
+$$
+另一方面, 
+$$
+\begin{align*}
+a_{2k+3} &amp;= f(a_{2k+2}) = f(g(a_{k+1}))\\ 
+&amp; = \frac{1}{[g(a_{k+1})] - \{g(a_{k+1})\} + 1} = \frac{1}{1-g(a_{k+1})} \\ 
+&amp;= \frac{1}{1-\frac{a_{k+1}}{1+a_{k+1}}} = 1 + a_{k+1}
+\end{align*}
+$$
+从而 $a_{2k+3} = h(a_{k+1})$.</p>
+<p>综合以上结论, 任意一个正有理数都可以从 $a_1$ 开始经过有限次的$g$或$h$得到, 而$g$和$h$ 作用在数列中的任意一项, 得到的都是数列的另一项, 所以经过有限次$g$或$h$操作, 得到的数也还是数列的一项, 就说明任意一个正有理数都是数列的某一项.</p>
+<p>证明 $h(a_n) = a_{2n+1}$也可以不用归纳法. 由 $g(a_n) = a_{2n}$, 然后 $a_{2n+1} = f(a_{2n}) = f(g(a_n)) = 1+a_n = h(a_n)$, 可以直接得到.</p>
+<h3 id="calkin-wilf-树">Calkin-Wilf 树</h3>
+<p>上述数列构造过程实际就是 Calkin-Wilf 树的构造过程. Calkin-Wilf 树如下所示.</p>
+<div><center>
+<img src='./figure1.svg' />
+</center></div>
+从根节点$\dfrac{1}{1}$出发, 每个节点 $x$ 的左右两个子节点分别表示应用 $g(x)= \dfrac{x}{1+x}$ 和 $h(x) = 1+x$. 表示成分数则是每个节点$\dfrac{i}{j}$的左右子节点分别是$\dfrac{i}{i+j}$和$\dfrac{i+j}{j}$. 从根节点出发, 按广度优先的顺序遍历这个树, 得到的序列为
+$$\frac{1}{1}, \frac{1}{2},\frac{2}{1},\frac{1}{3},\frac{3}{2},\frac{2}{3},\frac{3}{1},\frac{1}{4},\frac{4}{3},\frac{3}{5},\frac{5}{2},\frac{2}{5},\frac{5}{3},\frac{3}{4},\frac{4}{1},\frac{1}{5},\frac{5}{4},\frac{4}{7},\frac{7}{3},\frac{3}{8},\frac{8}{5},\frac{5}{7},\frac{7}{2},\frac{2}{7},\frac{7}{5},\cdots$$
+容易观察发现, 每个数的分子都是它前一个数的分母, 将每一项的分子拿出来, 组成数组 $b_n$, 则原来有理数每一项为 $a_n = \dfrac{b_n}{b_{n+1}}$, 而分子 $b_n$为:
+$$1, 1, 2, 1, 3, 2, 3, 1, 4, 3, 5, 2, 5, 3, 4, 1, 5, 4, 7, \cdots$$
+$b_n$表示正整数 $n$ 表示成 $2$ 的幂次之和的方法数, 且每个幂使用不超过两次. 例如,  $b_5 = 2$ 对应两种表示方法: $5=4+1=2+2+1$.
+<p>可以证明, $b_n$ 满足下面的递推关系: $b_{2n+1} = b_n, b_{2n+2} = b_n+b_{n+1}$. 考虑将 $2n+1$ 表示成 $2$ 的幂次之和, 因为 $2n+1$ 是奇数, 所以求和式中有且只有一个 $1$, 而求和式余下的 $2n$ 的分解方式与 $n$ 的分解方式是一一对应的, 因为将 $n$ 分解成 $2$ 的幂次之和, 然后每一项乘以 $2$, 就得到 $2n$ 的一种分解方法, 反之亦然. 对于 $2n+2$ 的分解, 可能有$0$ 或 $2$个 $1$, 分别对应将 $n+1$ 和 $n$ 的分解为 $2$ 的幂次之和的方法数.</p>
+<p>一个节点$a_n = \dfrac{b_n}{b_{n+1}}$, 其左儿子为 $a_{2n+1} = \dfrac{b_{2n+1}}{b_{2n+2}} = \dfrac{b_n}{b_n+b_{n+1}}$, 右儿子为 $a_{2n+2} = \dfrac{b_{2n+2}}{b_{2n+3}} = \dfrac{b_n+b_{n+1}}{b_{n+1}}$. 只要满足$b_n$的递推关系, 树的节点与子节点的关系也是自动满足的.</p>
+<p>关于 Calkin-Wilf 树的更多参考：</p>
+<ul>
+<li>论文：<a href="https://www2.math.upenn.edu/~wilf/website/recounting.pdf" target="_blank" rel="noopener noreffer">[原始链接]</a> | <a href="./recounting.pdf" rel="">[本地存档]</a></li>
+<li>cut-the-knot: <a href="https://www.cut-the-knot.org/blue/Fusc.shtml" target="_blank" rel="noopener noreffer">[链接]</a></li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2025-01-05</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/tips-for-git/" class="prev" rel="prev" title="Git 使用技巧"><i class="fas fa-angle-left fa-fw"></i>Git 使用技巧</a>
+            <a href="/eulers-miracle/" class="next" rel="next" title="欧拉的奇迹">欧拉的奇迹<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

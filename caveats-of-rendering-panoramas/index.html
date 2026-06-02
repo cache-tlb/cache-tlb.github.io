@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>全景图渲染的常见问题 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="全景图渲染的常见问题" />
+<meta property="og:description" content="全景图是用2D平面图像表示球面图像的一种形式，例如世界地图。渲染全景图只需要准备一个球体模型，算好顶点UV，将2D图像作为纹理贴在球体表面即" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/caveats-of-rendering-panoramas/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-02-27T22:38:39&#43;08:00" />
+<meta property="article:modified_time" content="2024-02-27T22:38:39&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="全景图渲染的常见问题"/>
+<meta name="twitter:description" content="全景图是用2D平面图像表示球面图像的一种形式，例如世界地图。渲染全景图只需要准备一个球体模型，算好顶点UV，将2D图像作为纹理贴在球体表面即"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/caveats-of-rendering-panoramas/" /><link rel="prev" href="https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/" /><link rel="next" href="https://cache-tlb.github.io/leibniz-formula/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "全景图渲染的常见问题",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/caveats-of-rendering-panoramas\/"
+        },"genre": "posts","keywords": "demo","wordcount":  939 ,
+        "url": "https:\/\/cache-tlb.github.io\/caveats-of-rendering-panoramas\/","datePublished": "2024-02-27T22:38:39+08:00","dateModified": "2024-02-27T22:38:39+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">全景图渲染的常见问题</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%9B%BE%E5%BD%A2/"><i class="far fa-folder fa-fw"></i>图形</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2024-02-27">2024-02-27</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 939 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 2 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>全景图是用2D平面图像表示球面图像的一种形式，例如世界地图。渲染全景图只需要准备一个球体模型，算好顶点UV，将2D图像作为纹理贴在球体表面即可。
+原理很简单，实现起来会发现有不少陷阱。
+本文记录了笔者遇到的一些细节问题及对应的解决办法。</p>
+<h3 id="国际日期变更线">国际日期变更线</h3>
+<p>如果使用默认的纹理参数，会发现球面上有一条断断续续的线贯穿南北两极，就像地球仪上的国际日期变更线一样。这并不是因为全景图左右边界没接上。事实上，这条线处在 $u=0$ 和 $u=1$ 的交界处。这条线附近的像素，$u$ 坐标会发生跳变。在采样纹理时，硬件认为纹理坐标梯度很大，应该用较大的mip level。正确的做法是检查 $u$ 的梯度，如果太大就将 $u=1$ 附近的那些 $u$ 值拉到 $u=0$ 附近。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">const</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>  <span class="c1">// tune by hand
+</span><span class="c1"></span><span class="kt">float</span> <span class="n">fwx</span> <span class="o">=</span> <span class="n">fwidth</span><span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">fwx</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="n">uv</span><span class="p">.</span><span class="n">x</span> <span class="o">-=</span> <span class="mf">1.0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">return</span> <span class="nf">texture</span><span class="p">(</span><span class="n">u_texture</span><span class="p">,</span> <span class="n">uv</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的阈值不一定好调。另一个策略分别计算原始的梯度和平移了 $u$ 坐标之后的梯度，取较小的那种情况。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">float</span> <span class="n">fwx</span> <span class="o">=</span> <span class="n">fwidth</span><span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+<span class="kt">float</span> <span class="n">old_u</span> <span class="o">=</span> <span class="n">uv</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="n">uv</span><span class="p">.</span><span class="n">x</span> <span class="o">-=</span> <span class="mf">1.0</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">fwx2</span> <span class="o">=</span> <span class="n">fwidth</span><span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">fwx</span> <span class="o">&lt;</span> <span class="n">fwx2</span><span class="p">)</span> <span class="n">uv</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">old_u</span><span class="p">;</span>
+<span class="k">return</span> <span class="nf">texture</span><span class="p">(</span><span class="n">u_texture</span><span class="p">,</span> <span class="n">uv</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="南北极">南北极</h3>
+<p>即使修复了因 $u$ 值突变产生的虚线，还会发现在南北极发生了严重的失真。具体表现是围绕极点有多个环形的纹样，且极点附近的像素比其他位置更加模糊。这是因为极点附近 $u$ 坐标的梯度比其他地方更大，而 $v$ 坐标的梯度几乎是恒定的。因此采样纹理时也会用到较高等级的mip。这种情况下，$v$ 方向被错误地模糊了。修复措施是开启纹理的各向异性采样。</p>
+<p>还要注意的是纹理的 wrap mode，一般会设为 repeat，对于 $u$ 方向来说确是如此。
+考虑 $v$ 方向，全景图最上和最下一行的像素对应的球面位置并不在极点，而是靠近极点的一个圈。
+在极点处的 $v$ 坐标会超出图像边界，wrap mode 产生作用。
+正确的模式应该是 <code>wrap_T=clamp</code>.</p>
+<h3 id="mipmap">mipmap</h3>
+<p>如果不开mipmap，那么上述问题都不存在，唯一的问题就是欠采样，表现是在相机移动时画面会产生闪烁，以及细小的结构会被破坏，例如直线断开成虚线，等等。</p>
+<h3 id="demo">demo</h3>
+<p>在下面的<a href="./demo.html" rel="">demo</a>中，可以看到修正 $u$ 值对于国际日期变更线问题的改善（<code>look at u=0 / u=1</code>，<code>fix u</code>），使用正确的wrap mode对于极点失真的改善（<code>look at top / bottom</code>，<code>fix wrap T</code> &amp; <code>use anisotrpic</code>）。visualization mode 可以选择查看 $u$ 的梯度，各处的纹理各向异性程度。也可以用本地的全景图测试效果。</p>
+<iframe id="frame" width="100%" height="300" src="./demo.html" style="border: none;"></iframe>
+<script>
+    const frame = document.getElementById('frame');
+    const contentDom = document.getElementById('content');
+    frame.height = window.innerHeight*0.75;
+</script>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2024-02-27</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/demo/">demo</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/laplacian-smoothing-of-a-polygon/" class="prev" rel="prev" title="多边形的Laplacian平滑"><i class="fas fa-angle-left fa-fw"></i>多边形的Laplacian平滑</a>
+            <a href="/leibniz-formula/" class="next" rel="next" title="Leibniz级数的几何意义">Leibniz级数的几何意义<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

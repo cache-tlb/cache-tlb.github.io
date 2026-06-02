@@ -146,8 +146,18 @@ class UECameraControl {
     }
 }
 
-const canvas = document.getElementById('drawCanvas');
+const canvas = document.getElementById('canvas');
 const gl = canvas.getContext("webgl");
+
+function resizeCanvas() {
+    const displayWidth = canvas.clientWidth;
+    const displayHeight = canvas.clientHeight;
+
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+    console.log(canvas.width, canvas.height);
+}
+window.addEventListener('resize', resizeCanvas);
 
 // globals
 const minTess = 1;
@@ -441,9 +451,9 @@ function render(delta_t) {
     var projectionMatrix = m4.perspective(fov, aspect, near, far)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, canvas.width, canvas.height);    
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-
     // sky
     gl.disable(gl.DEPTH_TEST);
     gl.useProgram(skyProgramInfo.program);
@@ -519,10 +529,10 @@ function setupGui() {
 
     }
     gui.domElement.style.fontFamily='var(--font-family-mono)';
-    container.style = `width:${gui.domElement.clientWidth}px;position:relative;transform:translate(${canvas.width/2-gui.domElement.clientWidth/2-5}px,  -${canvas.height}px);`;
 }
 
 (async function() {
+    resizeCanvas();
     await initScene();
     setupGui();
     frameLoop();

@@ -29,7 +29,7 @@
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "https:\/\/cache-tlb.github.io\/radiosity\/"
-        },"genre": "posts","wordcount":  645 ,
+        },"genre": "posts","keywords": "demo","wordcount":  643 ,
         "url": "https:\/\/cache-tlb.github.io\/radiosity\/","datePublished": "2023-05-26T21:22:20+08:00","dateModified": "2023-05-26T21:22:20+08:00","publisher": {
             "@type": "Organization",
             "name": ""},"author": {
@@ -103,7 +103,7 @@
 <main class="main">
                 <div class="container"><article class="page single"><h1 class="single-title animated flipInX">Radiosity 辐射度方法</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%9B%BE%E5%BD%A2/"><i class="far fa-folder fa-fw"></i>图形</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-05-26">2023-05-26</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 645 字&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-05-26">2023-05-26</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 643 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 2 分钟&nbsp;</div>
         </div><div class="content" id="content"><p>谈及全局光照，绕不开一个重要的方程，即渲染方程（Render Equation），如下是其中一个简化版本：
 $$
@@ -120,23 +120,13 @@ $L_i$ 表示沿 $\omega_i$ 方向照射到 $x$ 点的辐射度。 它也等于�
 $$B_i = E_i + R_i \sum_j F_{ij} B_j .\tag{*}$$
 等式两边除了 $B_i, B_j$ 以外，其他都是已知项，因此很容易想到写成矩阵的形式求解。</p>
 <p>但实际上不用这么复杂，想象光线的传播过程，先是从光源出发，到达相机，此时只有自发光表面的 $B_i$ 才有值，其他的都是零. 这些非零的项代入到右边的求和式中，又会产生更多的非零项，也就是被直接光照亮的那些表面。再把当前的 $B_i$ 向量作为已知数代入 $(*)$ 式，则是相当于又计算了光线在物体表面反弹一次的间接光照。迭代几轮便会收敛到稳定值。</p>
-<p>以下是一个简单demo。</p>
-<center>
-    <div style=""> 
-            <canvas id="drawCanvas" style=""> </canvas>            
-            <div id="gui-container" style=""> </div>            
-    </div>
-</center>
+<p>以下是一个简单<a href="./demo.html" rel="">demo</a>。</p>
+<iframe id="frame" width="100%" height="300" src="./demo.html" style="border: none;"></iframe>
 <script>
-    (function (){
-        const canvas = document.getElementById('drawCanvas');
-        canvas.width = window.innerWidth/1.5;
-        canvas.height = window.innerHeight*0.75;
-    })();
+    const frame = document.getElementById('frame');
+    const contentDom = document.getElementById('content');
+    frame.height = window.innerHeight*0.75;
 </script>
-<script src='./m4.js'></script>
-<script src='./webgl-utils.js'></script>
-<script type="module" src="./demo.js"></script>
 </div><div class="post-footer" id="post-footer">
     <div class="post-info">
         <div class="post-info-line">
@@ -154,7 +144,7 @@ $$B_i = E_i + R_i \sum_j F_{ij} B_j .\tag{*}$$
     </div>
 
     <div class="post-info-more">
-        <section class="post-tags"></section>
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/demo/">demo</a></section>
         <section>
             <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
         </section>
@@ -166,7 +156,7 @@ $$B_i = E_i + R_i \sum_j F_{ij} B_j .\tag{*}$$
 <div id="comments"></div></article></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
         </div>
     </footer></div>
 

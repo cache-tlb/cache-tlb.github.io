@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>pi - 标签 - Praise the Sun!</title>
+        <link>https://cache-tlb.github.io/tags/pi/</link>
+        <description>pi - 标签 - Praise the Sun!</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Thu, 14 Mar 2024 22:49:37 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/tags/pi/" rel="self" type="application/rss+xml" /><item>
+    <title>Leibniz级数的几何意义</title>
+    <link>https://cache-tlb.github.io/leibniz-formula/</link>
+    <pubDate>Thu, 14 Mar 2024 22:49:37 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/leibniz-formula/</guid>
+    <description><![CDATA[Leibniz 级数定义如下的交错级数： $$ S = 1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \cdots = \sum_{k=0}^{\infty} { \frac{(-1)^k}{2k+1} }.$$ 它收敛到 $\displaystyle \frac{\pi}{4}$。每个带有 $\pi$ 的公式跟圆都有千丝万缕的联系，]]></description>
+</item></channel>
+</rss>

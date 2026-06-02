@@ -7,18 +7,32 @@
 | Shadow of the Colossus | 2005 | Léna Piquet(Froyok) | [\[地址\]](https://www.froyok.fr/blog/2012-10-breakdown-shadow-of-the-colossus-pal-ps2/) |
 | Assassin's Creed II | 2009 | Léna Piquet(Froyok) | [\[地址\]](https://www.froyok.fr/blog/2015-12-breakdown-assassins-creed-ii-2/) |
 | Batman : Arkham City | 2011 | Léna Piquet(Froyok) | [\[地址\]](https://www.froyok.fr/blog/2012-09-breakdown-batman-arkham-city/) |
+| Minecraft RTX | 2011 | Alain Galvan |  [\[地址\]](https://alain.xyz/blog/frame-analysis-minecraftrtx) |
 | Syndicate | 2012 | Léna Piquet(Froyok) | [\[地址\]](https://www.froyok.fr/blog/2024-01-breakdown-syndicate/) |
 | Grand Theft Auto V | 2013 | Adrian Courrèges | [\[地址\]](https://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study/) [^GTAV]| 
 | Middle Earth: Shadow of Mordor | 2014 | Emilio López | [\[地址\]](https://www.elopezr.com/the-rendering-of-middle-earth-shadow-of-mordor/) |
 | Rise of the Tomb Raider | 2015 | Emilio López | [\[地址\]](https://www.elopezr.com/the-rendering-of-rise-of-the-tomb-raider/) | 
 | The Witcher 3: Wild Hunt | 2015 | Astral Code? | [\[地址\]](https://astralcode.blogspot.com/2018/11/reverse-engineering-rendering-of.html) [^Witcher3] |
 | Metal Gear Solid V | 2015 | Adrian Courrèges | [\[地址\]](https://www.adriancourreges.com/blog/2017/12/15/mgs-v-graphics-study/) |
+| Arkham Knight | 2015 | m0radin | [\[地址\]](https://morad.in/2020/04/03/unmasking-arkham-knight/) |
 | The Witness | 2016 | Thomas Poulet | [\[地址\]](https://blog.thomaspoulet.fr/the-witness-frame-part-1/) [^Witness] |
-| DOOM (2016) | 2016 | Adrian Courrèges | [\[地址\]](https://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/) |
+| Overwatch | 2016 | Alain Galvan | [\[地址\]](https://alain.xyz/blog/frame-analysis-overwatch) |
+| DOOM (2016) | 2016 | Adrian Courrèges | [\[之一\]](https://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/) |
+| DOOM (2016) | 2016 | Simon Coenen | [\[之二\]](https://simoncoenen.com/blog/programming/graphics/DoomEternalStudy.html) |
+| Resident Evil 7: Biohazard | 2017 | M.A.Moniem | [\[地址\]](https://mamoniem.com/behind-the-pretty-frames-resident-evil/) |
+| Shadow Fight 3 | 2017 | Roman Tersky | [\[地址\]](https://web.archive.org/web/20190215095943/http://www.gamasutra.com/blogs/RomanTersky/20190215/336349/Rendering_process_in_Shadow_Fight_3.php) |
+| The Surge | 2017 | Philip Hammer | [\[地址\]](https://www.slideshare.net/philiphammer/dissecting-the-rendering-of-the-surge) |
 | Jurassic World: Evolution | 2018 | Emilio López | [\[地址\]](https://www.elopezr.com/the-rendering-of-jurassic-world-evolution/) |
 | Ni No Kuni II(二之国2) | 2018 | Thomas Poulet | [\[地址\]](https://blog.thomaspoulet.fr/ninokuni2-frame/) |
 | God of War (PC) | 2018 | M.A.Moniem | [\[地址\]](https://www.mamoniem.com/behind-the-pretty-frames-god-of-war/) |
+| Detroit Become Human | 2018 | M.A.Moniem | [\[地址\]](https://mamoniem.com/behind-the-pretty-frames-detroit-become-human/) |
+| Red Dead Redemption 2 | 2018 | Hüseyin | [\[地址\]](https://imgeself.github.io/posts/2020-06-19-graphics-study-rdr2/) |
+| Shadow of the Tomb Raider | 2018 | m0radin | [\[地址\]](https://morad.in/2019/04/19/under-the-hood-of-shadow-of-the-tomb-raider/) |
+| A Plague Tale: Innocence | 2019  | m0radin |  [\[地址\]](https://morad.in/2019/06/16/dissecting-a-plague-tale-innocence/) |
 | Death Stranding | 2019 | M.A.Moniem | [\[地址\]](https://mamoniem.com/behind-the-pretty-frames-death-stranding/) |
+| Metro: Exodus | 2019 | m0radin | [\[Part 1\]](https://morad.in/2019/03/27/observations-about-the-rendering-of-metro-exodus/), [\[Part 2\]](https://morad.in/2019/04/05/more-observations-in-metro-exodus/) |
+| Mortal Kombat 11 | 2019 | Alain Galvan | [\[地址\]](https://alain.xyz/blog/frame-analysis-mk11) |
+| Resident Evil 2 | 2019 | Anton Schreiner | [\[地址\]](https://aschrein.github.io/2019/08/01/re2_breakdown.html) |
 | Mafia: Definitive Edition | 2020 | Emilio López | [\[地址\]](https://www.elopezr.com/the-rendering-of-mafia-definitive-edition/) |
 | Cyberpunk 2077 | 2020 | Angelo Pesce | [\[之一\]](https://c0de517e.blogspot.com/2020/12/hallucinations-re-rendering-of.html) |
 | Cyberpunk 2077 | 2020 | Hang Zhang | [\[之二\]](https://zhangdoa.com/posts/rendering-analysis-cyberpunk-2077) |
@@ -28,6 +42,7 @@
 | Diablo IV | 2023 | Blizzard Entertainment | [\[地址\]](https://news.blizzard.com/en-us/diablo4/23964183/peeling-back-the-varnish-the-graphics-of-diablo-iv) |
 | Diablo IV | 2023 | M.A.Moniem | [\[地址\]](https://mamoniem.com/behind-the-pretty-frames-diablo-iv/) |
 | Cities: Skylines 2 | 2023 | Paavo Huhtala | [\[地址\]](https://blog.paavo.me/cities-skylines-2-performance/) |
+| Pragmata | 2026 | M.A.Moniem | [\[地址\]](https://mamoniem.com/behind-the-pretty-frames-pragmata/) |
 
 
 [^GTAV]: 分 3 部分 

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>漫谈Cubemap插值 - Praise the Sun!</title><meta name="Description" content="How to interpolate an 1x1x1 cubemap"><meta property="og:title" content="漫谈Cubemap插值" />
+<meta property="og:description" content="How to interpolate an 1x1x1 cubemap" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/cubemap-interpolation/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-08-12T20:16:03&#43;08:00" />
+<meta property="article:modified_time" content="2023-08-12T20:16:03&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="漫谈Cubemap插值"/>
+<meta name="twitter:description" content="How to interpolate an 1x1x1 cubemap"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/cubemap-interpolation/" /><link rel="prev" href="https://cache-tlb.github.io/expected-elevator-stops/" /><link rel="next" href="https://cache-tlb.github.io/the-unguarded-tower/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "漫谈Cubemap插值",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/cubemap-interpolation\/"
+        },"genre": "posts","keywords": "demo","wordcount":  1136 ,
+        "url": "https:\/\/cache-tlb.github.io\/cubemap-interpolation\/","datePublished": "2023-08-12T20:16:03+08:00","dateModified": "2023-08-12T20:16:03+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": "How to interpolate an 1x1x1 cubemap"
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">漫谈Cubemap插值</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%9B%BE%E5%BD%A2/"><i class="far fa-folder fa-fw"></i>图形</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-08-12">2023-08-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1136 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>Cubemap 是一种常见的表示球面信息的数据结构。因为球面和正方体表面是同胚的，所以用正方体的6个面存储球面上的数据也是自然而然的想法。Cube的每个面正方形的2D纹理，根据球面上的方向向量$(x,y,z)$，可以很容易确定它落在哪个面上（face index），以及对应的2D纹理坐标 $(u,v)$，从而获取对应的颜色。</p>
+<p>以上描述看上去合情合理，然而其中埋藏了很多细节上的问题。例如，2D纹理上每个像素点记录的数值为像素中心位置的采样值，如果采样位置落在了边界一圈像素中心点之外又该怎么计算呢？</p>
+<div>
+<center>
+<img src="./figure1.svg" />
+</center>
+</div>
+<p>如上图截取了 Cubemap 的一个角，$A,B,C$ 三个点对应三个面上角落的像素位置，位于图中灰色阴影区域的地方无法仅根据单个面内部的像素颜色插值得到，需要结合相邻面的像素。这里讨论几种可能的结合方式。</p>
+<h4 id="拉伸">拉伸</h4>
+<p>类似 2D 纹理的 clamp to edge 模式，只用到一个面的像素，哪个方向上出界了就用边界的颜色，相当于把边界往外平移了半个像素宽度，会明显看出瑕疵。</p>
+<h4 id="八面体映射">八面体映射</h4>
+<p>可以将每个面的 2D 纹理往外扩充一圈，扩充的部分填上对应的邻接面上的像素。这样大部分的边界像素都能找到双线性插值的邻居。而只在角上无法确定邻居关系。例如对 $A$ 面做扩充，$A$ 向上走的邻居是 $B$，向右的邻居是 $C$，但是右上的邻居就不好定义了。</p>
+<p>换个思路，对于落在空间三角形 $ABC$ 内的采样方向 $\mathbf{d}$，可以直接用 $\mathbf{d}$ 在 $ABC$ 上的重心坐标来插值。</p>
+<p>结合上面边和角的两种情况，相当于将立方体先削去8个角，再削去12条棱，用剩余的形状（见下图）与采样方向求交，根据交点在面上、棱上或是角上分别使用双线性插值或是重心坐标插值。</p>
+<div>
+<center>
+<img src="./figure2.svg" />
+</center>
+</div>
+<p>如果削去的部分足够大，剩下的几何体的6个正方形面退化成一个点，则这个几何体就是正八面体。</p>
+<h4 id="球面三角形重心坐标插值">球面三角形重心坐标插值</h4>
+<p>Cubemap 每个面的 texel 对应球面上的一点，所以在插值时使用球面矩形/三角形面积关系计算双线性/重心坐标插值是更准确的做法。尤其是在相邻 texel 之间的距离很大的时候更为明显。
+<a href="https://cache-tlb.github.io/spherical-triangle-area/" target="_blank" rel="noopener noreffer">前文</a>已经介绍了球面三角形/多边形面积的计算方法，简单替换面积公式即可。</p>
+<h4 id="扩展的双线性插值">扩展的双线性插值</h4>
+<p>Cubemap 每个面往外扩充一个像素能解决除角上的大部分情况。我们可以假设相邻面的交界出也有一系列的采样点，其值就是两个邻接像素的平均值，如上图的 $D,E,F$ 三点。而三个面的交界处（角点）上也有一个采样点，$M$，其值为三个邻接像素的平均值。这些假想的采样点正好把出界的区域分割到不同的矩形里，无论射线方向交在哪个区域，都能找到一个的矩形做双线性插值，并且保证值连续。</p>
+<h4 id="demo">demo</h4>
+<p>下面的<a href="./demo.html" rel="">demo</a>演示了不同插值策略的对比，Cubemap每个面仅有1个像素。
+在极端的情况下可以看清楚各种插值策略（nearest/spherical barycentric/octahedron/bilinear extended）的效果，并且可与硬件实现的效果（reference）进行比较。</p>
+<iframe id="frame" width="100%" height="300" src="./demo.html" style="border: none;"></iframe>
+<script>
+    const frame = document.getElementById('frame');
+    const contentDom = document.getElementById('content');
+    frame.height = window.innerHeight*0.75;
+</script>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2023-08-12</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/demo/">demo</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/expected-elevator-stops/" class="prev" rel="prev" title="每天上班电梯要停多少次"><i class="fas fa-angle-left fa-fw"></i>每天上班电梯要停多少次</a>
+            <a href="/the-unguarded-tower/" class="next" rel="next" title="百密一疏的防御">百密一疏的防御<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>AI 侦探 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="AI 侦探" />
+<meta property="og:description" content="现在的 AI 推理能力已经是今非昔比，今天测试了一个命令行的推理谜题 clmystery，效果令人印象深刻。来源: 【Github】, 【本地备份】。题" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/ai-detective/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-05-22T19:17:43&#43;08:00" />
+<meta property="article:modified_time" content="2026-05-22T19:17:43&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="AI 侦探"/>
+<meta name="twitter:description" content="现在的 AI 推理能力已经是今非昔比，今天测试了一个命令行的推理谜题 clmystery，效果令人印象深刻。来源: 【Github】, 【本地备份】。题"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/ai-detective/" /><link rel="prev" href="https://cache-tlb.github.io/local-llm-deployment/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "AI 侦探",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/ai-detective\/"
+        },"genre": "posts","wordcount":  2741 ,
+        "url": "https:\/\/cache-tlb.github.io\/ai-detective\/","datePublished": "2026-05-22T19:17:43+08:00","dateModified": "2026-05-22T19:17:43+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">AI 侦探</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/ai/"><i class="far fa-folder fa-fw"></i>AI</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2026-05-22">2026-05-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2741 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>现在的 AI 推理能力已经是今非昔比，今天测试了一个命令行的推理谜题 clmystery，效果令人印象深刻。来源: 【<a href="https://github.com/veltman/clmystery" target="_blank" rel="noopener noreffer">Github</a>】, 【<a href="./clmystery-master.zip" rel="">本地备份</a>】。题目如下：</p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>There&rsquo;s been a murder in Terminal City, and TCPD needs your help.</p>
+<p>To figure out whodunit, go to the &lsquo;mystery&rsquo; subdirectory and start working from there.</p>
+<p>You&rsquo;ll want to start by collecting all the clues at the crime scene (the &lsquo;crimescene&rsquo; file).</p>
+<p>The officers on the scene are pretty meticulous, so they&rsquo;ve written down EVERYTHING in their officer reports.</p>
+<p>Fortunately the sergeant went through and marked the real clues with the word &ldquo;CLUE&rdquo; in all caps.</p>
+<p>If you get stuck, open one of the hint files (from the CL, type &lsquo;cat hint1&rsquo;, &lsquo;cat hint2&rsquo;, etc.).</p>
+<p>To check your answer or find out the solution, open the file &lsquo;solution&rsquo; (from the CL, type &lsquo;cat solution&rsquo;).</p>
+<p>To get started on how to use the command line, open cheatsheet.md or cheatsheet.pdf (from the command line, you can type &lsquo;nano cheatsheet.md&rsquo;).</p>
+<p>Don&rsquo;t use a text editor to view any files except these instructions, the cheatsheet, and hints.</p>
+</div>
+        </div>
+    </div>
+<p>直接在 OpenClaw 里让它按指引工作即可。提示词如下：
+<code>将工作目录切到 ~/clmystery，你是一个侦探，根据 ~/clmystery/instructions 的指引找到凶手，并写下完整的推理链条，例如 根据 instauctions 搜索文件 xxxx，得到结论/线索 yyyy；根据线索 yyyy 和 zzzz 搜索文件 aaaa，得到结论/线索 bbbb，等等</code></p>
+<p>模型采用 DeepSeek-V4-Pro，消耗了约 500K 的token，就找到了答案。输出的推理过程如下：</p>
+<div class="details admonition quote">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>引用<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>📋 完整推理链条</p>
+<h3 id="线索一犯罪现场调查--凶手画像">线索一：犯罪现场调查 → 凶手画像</h3>
+<p>根据 instructions 指引，搜索 crimescene 中标记为 &ldquo;CLUE&rdquo; 的内容：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  grep -n <span class="s2">&#34;CLUE&#34;</span> ~/clmystery/mystery/crimescene
+</code></pre></td></tr></table>
+</div>
+</div><p>得出 3 条关键线索：</p>
+<ul>
+<li>线索 1：ATM 监控显示凶手是身高 ≥ 6 英尺的高个子男性</li>
+<li>线索 2：凶手钱包里有 AAA、Delta SkyMiles、图书馆、Museum of Bash History 四张会员卡</li>
+<li>线索 3：枪响前离开咖啡店的女人叫 Annabel，金发短发，新西兰口音</li>
+</ul>
+<p>────────────────────────────────────────────────────────────────────────────────</p>
+<h3 id="线索二追踪目击证人--获取逃逸车辆信息">线索二：追踪目击证人 → 获取逃逸车辆信息</h3>
+<p>搜索 people 文件找 Annabel：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  grep -i <span class="s2">&#34;annabel&#34;</span> ~/clmystery/mystery/people
+</code></pre></td></tr></table>
+</div>
+</div><p>找到 4 个 Annabel（2 女 2 男）。走访两位女性 Annabel 的住所：</p>
+<ul>
+<li>Annabel Sun（Hart Place, line 40）：棕发，非新西兰人 ❌</li>
+<li>Annabel Church（Buckingham Place, line 179）：她的证词提供了逃逸车辆关键信息 —— 蓝色 Honda，车牌以 &ldquo;L337&rdquo; 开头、以 &ldquo;9&rdquo; 结尾</li>
+</ul>
+<p>────────────────────────────────────────────────────────────────────────────────</p>
+<h3 id="线索三车辆追踪--锁定嫌犯范围">线索三：车辆追踪 → 锁定嫌犯范围</h3>
+<p>搜索 vehicles 文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  grep -A5 <span class="s2">&#34;License Plate L337&#34;</span> ~/clmystery/mystery/vehicles
+</code></pre></td></tr></table>
+</div>
+</div><p>找到 6 辆蓝色 Honda（L337&hellip;9），筛选身高 ≥ 6' 的男性：</p>
+<p>┌─────────┬──────────────────┬──────┬───────────┐
+│ 车牌    │ 车主             │ 身高 │ 性别      │
+├─────────┼──────────────────┼──────┼───────────┤
+│ L337QE9 │ Erika Owens      │ 6'5&quot; │ 女 ❌     │
+├─────────┼──────────────────┼──────┼───────────┤
+│ L337539 │ Aron Pilhofer    │ 5'3&quot; │ ❌ (太矮) │
+├─────────┼──────────────────┼──────┼───────────┤
+│ L337369 │ Heather Billings │ 5'2&quot; │ ❌        │
+├─────────┼──────────────────┼──────┼───────────┤
+│ L337DV9 │ Joe Germuska     │ 6'2&quot; │ 男 ✅     │
+├─────────┼──────────────────┼──────┼───────────┤
+│ L3375A9 │ Jeremy Bowers    │ 6'1&quot; │ 男 ✅     │
+├─────────┼──────────────────┼──────┼───────────┤
+│ L337WR9 │ Jacqui Maher     │ 6'2&quot; │ 女 ❌     │
+└─────────┴──────────────────┴──────┴───────────┘</p>
+<p>嫌犯缩小到 2 人：Joe Germuska 和 Jeremy Bowers</p>
+<p>────────────────────────────────────────────────────────────────────────────────</p>
+<h3 id="线索四会员卡交叉比对--决定性证据">线索四：会员卡交叉比对 → 决定性证据</h3>
+<p>对比两人的四张会员卡：</p>
+<p>┌────────────────────────┬──────────────┬───────────────┐
+│ 会员卡                 │ Joe Germuska │ Jeremy Bowers │
+├────────────────────────┼──────────────┼───────────────┤
+│ AAA                    │ ✅           │ ✅            │
+├────────────────────────┼──────────────┼───────────────┤
+│ Delta SkyMiles         │ ❌           │ ✅            │
+├────────────────────────┼──────────────┼───────────────┤
+│ Terminal City Library  │ ✅           │ ✅            │
+├────────────────────────┼──────────────┼───────────────┤
+│ Museum of Bash History │ ❌           │ ✅            │
+└────────────────────────┴──────────────┴───────────────┘</p>
+<p>Joe Germuska 缺少 Delta SkyMiles 和 Museum of Bash History ❌
+Jeremy Bowers 拥有全部四张会员卡 ✅✅✅✅</p>
+<p>────────────────────────────────────────────────────────────────────────────────</p>
+<h3 id="线索五走访嫌犯住所--最终确认">线索五：走访嫌犯住所 → 最终确认</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  sed -n <span class="s1">&#39;284p&#39;</span> ~/clmystery/mystery/streets/Dunstable_Road
+  <span class="c1"># → SEE INTERVIEW #9620713</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>证词显示：「家中空无一人，邻居称住户近期外出旅行」—— 畏罪潜逃！</p>
+<p>────────────────────────────────────────────────────────────────────────────────</p>
+<h3 id="-结论">🎯 结论</h3>
+<p>┌────────────────────────┬───────────────┐
+│ 条件                   │ Jeremy Bowers │
+├────────────────────────┼───────────────┤
+│ 身高 ≥ 6'              │ ✅ 6'1&quot;       │
+├────────────────────────┼───────────────┤
+│ 男性                   │ ✅            │
+├────────────────────────┼───────────────┤
+│ 蓝色 Honda             │ ✅            │
+├────────────────────────┼───────────────┤
+│ 车牌 L337&hellip;9          │ ✅ L3375A9    │
+├────────────────────────┼───────────────┤
+│ AAA 会员               │ ✅            │
+├────────────────────────┼───────────────┤
+│ Delta SkyMiles         │ ✅            │
+├────────────────────────┼───────────────┤
+│ 图书馆会员             │ ✅            │
+├────────────────────────┼───────────────┤
+│ Museum of Bash History │ ✅            │
+├────────────────────────┼───────────────┤
+│ 住所空无一人           │ ✅ 潜逃       │
+└────────────────────────┴───────────────┘</p>
+<p>凶手身份已通过 MD5 校验确认：Jeremy Bowers！ 🕵</p>
+</div>
+        </div>
+    </div>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2026-05-22</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/local-llm-deployment/" class="prev" rel="prev" title="本地大模型部署"><i class="fas fa-angle-left fa-fw"></i>本地大模型部署</a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

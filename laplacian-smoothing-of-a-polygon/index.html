@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>多边形的Laplacian平滑 - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="多边形的Laplacian平滑" />
+<meta property="og:description" content="多年以前在微博上看到一个优美的结论，但是没有解释背后的原理。最近又看到了，有了一些思路，在此给出推导过程。 Conclusion 画个随机多边形，连接各条边的中点" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-01-09T19:29:40&#43;08:00" />
+<meta property="article:modified_time" content="2024-01-09T19:29:40&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="多边形的Laplacian平滑"/>
+<meta name="twitter:description" content="多年以前在微博上看到一个优美的结论，但是没有解释背后的原理。最近又看到了，有了一些思路，在此给出推导过程。 Conclusion 画个随机多边形，连接各条边的中点"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/" /><link rel="prev" href="https://cache-tlb.github.io/volumetric-lightmap/" /><link rel="next" href="https://cache-tlb.github.io/caveats-of-rendering-panoramas/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "多边形的Laplacian平滑",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/laplacian-smoothing-of-a-polygon\/"
+        },"genre": "posts","keywords": "demo","wordcount":  1636 ,
+        "url": "https:\/\/cache-tlb.github.io\/laplacian-smoothing-of-a-polygon\/","datePublished": "2024-01-09T19:29:40+08:00","dateModified": "2024-01-09T19:29:40+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">多边形的Laplacian平滑</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E6%95%B0%E5%AD%A6/"><i class="far fa-folder fa-fw"></i>数学</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2024-01-09">2024-01-09</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1636 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 4 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>多年以前在微博上看到一个<a href="https://weibo.com/5097174964/IDKXgdi0t" target="_blank" rel="noopener noreffer">优美的结论</a>，但是没有解释背后的原理。最近又看到了，有了一些思路，在此给出推导过程。</p>
+<div class="details admonition quote open">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-quote-right fa-fw"></i>Conclusion<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content">画个随机多边形，连接各条边的中点，形成新的多边形，不断重复这一过程，最后会收敛成一个椭圆。</div>
+        </div>
+    </div>
+<p>下面的<a href="./demo.html" rel="">demo</a>展示了这个过程。</p>
+<iframe id="frame" width="100%" height="300" src="./demo.html" style="border: none;"></iframe>
+<script>
+    const frame = document.getElementById('frame');
+    const contentDom = document.getElementById('content');
+    frame.height = window.innerHeight*0.75;
+</script>
+<p>我想到了两个推导方法，本质上是一样的。</p>
+<div class="details admonition info">
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-info-circle fa-fw"></i>Spoiler<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><h3 id="从矩阵特征值求解">从矩阵特征值求解</h3>
+<p>设原多边形有 $n$ 个顶点, 坐标分别是 $(x_0,y_0), (x_1,y_1), \cdots, (x_{n-1},y_{n-1})$. 仅考虑 $x$ 坐标, 设 $x_k$ 经过 $t$ 步迭代变成了 $x_k^{(t)}$, 则有如下关系:
+$$ \begin{bmatrix} x_0^{(t+1)}\\x_1^{(t+1)}\\ \vdots \\x_{n-2}^{(t+1)} \\x_{n-1}^{(t+1)} 
+\end{bmatrix} =  \frac{1}{2} \begin{bmatrix} 1 &amp; 1 &amp; 0 &amp; \cdots &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 1 &amp; \cdots &amp; 0 &amp; 0 \\ &amp; &amp; &amp; \ddots &amp; &amp; \\ 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 0 &amp; \cdots &amp; 0 &amp; 1\end{bmatrix} \begin{bmatrix} x_0^{(t)}\\x_1^{(t)}\\ \vdots \\ x_{n-2}^{(t)} \\ x_{n-1}^{(t)} \end{bmatrix} $$
+记变换矩阵为 $M$, 并记
+$$ \bold{x}^{(t)} =  [x_0^{(t)},x_1^{(t)},\cdots,x_{n-1}^{(t)}]^\mathrm{T} ,$$
+则 
+$$ \bold{x}^{(t)} = M^t \bold{x}^{(0)} .$$
+对 $M$ 进行特征值分解, 特征方程为
+$$ \begin{vmatrix} \dfrac{1}{2} - \lambda &amp; \dfrac{1}{2} &amp; 0 &amp; \cdots &amp; 0 &amp; 0 \\ 0 &amp; \dfrac{1}{2} - \lambda &amp; \dfrac{1}{2} &amp; \cdots &amp; 0 &amp; 0 \\ &amp; &amp; &amp; \ddots &amp; &amp; \\ 0 &amp; 0 &amp; 0 &amp; \cdots &amp; \dfrac{1}{2} - \lambda &amp; \dfrac{1}{2} \\ \dfrac{1}{2} &amp; 0 &amp; 0 &amp; \cdots &amp; 0 &amp; \dfrac{1}{2} - \lambda \end{vmatrix} = 0.$$
+依次将第 $k$ 行乘以 $\dfrac{1}{(2\lambda-1)^k}$ 加到最后一行, 可以化简为
+$$ (\lambda - \frac{1}{2})^n = \frac{1}{2} ,$$
+于是特征值为 $\lambda_k = \dfrac{1+\xi^k}{2}$, $0\le k\le n-1$. 这里 $\xi$ 为 $n$ 次单位根: $\xi = e^{\frac{2\pi i}{n}}$. $\lambda_k$ 对应的特征向量为
+$$ \bold{u}_k = [1, \xi^k, \xi^{2k}, \cdots, \xi^{(n-1)k}]^\mathrm{T} .$$
+对 $M$ 进行对角化得 $M = P^{-1}\Lambda P$, 其中 $\Lambda = \mathrm{diag}(\lambda_0,\cdots,\lambda_{n-1})$, $P$ 的第 $k$ 列是 $\bold{u}_k$, 它是一个特殊的范德蒙矩阵, 并且不难验证
+$$P^{-1} = \begin{bmatrix} 1 &amp; 1 &amp; \cdots &amp; 1 \\ 1 &amp; \xi &amp; \cdots &amp; \xi^{n-1} \\ 1 &amp; \xi^2  &amp; \cdots &amp; \xi^{2(n-1)} \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 1 &amp; \xi^{n-1} &amp; \cdots &amp; \xi^{(n-1)(n-1)} \end{bmatrix} ^{-1} = \frac{1}{n} \begin{bmatrix} 1 &amp; 1 &amp; \cdots &amp; 1 \\ 1 &amp; \xi^{-1} &amp; \cdots &amp; \xi^{-(n-1)} \\ 1 &amp; \xi^{-2}  &amp; \cdots &amp; \xi^{-2(n-1)} \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 1 &amp; \xi^{-(n-1)} &amp; \cdots &amp; \xi^{-(n-1)(n-1)} \end{bmatrix}  $$
+只要注意到 $\xi^{-k} = \xi^{n-k}$ 以及当 $1\le k\le n-1$ 时有 $1+\xi^k+\xi^{2k}+\cdots+\xi^{(n-1)k}=0$ 即可. 后者成立是因为 $\xi^k$ 满足 
+$$(\xi^k-1)(1+\xi^k+\xi^{2k}+\cdots+\xi^{(n-1)k}) = \xi^{nk}-1 = 0 .$$
+进一步, 因为 $\xi^{-1} = \bar{\xi}$, 所以矩阵 $P$ 和 $nP^{-1}$ 不仅都是对称矩阵, 而且对应的行(列)互为共轭.
+有了对角化结果, $ \bold{x}^{(t)}$ 的解析表达式可以直接求出: 
+$$
+\begin{aligned} 
+\bold{x}^{(t)} &amp;= P^{-1}\cdot\Lambda^t\cdot P\cdot \bold{x}^{(0)} \\ 
+&amp;=  \frac{1}{n}[\bar{\bold{u}}_0,\cdots,\bar{\bold{u}}_{n-1}] \cdot \Lambda^t\cdot [\bold{u}_0^\mathrm{T},\cdots,\bold{u}_{n-1}^\mathrm{T}]^\mathrm{T}\cdot  \bold{x}^{(0)} \\ 
+&amp;= \frac{1}{n}[\lambda_0^t\bar{\bold{u}}_0,\cdots,\lambda_{n-1}^t\bar{\bold{u}}_{n-1}]\cdot[\bold{u}_0^\mathrm{T},\cdots,\bold{u}_{n-1}^\mathrm{T}]^\mathrm{T} \cdot \bold{x}^{(0)} \\ 
+&amp;= \frac{1}{n}\left(\sum_{k=0}^{n-1}{\lambda_k^t\bar{\bold{u}}_k\cdot\bold{u}_k^\mathrm{T} }\right)\bold{x}^{(0)}
+\end{aligned}
+$$
+这里每个 $\bar{\bold{u}}_k\cdot\bold{u}_k^\mathrm{T}$ 都是一个矩阵. 
+当 $t\to\infty$ 时, 求和式中除了 $k=0$ 一项以外其余的 $\lambda_k^t$都趋于 $0$, $\bar{\bold{u}}_0\cdot\bold{u}_0^\mathrm{T}$ 为全 $1$ 的矩阵, 而 $\lambda_0=1$, 表明最终每个点的 $x$ 坐标都会收敛到所有点 $x$ 坐标的均值.</p>
+<div>
+<center>
+<img src="./figure1.svg" />
+</center>
+</div>
+<p>再考虑绝对值第二大的特征值 $\lambda_1$ 和 $\lambda_{n-1}$, 这两项决定了收敛过程的主要细节. 两个矩阵的第 $p$ 行第 $q$ 列元素分别为( $p$, $q$ 从 $0$ 开始):
+$$
+\begin{aligned}
+\left[\lambda_1^t\bar{\bold{u}}_1\bold{u}_1^\mathrm{T}\right]_{p,q} &amp;= \lambda_1^t\xi^{q-p} \\ 
+\left[\lambda_{n-1}^t\bar{\bold{u}}_{n-1}\bold{u}_{n-1}^\mathrm{T}\right]_{p,q} &amp;= \bar{\lambda}_1^t\xi^{p-q} = \overline{\lambda_1^t\xi^{q-p}}
+\end{aligned}
+$$
+而对于$\lambda_1$, 它的辐角 $\omega$ 和模长 $r$ 都可以求出来: 
+$$\lambda_1 = r\cdot e^{i\omega} = \cos(\dfrac{\pi}{n})\cdot e^{\frac{i\pi}{n}}.$$</p>
+<p>综上, 设所有点的 $x$ 坐标均值为 $X$, 则 $\bold{x}^{(t)}$ 第 $k$ 个元素偏离均值的量为
+$$
+\begin{aligned}
+x_k^{(t)} - X &amp;= \sum_{q=0}^{n-1}{ (\lambda_1^t\xi^{q-k} + \overline{\lambda_1^t\xi^{q-k}}) x_q } = \sum_{q=1}^{n-1}2\cdot\mathrm{Re}(\lambda_1^t\xi^{q-k} x_q) \\ 
+&amp;= 2\cdot\mathrm{Re}\left(\sum_{q=1}^{n-1}\lambda_1^t\xi^{q-k} x_q\right) = 2\cdot\mathrm{Re}\left(\lambda_1^t\sum_{q=1}^{n-1}\xi^{q-k} x_q\right) \\ 
+&amp;= 2r^t\cdot\mathrm{Re}\left( e^{i\omega t}\cdot\xi^{-k}\cdot\sum_{q=0}^{n-1}\xi^{q}x_q \right) 
+\end{aligned}
+$$
+求和式内的复数与 $t$ 无关, 给定初始点坐标, 求和式的值其实也就确定了, 它其实就是对所有 $x$ 坐标进行离散傅里叶逆变换的第一项. 记求和式的值为 $\displaystyle \sum_{q=0}^{n-1}\xi^{q}x_q = r_x \cdot e^{i\phi_x}$, 则
+$$ 
+\begin{aligned}
+x_k^{(t)} - X &amp; = 2r^t\mathrm{Re}\left( r_x \cdot e^{i(\phi_x+\omega t-\frac{2k\pi}{n})}\right) \\ 
+&amp; = 2r^t\cdot r_x\cos(\phi_x+\omega t-\frac{2k\pi}{n}).
+\end{aligned}
+$$</p>
+<p>类似的, 对于 $y$ 坐标, 也有如下关系:
+$$ y_k^{(t)} - Y = 2r^t\cdot r_y\cos(\phi_y+\omega t-\frac{2k\pi}{n}).$$
+可见每个点 $(x_k, y_k)$ 在迭代过程中围绕中心坐标 $(X,Y)$ 在 $x$ 和 $y$ 方向上分别做阻尼震荡, 振幅和相位由所有点的初始位置决定. 随着 $t$ 变化, $(x_k, y_k)$ 的运动轨迹是一条螺线, 如果不考虑半径的变化, 运动轨迹就是一个椭圆. 参数方程已由上面的式子给出.</p>
+<h3 id="离散傅里叶变换">离散傅里叶变换</h3>
+<p>还可以从卷积的角度考虑这个问题. 两个离散序列 $\bold{a}={a_i}, \bold{b}={b_i}$ 之间的卷积运算定义为:
+$$ 
+\left[\bold{a}*\bold{b}\right]_k = \sum_{j=-\infty}^{+\infty} {a_j\cdot b_{k-j}} .
+$$</p>
+<p>若令 
+$$\bold{b}^{(t)}=[x_0^{(t)}, \cdots, x_{n-1}^{(t)}], \qquad \bold{a}=\left[\dfrac{1}{2}, 0, \cdots, 0, \dfrac{1}{2}\right], $$
+则 
+$$
+\begin{aligned}
+\bold{a}*\bold{b}^{(t)} &amp;= [ \frac{1}{2} (x_0^{(t)} + x_1^{(t)}), \cdots, \frac{1}{2} (x_{n-1}^{(t)} + x_0^{(t)}) ] \\ 
+&amp;= [x_0^{(t+1)}, \cdots, x_{n-1}^{(t+1)}] \\ 
+&amp;= \bold{b}^{(t+1)} 
+\end{aligned}
+$$</p>
+<p>迭代一次相当于用卷积核 $\bold{a}$ 作用于原序列. 又因为时(空)域的卷积对应于频域的乘积, 所以可以利用离散傅里叶变换(DFT)来计算任意次迭代之后的结果.</p>
+<p>记序列 $\bold{a}, \bold{b}$ 的离散傅里叶变换分别为花体的 $\mathcal{A}, \mathcal{B}$, 则
+$$
+\begin{aligned}
+\mathcal{A}_k &amp;= \sum_{j=0}^{n-1}{a_j \xi^{-kj}} = \frac{1}{2}(1+\xi^k) = r_k \cdot e^{i\omega_k} \\ 
+\mathcal{B}_k &amp;= \sum_{j=0}^{n-1}{b_j \xi^{-kj}}
+\end{aligned}
+$$
+其中 $\xi = e^{\frac{2\pi i}{n}}$ 依然是 $n$ 次单位根, $r_k=\cos(\omega_k)$, $\omega_k=\dfrac{k\pi}{n}$. 将 $\mathcal{A}$ 的每个元素自乘 $t$ 次, 就得到将序列 $\bold{a}$ 进行 $t$ 次卷积后的 DFT 结果:
+$$ \mathcal{A}_k^t =  r_k^t\cdot e^{i\omega_kt} $$
+将序列 $\mathcal{A}^t \mathcal{B}$ 进行离散傅里叶逆变换, 即可得到 $ \bold{b}^{(t)} = \bold{a}*\bold{a}*\cdots *\bold{b}$ 的结果:
+$$
+[\bold{b}^{(t)}]_k = \frac{1}{n}\sum_{j=0}^{n-1}{ \mathcal{A}_j^t\mathcal{B}_j\xi^{jk} } = \frac{1}{n}\sum_{j=0}^{n-1}{ r_j^t \cdot e^{i\omega_j (t+2k)} \cdot B_j } 
+$$
+观察 $t\to\infty$ 时, 求和式的每一项. 当 $j&gt;0$ 时, $r_j &lt; 1$, $r_j^t\to 0$, 而 $r_0 = 1$, $\omega_0=0$, $\mathcal{B}_0$ 就是 $\bold{b}$ 的各项之和. 说明 $\bold{b}^{(t)}$ 的每一项都会收敛于原来序列的均值.
+$j=1$ 和 $j=n-1$ 所对应的 $r_j$ 是第二大的, 又容易证明 $\mathcal{B}_1$ 与 $\mathcal{B}_{n-1}$ 互为共轭, $r_{n-1}=-r_1$, 以及 $\omega_{n-1} = \pi - \omega_1 $. 所以
+$$
+\begin{aligned}
+&amp; r_1^t\cdot e^{i\omega_1(t+2k)} \cdot \mathcal{B}_1 + r_{n-1}^t\cdot e^{i\omega_{n-1}(t+2k)} \cdot \mathcal{B}_{n-1} \\ 
+= &amp; r_1^t\cdot e^{i(t+2k)\omega_1} \cdot \mathcal{B}_1 + (-1)^t r_1^t \cdot e^{i(t+2k)(\pi-\omega_1)} \cdot \mathcal{B}_{n-1} \\ 
+= &amp; r_1^t\cdot e^{i(t+2k)\omega_1} \cdot \mathcal{B}_1 + r_1^t\cdot e^{-i(t+2k)\omega_1} \cdot \mathcal{B}_{n-1} \\ 
+=&amp; r_1^t\cdot 2\mathrm{Re}\left( e^{i(t+2k)\omega_1} \cdot \mathcal{B}_1 \right)
+\end{aligned}
+$$</p>
+<p>这与用矩阵对角化方法的结果是一致的.</p>
+</div>
+        </div>
+    </div>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2024-01-09</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/demo/">demo</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/volumetric-lightmap/" class="prev" rel="prev" title="Volumetric LightMap"><i class="fas fa-angle-left fa-fw"></i>Volumetric LightMap</a>
+            <a href="/caveats-of-rendering-panoramas/" class="next" rel="next" title="全景图渲染的常见问题">全景图渲染的常见问题<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

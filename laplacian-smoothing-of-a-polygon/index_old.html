@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<script src="./complex.js" ></script>
+<title>test</title>
+  
+</head>
+<body>
+<canvas id="canvas"> </canvas>
+
+<script>
+// let Complex = require('complex.js');
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// states
+var mouse_state = 0;    // 0: not pressed, 1: pressed
+var mouse_x = 0;
+var mouse_y = 0;
+
+var num_points = 100;
+var points = [];
+var colors = [];
+var mean_x = 0;
+var mean_y = 0;
+
+// ellipse params
+var phase_x = 0;
+var phase_y = 0;
+var r_x = 0;
+var r_y = 0;
+
+// draw params
+const ellipse_segments = 256;
+
+
+function dft()
+{
+    mean_x = 0;
+    mean_y = 0;
+    var cx = new Complex(), cy = new Complex();
+    let n = points.length;
+    let a = 2*Math.PI / n;
+    // let xi = new Complex(Math.cos(a), Math.sin(a));
+    for (var i = 0; i < n; i++) {
+        let x = points[i][0], y = points[i][1];
+        let xi_k = new Complex({phi: a*i, r: 1});
+        cx = cx.add(xi_k.mul(x));
+        cy = cy.add(xi_k.mul(y));
+        mean_x += x;
+        mean_y += y;
+    }
+    mean_x /= n;
+    mean_y /= n;
+    cx = cx.div(n);
+    cy = cy.div(n);
+    r_x = cx.abs();
+    r_y = cy.abs();
+    phase_x = cx.arg();
+    phase_y = cy.arg();
+}
+
+function generate_points() 
+{
+    points = [];
+    colors = [];
+    for (var i = 0; i < num_points; i++) {
+        var r0 = Math.random();
+        var r1 = Math.random();
+        var x = r0*canvas.width, y = r1*canvas.height;
+        points.push([x, y]);
+        colors.push([Math.random(), Math.random(), Math.random()]);
+    }
+
+    dft();
+}
+
+function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    generate_points();
+}
+
+function resize(scale) {
+    var new_points = [];
+    var sx = 0, sy = 0;
+    for (var i = 0; i < points.length; i++) {
+        sx += points[i][0];
+        sy += points[i][1];
+    }
+    sx /= points.length;
+    sy /= points.length;
+
+    for (var i = 0; i < points.length; i++) {
+        var x = scale*points[i][0] + (1-scale)*sx;
+        var y = scale*points[i][1] + (1-scale)*sy;
+        new_points.push([x,y]);
+    }
+
+    points = new_points;
+}
+
+function auto_resize() {
+    const n = points.length;
+    const s = Math.cos(Math.PI / n);
+    resize(1/s);
+}
+
+function iterate() {
+    var new_points = [];
+    for (var i = 0; i < points.length; i++) {
+        var x = (points[i][0]*0.5 + points[(i+1)%points.length][0]*0.5);
+        var y = (points[i][1]*0.5 + points[(i+1)%points.length][1]*0.5);
+        // var x = (points[i][0]*0.5 + points[(i+1)%points.length][0]*0.25 + points[(i-1+points.length)%points.length][0]*0.25);
+        // var y = (points[i][1]*0.5 + points[(i+1)%points.length][1]*0.25 + points[(i-1+points.length)%points.length][1]*0.25);
+        // var x = (points[i][0]*0 + points[(i+1)%points.length][0]*0.5 + points[(i-1+points.length)%points.length][0]*0.5);
+        // var y = (points[i][1]*0 + points[(i+1)%points.length][1]*0.5 + points[(i-1+points.length)%points.length][1]*0.5);
+        new_points.push([x,y]);
+    }
+    points = new_points;
+
+    auto_resize();
+
+}
+
+function iterate100() {
+    for (var i = 0; i < 100; i++) {
+        iterate();
+    }
+}
+
+function draw() {
+    if (points.length <= 0) return;
+
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.strokeStyle = '#333333';
+    ctx.lineWidth = 2;
+    let region = new Path2D();
+
+    for (var i = 0; i < points.length; i++) {
+        if (i == 0) {
+            region.moveTo(points[i][0], points[i][1]);
+        } else {
+            region.lineTo(points[i][0], points[i][1]);
+        }
+    }
+    region.closePath();
+
+    ctx.stroke(region);
+
+    for (var i = 0; i < points.length; i++) {
+        ctx.beginPath();
+        ctx.arc(points[i][0], points[i][1], 2, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.fillStyle = `rgb(
+            ${Math.floor(128 + colors[i][0]*127)},
+            ${Math.floor(128 + colors[i][1]*127)},
+            ${Math.floor(128 + colors[i][2]*127)}
+            )`;
+        ctx.fill();
+    }
+
+    // draw ellipse
+    ctx.strokeStyle = '#ff7777';
+    let path = new Path2D();
+    const omega = 2*Math.PI/ellipse_segments;
+    for (var i = 0; i < ellipse_segments; i++) {
+        let x = 2*r_x*Math.cos(phase_x + i*omega) + mean_x;
+        let y = 2*r_y*Math.cos(phase_y + i*omega) + mean_y;
+        if (i == 0) path.moveTo(x, y);
+        else path.lineTo(x,y);
+    }
+    path.closePath();
+    ctx.stroke(path);
+}
+
+function render() {
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    draw();
+    window.requestAnimationFrame(render);
+}
+
+init();
+render();
+
+window.addEventListener('keydown', function (event) {
+    switch ( event.code ) {
+        case 'KeyN': iterate(); break;
+        case 'KeyM': iterate100(); break;
+        case 'KeyL': resize(2); break;
+        case 'KeyS': resize(0.5); break;
+    }
+
+}, false);
+
+canvas.addEventListener('mousedown', function (event) {
+    mouse_state = 1;
+    mouse_x = event.clientX;
+    mouse_y = event.clientY;
+
+    // points.push([mouse_x, mouse_y]);
+    
+}, false);
+canvas.addEventListener('mousemove', function (event) {
+    mouse_x = event.clientX;
+    mouse_y = event.clientY;
+}, false);
+canvas.addEventListener('mouseup', function (event) {
+    mouse_state = 0;
+    mouse_x = event.clientX;
+    mouse_y = event.clientY;
+}, false);
+function getTouchPos(canvasDom, touchEvent) {
+  var rect = canvasDom.getBoundingClientRect();
+  return {
+    x: touchEvent.touches[0].clientX - rect.left,
+    y: touchEvent.touches[0].clientY - rect.top
+  };
+}
+canvas.addEventListener("touchstart", function (e) {
+    mousePos = getTouchPos(canvas, e);
+    var touch = e.touches[0];
+    var mouseEvent = new MouseEvent("mousedown", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+  canvas.dispatchEvent(mouseEvent);
+  event.preventDefault();
+}, false);
+canvas.addEventListener("touchend", function (e) {
+    var mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+    event.preventDefault();
+}, false);
+canvas.addEventListener("touchmove", function (e) {
+    var touch = e.touches[0];
+    var mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    event.preventDefault();
+}, false);
+
+</script>
+  
+</body>
+</html>

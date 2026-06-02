@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html>
+<head> <meta charset=utf-8 />
+<title>demo</title>
+<style>
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; 
+}
+#canvas {
+    width: 100%;
+    height: 100%;
+    display: block; 
+}
+</style>
+<script src='./m4.js'></script>
+<script src='./webgl-utils.js'></script>
+</head>
+
+<body>
+    <div>
+        <canvas id="canvas" width="1024" height="768"> </canvas>
+    </div>
+
+<script id="sky-vertex-shader" type="x-shader/x-vertex">
+attribute vec3 a_position;
+
+uniform mat4 u_projection;
+uniform mat4 u_view;
+
+varying vec3 v_texcoord;
+
+void main() {
+    vec3 positionVS = mat3(u_view) * (a_position);
+    gl_Position = u_projection * vec4(positionVS, 1.0);
+    // gl_Position = u_projection * u_view * u_world * vec4(a_position, 1.0);
+    v_texcoord = a_position;
+}
+</script>
+<script id="sky-fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec3 v_texcoord;
+
+#define Gamma 1.4
+
+#define Rayleigh 1.
+#define Mie 1.
+#define RayleighAtt 1.
+#define MieAtt 1.2
+const float g = -0.93;
+
+#if 1
+vec3 _betaR = vec3(1.95e-2, 1.1e-1, 2.94e-1); 
+vec3 _betaM = vec3(4e-2, 4e-2, 4e-2);
+#else
+vec3 _betaR = vec3(6.95e-2, 1.18e-1, 2.44e-1); 
+vec3 _betaM = vec3(4e-2, 4e-2, 4e-2);
+#endif
+
+vec3 calcAtmosphericScattering( float sR, float sM, out vec3 extinction, float cosine, float g1)
+{
+    extinction = exp(-(_betaR * sR + _betaM * sM));
+
+    // scattering phase
+    float g2 = g1 * g1;
+    float fcos2 = cosine * cosine;
+    float miePhase = Mie * pow(1. + g2 + 2. * g1 * cosine, -1.5) * (1. - g2) / (2. + g2);
+    //g = 0;
+    float rayleighPhase = Rayleigh;
+
+    vec3 inScatter = (1. + fcos2) * vec3(rayleighPhase + _betaM / _betaR * miePhase);
+    
+    return inScatter;
+}
+vec3 ACESFilm( vec3 x ) {
+    float tA = 2.51;
+    float tB = 0.03;
+    float tC = 2.43;
+    float tD = 0.59;
+    float tE = 0.14;
+    return clamp((x*(tA*x+tB))/(x*(tC*x+tD)+tE),0.0,1.0);
+}
+vec3 getSkyColor(in vec3 rd, vec3 light1) {
+    float sundot = clamp(dot(rd,light1),0.0,1.0);
+    
+    vec3 extinction;
+
+    // optical depth -> zenithAngle
+    float zenithAngle = max(0., rd.y); //abs( rd.y);
+    float sR = RayleighAtt / zenithAngle ;
+    float sM = MieAtt / zenithAngle ;
+
+    vec3 inScatter = calcAtmosphericScattering(sR, sM, extinction, sundot, g);
+    vec3 skyCol = inScatter*(1.0-extinction);
+
+    // sky  
+    vec3 col = skyCol; // *vec3(1.6,1.4,1.0)
+    // sun
+    col += 0.47*vec3(1.6,1.4,1.0)*pow( sundot, 350.0 ) * extinction;
+    // sun haze
+    col += 0.4*vec3(0.8,0.9,1.0)*pow( sundot, 2.0 ) * extinction;
+    
+    // sun scatter
+    col += 0.3*vec3(1.0,0.7,0.3)*pow( sundot, 8.0 );
+
+    // gamma
+    //col = sqrt(col);
+            
+    col = ACESFilm(col);
+    col = pow(col, vec3(Gamma));
+    return col;
+}
+void main() {
+    vec3 rd = normalize(v_texcoord.xyz);
+    vec3 light_dir = vec3(1.0, 10.0, 1.0);
+    vec3 color = getSkyColor(rd, normalize(light_dir));
+    gl_FragColor = vec4(color, 1.0);
+}
+</script>
+
+<script id="model-vertex-shader" type="x-shader/x-vertex">#version 300 es
+in vec3 a_position;
+in vec3 a_normal;
+in vec2 a_texcoord;
+
+uniform mat4 u_model;
+uniform mat4 u_projection;
+uniform mat4 u_view;
+
+out vec2 v_uv;
+out vec3 v_normal;
+out vec3 v_positionWS;
+
+void main() {
+    vec3 pos = a_position;
+    gl_Position = u_projection * u_view * u_model * vec4(pos, 1.0);
+    v_uv = a_texcoord;
+    v_positionWS = (u_model * vec4(pos, 1.0)).xyz;
+    v_normal = a_normal;
+}
+</script>
+
+<script id="model-fragment-shader" type="x-shader/x-fragment"> #version 300 es
+precision highp float;
+uniform samplerCube u_texture;
+
+in vec2 v_uv;
+in vec3 v_normal;
+in vec3 v_positionWS;
+
+out vec4 FragColor;
+
+void main() {
+    vec3 baseColor = texture(u_texture, normalize(v_positionWS)).rgb;
+    vec3 normal = normalize(v_normal);
+
+    FragColor = vec4(baseColor, 1.0);
+}
+</script>
+
+<script id="debug-fragment-shader" type="x-shader/x-fragment"> #version 300 es
+precision highp float;
+precision highp int;
+precision highp sampler2DArray;
+uniform sampler2D u_texture;
+uniform sampler2DArray u_textureArray;
+uniform int u_layer;
+
+in vec2 v_uv;
+out vec4 FragColor;
+void main() {
+    vec3 c = texture(u_textureArray, vec3(v_uv, u_layer)).rgb;
+    FragColor = vec4(c, 1.0);
+}
+</script>
+
+
+<script id="stitch-fragment-shader" type="x-shader/x-fragment"> #version 300 es
+precision highp float;
+precision highp int;
+precision highp sampler2DArray;
+
+in vec2 v_uv;
+in vec3 v_normal;
+in vec3 v_positionWS;
+
+uniform sampler2DArray u_textureArray;
+uniform vec3 u_viewParams[32]; // yaw, pitch
+uniform int u_numViews;
+uniform int u_faceIndex;
+uniform int u_stitchMethod;
+uniform int u_synthetic;
+uniform vec3 u_colors[32];
+out vec4 FragColor;
+
+#define PI 3.14159265359
+
+float deg_to_rad(float deg) {return deg / 180.0 * PI;}
+
+vec3 yawPitchToVector(float yaw_rad, float pitch_rad) {
+    float r = cos(pitch_rad);
+    float x = r * cos(yaw_rad);
+    float y = r * sin(yaw_rad);
+    float z = sin(pitch_rad);
+    return vec3(x, y, z);
+}
+
+vec3 dirFromCubemapFace(int faceIndex, vec2 uv) {
+    vec3 dir;
+    float u = uv.x * 2.0 - 1.0;
+    float v = uv.y * 2.0 - 1.0;
+    if (faceIndex == 0) {       // +X
+        dir = vec3(1.0, -v, -u);
+    } else if (faceIndex == 1) { // -X
+        dir = vec3(-1.0, -v, u);
+    } else if (faceIndex == 2) { // +Y
+        dir = vec3(u, 1.0, v);
+    } else if (faceIndex == 3) { // -Y
+        dir = vec3(u, -1.0, -v);
+    } else if (faceIndex == 4) { // +Z
+        dir = vec3(u, -v, 1.0);
+    } else if (faceIndex == 5) { // -Z
+        dir = vec3(-u, -v, -1.0);
+    }
+    return dir;
+}
+
+// theta -> pitch
+// phi -> yaw
+void main() {
+    vec3 vec = dirFromCubemapFace(u_faceIndex, v_uv);
+    vec3 unit_vec = normalize(vec);
+    float res_pitch = asin(unit_vec.y);
+    float res_yaw = atan(unit_vec.x, unit_vec.z);
+    float theta = res_pitch, phi = res_yaw;
+    vec3 pano_vec = yawPitchToVector(phi, theta);
+    vec3 c = vec3(0.0);
+    float s = 0.0;
+    for (int i = 0; i < 32; i++) {
+        if (i >= u_numViews) {
+            break;
+        }
+        float view_yaw = u_viewParams[i].x;
+        float view_pitch = u_viewParams[i].y;
+        float fov = u_viewParams[i].z;
+        float theta_v = deg_to_rad(view_pitch), phi_v = deg_to_rad(view_yaw);
+        vec3 view_vec = yawPitchToVector(phi_v, theta_v);
+        if (dot(view_vec, pano_vec) < -0.5) {
+            continue;
+        }
+        float delta_phi = phi - phi_v;
+        float y = 0.0;
+        bool theta_valid = abs(theta) + 1e-6 < PI*0.5;
+        bool theta_v_valid = abs(theta_v) + 1e-6 < PI*0.5;
+        if (theta_valid && theta_v_valid) {
+            y = (tan(theta) - tan(theta_v)*cos(delta_phi)) / (cos(delta_phi) + tan(theta_v)*tan(theta));
+        } else if (theta_valid && !theta_v_valid) {
+            y = -cos(delta_phi) / tan(theta);
+        } else if (!theta_valid && theta_v_valid) {
+            y = 1.0/tan(theta_v);
+        } else {
+            y = 0.0;
+        }
+        float x = tan(delta_phi) * (cos(theta_v) - y*sin(theta_v));
+        float z = tan(deg_to_rad(fov*0.5));
+        y /= z;
+        x /= z;
+        if (x > -1.0 && x < 1.0 && y > -1.0 && y < 1.0) {
+            vec3 viewport_c = texture(u_textureArray, vec3( (x+1.0)*0.5, (y+1.0)*0.5, float(i) ) ).rgb;
+            if (u_synthetic > 0) {
+                viewport_c = u_colors[i];
+            }
+            float cos_wx = cos(abs(x)*PI*0.5);
+            float cos_wy = cos(abs(y)*PI*0.5);
+            float wx = 1.0 - abs(x);
+            float wy = 1.0 - abs(y);
+            float w = 1.0;
+            if (u_stitchMethod == 0) {
+                if (s < 0.5) w = 1.0;
+                else w = 0.0;
+            } else if (u_stitchMethod == 1) {
+                w = 1.0;
+            } else if (u_stitchMethod == 2) {
+                w = cos_wx * cos_wy;                
+            } else if (u_stitchMethod == 3){
+                w = wx * wy;
+            } else if (u_stitchMethod == 4){
+                w = wx*wy;
+                w = w*w;
+            } else if (u_stitchMethod == 5){
+                w = wx*wy;
+                w = w*w*w;
+            } else if (u_stitchMethod == 6){
+                w = wx*wy;
+                w = pow(w,0.5);
+            } else if (u_stitchMethod == 7){
+                w = wx*wy;
+                w = pow(w,0.333);
+            }
+            c += viewport_c * w;
+            s += w;
+        }
+    }
+    vec3 ret = c / max(s, 1e-6);
+    if (u_faceIndex == 2) {
+        // ret = vec3(1.0, 0.0, 0.0);
+    }
+    FragColor = vec4(ret, 1.0);
+}
+</script>
+
+<script>
+"use strict";
+
+function degreeToRad(degree) { return degree*Math.PI/180.0; }
+
+class Camera {
+    constructor() {
+        this.forward = [0,0,-1];    // -z
+        this.right = [1,0,0];       // x
+        this.position = [0,0,0];
+    }
+    moveForward(distance) {
+        this.position = m4.addVectors( this.position, m4.scaleVector(this.forward, distance) );
+    }
+    moveRight(distance) {
+        this.position = m4.addVectors( this.position, m4.scaleVector(this.right, distance) );
+    }
+    moveUp(distance) {
+        this.position = m4.addVectors( this.position, m4.scaleVector([0,1,0], distance) );
+    }
+    getViewMatrix() {
+        var target = m4.addVectors(this.position, this.forward);
+        var transform = m4.lookAt(this.position, target, [0,1,0]);
+        return m4.inverse(transform);
+    }
+}
+
+class UECameraControl {
+    constructor(camera) {
+        this.camera = camera;
+        this.moveSpeed = 2;
+        this.rotateSpeed = 1;
+        this.isMoveForward = false;
+        this.isMoveBackward = false;
+        this.isMoveLeft = false;
+        this.isMoveRight = false;
+        this.isMoveUp = false;
+        this.isMoveDown = false;
+        this.yaw = 0;
+        this.pitch = 0;
+        this.maxPitch = 88;
+        this.isLocked = true;
+    }
+    update(delta_t) {
+        this.updateCameraPosition(delta_t);
+        this.updateCameraRotation(delta_t);
+    }
+    updateCameraPosition(delta_t){
+        var distance = delta_t * this.moveSpeed;
+        if (this.isMoveForward && !this.isMoveBackward) {
+            this.camera.moveForward(distance);
+        }
+        if (!this.isMoveForward && this.isMoveBackward) {
+            this.camera.moveForward(-distance);
+        }
+        if (this.isMoveLeft && !this.isMoveRight) {
+            this.camera.moveRight(-distance);
+        }
+        if (!this.isMoveLeft && this.isMoveRight) {
+            this.camera.moveRight(distance);
+        }
+        if (this.isMoveUp && !this.isMoveDown) {
+            this.camera.moveUp(distance);
+        }
+        if (!this.isMoveUp && this.isMoveDown) {
+            this.camera.moveUp(-distance);
+        }
+    }
+    updateCameraRotation(delta_t){
+        // yaw, pitch to forward & right
+        var sin_pitch = Math.sin(degreeToRad(this.pitch));
+        var sin_yaw = Math.sin(degreeToRad(this.yaw));
+        var cos_yaw = Math.cos(degreeToRad(this.yaw));
+        var xz_len = Math.sqrt(1.0 - sin_pitch*sin_pitch);
+        var fwd = [-xz_len*sin_yaw, sin_pitch, -xz_len*cos_yaw];
+        var right = [cos_yaw, 0, -sin_yaw];
+        camera.forward = fwd;
+        camera.right = right;
+    }
+
+    onKeyDown ( event ) {
+        if (this.isLocked) return;
+        switch ( event.code ) {
+            case 'ArrowUp':
+            case 'KeyW': this.isMoveForward = true; break;
+            case 'ArrowLeft':
+            case 'KeyA': this.isMoveLeft = true; break;
+            case 'ArrowDown':
+            case 'KeyS': this.isMoveBackward = true; break;
+            case 'ArrowRight':
+            case 'KeyD': this.isMoveRight = true; break;
+            case 'KeyE': this.isMoveUp = true; break;
+            case 'KeyQ': this.isMoveDown = true; break;
+        }
+    };
+    onKeyUp ( event ) {
+        switch ( event.code ) {
+            case 'ArrowUp':
+            case 'KeyW': this.isMoveForward = false; break;
+            case 'ArrowLeft':
+            case 'KeyA': this.isMoveLeft = false; break;
+            case 'ArrowDown':
+            case 'KeyS': this.isMoveBackward = false; break;
+            case 'ArrowRight':
+            case 'KeyD': this.isMoveRight = false; break;
+            case 'KeyE': this.isMoveUp = false; break;
+            case 'KeyQ': this.isMoveDown = false; break;
+        }
+    };
+    onPointerMove( event ) {
+        if (this.isLocked) return;
+        const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+        const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+        this.yaw -= movementX * 0.05 * this.rotateSpeed;
+        this.yaw = this.yaw % 360;
+        this.pitch -= movementY * 0.05 * this.rotateSpeed;
+        this.pitch = Math.max( -this.maxPitch, Math.min( this.maxPitch, this.pitch ) );
+    }
+    onPointerDown(event) {
+        if (event.button == 2) {
+            this.isLocked = false;
+        }
+    }
+    onPointerUp(event) {
+        if (event.button == 2) {
+            this.isLocked = true;
+        }
+    }
+    onContextmenu( event ) {
+        event.preventDefault();
+    }
+
+    registerEventHandlers(domElement) {
+        domElement.addEventListener( 'mouseup', this.onPointerUp.bind(this) );
+        domElement.addEventListener( 'mousemove', this.onPointerMove.bind(this) );
+        domElement.addEventListener( 'mousedown', this.onPointerDown.bind(this) );
+        domElement.addEventListener( 'contextmenu', this.onContextmenu.bind(this) );
+        window.addEventListener( 'keydown', this.onKeyDown.bind(this) );
+        window.addEventListener( 'keyup', this.onKeyUp.bind(this) );
+    }
+}
+
+const canvas = document.getElementById('canvas');
+const gl = canvas.getContext("webgl2");
+const ext = gl.getExtension('EXT_color_buffer_float');
+if (!ext) {
+    alert('need EXT_color_buffer_float');
+}
+
+var planeBufferInfo = null;
+var cubeBufferInfo = null;
+var skyProgramInfo = null;
+var modelProgramInfo = null;
+var debugProgramInfo = null;
+var stitchProgramInfo = null;
+var camera = null;
+var cameraControl = null;
+var modelBufferInfo = [];
+var num_views = 0;
+var view_params = [];
+var view_width = 0;
+var view_height = 0;
+var envmap_size = 1024;
+var tex3d = null;
+var texCube = null;
+var debugLayer = 0;
+var cubemapFB = [];
+var stitch_method_id = 0; 
+var render_fov = 90.;
+var colors = [];
+var useSyntheticColor = false;
+var imgSetId = 0; // 0 -> 18 views, 1 -> 6 views
+var alwaysStitch = true;
+
+function createTexArray(width, height, depth) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+    const level = 0;
+    const internalFormat = gl.RGBA8;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    gl.texImage3D(gl.TEXTURE_2D_ARRAY, level, internalFormat, width, height, depth, border, srcFormat, srcType, null);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return texture;
+}
+
+function loadTexLayer(url, layer) {
+    const image = new Image();
+    image.onload = () => {
+        if (tex3d == null) {
+            tex3d = createTexArray(image.width, image.height, num_views);
+            view_width = image.width;
+            view_height = image.height;
+        } 
+        else {
+            if (view_width != image.width || view_height != image.height) {
+                console.log('error: image size mismatch');
+                // return;
+            }
+        }
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex3d);
+        gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.width, image.height, 1, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    };
+    image.src = url;
+
+    return;
+}
+
+function loadViews() {
+    view_params = [];
+    var view_paths = [];
+    if (imgSetId == 0) {
+        const base_url = './views/';
+        var xs = [150,-150,90,-90,30,-30];
+        var ys = [60,-60,0];
+        for (var yi=0; yi<ys.length; yi++) {
+            for (var xi=0; xi<xs.length; xi++) {
+                var view_path = base_url + 'Panoramic_PaneX_' + xi + '_PaneY_' + yi + '_0_L.jpg';
+                view_paths.push(view_path);
+                view_params.push( { yaw: xs[xi], pitch: ys[yi], fov: 90 } );
+            }
+        }        
+    }
+    if (imgSetId == 1) {
+        const base_url = './views_2/';
+        var yaw_pitch = [
+            [0,0],
+            [90,0],
+            [180,0],
+            [270,0],
+            [0,90],
+            [0,-90],
+        ];
+        for (var i=0; i<yaw_pitch.length; i++) {
+            var view_path = base_url + 'Test_Pitch' + yaw_pitch[i][1] + '_Yaw' + yaw_pitch[i][0] + '.jpg';
+            view_paths.push(view_path);
+            view_params.push( { yaw: yaw_pitch[i][0], pitch: yaw_pitch[i][1], fov: 100 } );
+        }
+    }
+
+    num_views = view_paths.length;
+    if (tex3d) {
+        gl.deleteTexture(tex3d);
+        tex3d = null;
+    }
+    for (var i=0; i<view_paths.length; i++) {
+        loadTexLayer(view_paths[i], i);
+    }
+}
+
+function initScene() {
+    gl.clearColor(0, 0, 0, 1);
+    gl.clearDepth(1.0);
+
+    // init view textures
+    num_views = 0;
+    view_params = [];
+    view_width = 0;
+    view_height = 0;
+    tex3d = null;
+
+    loadViews();
+
+    for (var i = 0; i < 32; i++) {
+        var c = [Math.random(), Math.random(), Math.random()];
+        colors.push(c);
+    }
+
+    // init cubemap FB
+    texCube = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texCube);
+    const level = 0;
+    const internalFormat = gl.RGBA8;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    for (var i = 0; i < 6; ++i) {
+        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level, internalFormat, envmap_size, envmap_size, border, srcFormat, srcType, null);
+    }
+    for (let i = 0; i < 6; ++i) {
+        const fb = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.COLOR_ATTACHMENT0,
+            gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            texCube,
+            0);
+        cubemapFB.push(fb);
+    }
+
+    var planeVB = {
+        position: [-1, -1, 0,  1, -1, 0,  -1,  1, 0,  1,  1, 0, ],  
+        texcoord: [0, 0,  1, 0,  0, 1,  1, 1,],
+        indices: [0,1,2,  1,3,2],
+    };
+
+    planeBufferInfo = webglUtils.createBufferInfoFromArrays(gl, planeVB);
+    cubeBufferInfo = webglUtils.createBufferInfoFromArrays(gl, {
+        position: [
+            -1,  1,  1,  
+             1,  1,  1,  
+             1, -1,  1,  
+            -1, -1,  1, 
+             1,  1, -1,  
+            -1,  1, -1,  
+            -1, -1, -1,  
+             1, -1, -1, 
+        ],  
+        indices: [0,1,2,2,3,0,1,4,7,7,2,1,4,5,6,6,7,4,5,0,3,3,6,5,5,4,1,1,0,5,3,2,7,7,6,3],
+    });
+    skyProgramInfo = webglUtils.createProgramInfo(gl, ['sky-vertex-shader', 'sky-fragment-shader']);
+    modelProgramInfo = webglUtils.createProgramInfo(gl, ['model-vertex-shader', 'model-fragment-shader']);
+    debugProgramInfo = webglUtils.createProgramInfo(gl, ['model-vertex-shader', 'debug-fragment-shader']);
+    stitchProgramInfo = webglUtils.createProgramInfo(gl, ['model-vertex-shader', 'stitch-fragment-shader']);
+
+    camera = new Camera();
+    camera.position = [0,10,50];
+
+    cameraControl = new UECameraControl(camera);
+    cameraControl.registerEventHandlers(window);
+    cameraControl.moveSpeed *= 10;
+}
+
+function logicUpdate(delta_t) {
+    cameraControl.update(delta_t);
+}
+
+function stitchEnvmap() {
+    for (let i = 0; i < 6; ++i) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, cubemapFB[i]);
+        gl.viewport(0, 0, envmap_size, envmap_size);
+        gl.clearColor(0,0,0,1);
+        gl.clearDepth(1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.disable(gl.DEPTH_TEST);
+
+        gl.useProgram(stitchProgramInfo.program);
+        webglUtils.setUniforms(stitchProgramInfo, {
+            u_model: m4.identity(),
+            u_view: m4.identity(),
+            u_projection: m4.identity(),
+            u_textureArray: tex3d,
+            u_numViews: num_views,
+            u_viewParams: view_params.flatMap( (p) => [p.yaw, p.pitch, p.fov] ),
+            u_faceIndex: i,
+            u_stitchMethod: stitch_method_id,
+            u_colors: colors.flat(),
+            u_synthetic: useSyntheticColor,
+        });
+        webglUtils.setBuffersAndAttributes(gl, stitchProgramInfo, planeBufferInfo);
+        webglUtils.drawBufferInfo(gl, planeBufferInfo);
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texCube);
+    gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+}
+
+function renderMainPass() {
+    var viewMatrix = camera.getViewMatrix();
+    var fov = degreeToRad(render_fov);
+    var aspect = canvas.width/canvas.height;
+    var near = 0.1;
+    var far = 1000.0;
+    var projectionMatrix = m4.perspective(fov, aspect, near, far);
+    var worldMatrix =  m4.identity();
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(1,1,1,1);
+    gl.clearDepth(1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // sky
+    gl.useProgram(skyProgramInfo.program);
+    webglUtils.setUniforms(skyProgramInfo, {
+        u_view: viewMatrix,
+        u_projection: projectionMatrix,
+    });
+    webglUtils.setBuffersAndAttributes(gl, skyProgramInfo, cubeBufferInfo);
+    gl.disable(gl.DEPTH_TEST);
+    webglUtils.drawBufferInfo(gl, cubeBufferInfo);
+    gl.enable(gl.DEPTH_TEST);
+
+    // cube
+    gl.useProgram(modelProgramInfo.program);
+    webglUtils.setUniforms(modelProgramInfo, {
+        u_model: m4.compose([0,0,0], [0,0,0,1], [500,500,500]),
+        u_view: viewMatrix,
+        u_projection: projectionMatrix,
+        u_texture: texCube,
+    });
+    webglUtils.setBuffersAndAttributes(gl, modelProgramInfo, cubeBufferInfo);
+    webglUtils.drawBufferInfo(gl, cubeBufferInfo);
+
+    // debug plane
+    // gl.useProgram(debugProgramInfo.program);
+    // webglUtils.setUniforms(debugProgramInfo, {
+    //     u_model: m4.compose([10,10,-50], [0,0,0,1], [10,10,10]),
+    //     u_view: viewMatrix,
+    //     u_projection: projectionMatrix,
+    //     u_textureArray: tex3d,
+    //     u_layer: debugLayer,
+    // });
+    // webglUtils.setBuffersAndAttributes(gl, debugProgramInfo, planeBufferInfo);
+    // webglUtils.drawBufferInfo(gl, planeBufferInfo);
+}
+
+function render(delta_t) {
+    if (alwaysStitch) {
+        stitchEnvmap();
+    }
+    renderMainPass();
+}
+
+var last_time = null;
+
+function frameLoop() {
+    var current_time = Date.now();
+    var delta_t = 1./30.;
+    if (last_time != null) {
+        delta_t = (current_time - last_time)/1000.0;
+    }
+    logicUpdate(delta_t);
+    render(delta_t);
+    last_time = current_time;
+    window.requestAnimationFrame(frameLoop);
+}
+
+function resizeCanvas() {
+    const displayWidth = canvas.clientWidth;
+    const displayHeight = canvas.clientHeight;
+
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+function main() {
+    resizeCanvas();
+    initScene();
+    frameLoop();
+}
+
+
+main();
+
+</script>
+
+<script type="module">
+import GUI from './lil-gui.js';
+function setupGui() {
+    const gui = new GUI();
+    gui.title('controls');
+
+    const stitch_methods = [
+        'no blend',
+        'constant',
+        'cosine',
+        'linear',
+        'square',
+        'cubic',
+        'square root',
+        'cubic root',
+    ];
+    const view_modes = [
+        '3 pitches x 4 yaws',
+        '6 views'
+    ];
+    const params = {
+        stitch_method: stitch_methods[stitch_method_id],
+        view_modes: view_modes[imgSetId],
+        render_fov: render_fov,
+        useSyntheticColor: useSyntheticColor,
+        alwaysStitch: alwaysStitch,
+        run_stitch: () => {
+            stitchEnvmap();
+        },
+    };
+
+    gui.add( params, 'stitch_method', stitch_methods ).name('blend mode').onChange( value => {
+        stitch_method_id = stitch_methods.indexOf(value);
+        // console.log('stitch_method_id:', stitch_method_id);
+    });
+    gui.add( params, 'view_modes', view_modes ).name('preset views').onChange( value => {
+        imgSetId = view_modes.indexOf(value);
+        loadViews();
+    });
+    gui.add( params, 'render_fov',30,160,1).name('render fov').onChange( value => {
+        render_fov = value;
+    });
+    gui.add( params, 'useSyntheticColor' ).name('use synthetic color').onChange( value => {
+        useSyntheticColor = value;
+    });
+    gui.add( params, 'alwaysStitch' ).name('run stitch every frame').onChange( value => {
+        alwaysStitch = value;
+    });
+    
+    gui.add( params, 'run_stitch').name('run stitch once');
+    gui.domElement.style.fontFamily='var(--font-family-mono)';
+}
+
+setupGui();
+</script>
+
+</body>
+</html>

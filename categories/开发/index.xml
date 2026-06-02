@@ -4,7 +4,21 @@
         <link>https://cache-tlb.github.io/categories/%E5%BC%80%E5%8F%91/</link>
         <description>开发 - 分类 - Praise the Sun!</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
-            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Fri, 29 Oct 2021 20:03:05 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%BC%80%E5%8F%91/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Mon, 02 Dec 2024 13:28:03 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%BC%80%E5%8F%91/" rel="self" type="application/rss+xml" /><item>
+    <title>Git 使用技巧</title>
+    <link>https://cache-tlb.github.io/tips-for-git/</link>
+    <pubDate>Mon, 02 Dec 2024 13:28:03 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/tips-for-git/</guid>
+    <description><![CDATA[如何迁移 git 仓库 本地有一个仓库 A，想放在远端变成仓库 B，同时 B 还要保留 A 的提交记录。方法如下： 先新建远端的 B 仓库，什么也不要有，readme，]]></description>
+</item><item>
+    <title>Volumetric LightMap</title>
+    <link>https://cache-tlb.github.io/volumetric-lightmap/</link>
+    <pubDate>Tue, 12 Dec 2023 23:19:55 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/volumetric-lightmap/</guid>
+    <description><![CDATA[Volumetric LightMap（简称VLM）是 UE 中存储静态场景在空间中产生的间接光照的一种数据结构，类似其他引擎或文献中的 irradiance volume 或 light probe。 VLM的官]]></description>
+</item><item>
     <title>UE4 MovieRenderPipeline 以及在 Vulkan 下的重影问题</title>
     <link>https://cache-tlb.github.io/ue4-movierenderpipeline-and-vulkan-ghost/</link>
     <pubDate>Fri, 29 Oct 2021 20:03:05 &#43;0800</pubDate>

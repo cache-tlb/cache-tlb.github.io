@@ -1,0 +1,29 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>AI - 分类 - Praise the Sun!</title>
+        <link>https://cache-tlb.github.io/categories/ai/</link>
+        <description>AI - 分类 - Praise the Sun!</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Fri, 22 May 2026 19:17:43 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/ai/" rel="self" type="application/rss+xml" /><item>
+    <title>AI 侦探</title>
+    <link>https://cache-tlb.github.io/ai-detective/</link>
+    <pubDate>Fri, 22 May 2026 19:17:43 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/ai-detective/</guid>
+    <description><![CDATA[现在的 AI 推理能力已经是今非昔比，今天测试了一个命令行的推理谜题 clmystery，效果令人印象深刻。来源: 【Github】, 【本地备份】。题]]></description>
+</item><item>
+    <title>本地大模型部署</title>
+    <link>https://cache-tlb.github.io/local-llm-deployment/</link>
+    <pubDate>Thu, 26 Mar 2026 19:32:43 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/local-llm-deployment/</guid>
+    <description><![CDATA[方案综述 推理框架采用 llama.cpp，模型采用千问Qwen3.5-35B-A3B，量化为4bit。如此只需要8G显存或20G内存即可运行一]]></description>
+</item><item>
+    <title>GPT 使用体验</title>
+    <link>https://cache-tlb.github.io/gpt-experience/</link>
+    <pubDate>Mon, 20 Mar 2023 19:20:22 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/gpt-experience/</guid>
+    <description><![CDATA[最近 OpenAI 的对话类大语言模型产品 ChatGPT 异常火爆，以其出色的对话、信息归纳等能力，引发人们对通用人工智能、搜索引擎、人机交互的重新思考，有人甚至称它开]]></description>
+</item></channel>
+</rss>

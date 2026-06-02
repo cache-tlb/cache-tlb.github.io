@@ -25,7 +25,7 @@ $$a+b+c=1 \tag{4} $$
 
 <div>
 <center>
-<img src="./illustration.svg/" />
+<img src="./illustration.svg" />
 </center>
 </div>
 
@@ -69,12 +69,12 @@ $$r = \frac{a\cdot W_A}{W_P}, \qquad s = \frac{b\cdot W_B}{W_P},\qquad t = \frac
 ## demo
 
 以下的例子展示了一个三维空间中的网格，可以按 UE 的交互模式在场景中漫游，从各个角度观察网格，并切换是否使用透视矫正的重心坐标作为插值系数。
-<canvas id="drawCanvas" width="1024" height="768"> </canvas>
-<div>
-    <input type="checkbox" id="useCorrection" /> Use Correction
-</div>
-<script src='./m4.js'></script>
-<script src='./demo.js'></script>
+<iframe id="frame" width="100%" height="300" src="./demo.html" style="border: none;"></iframe>
+<script>
+    const frame = document.getElementById('frame');
+    const contentDom = document.getElementById('content');
+    frame.height = window.innerHeight*0.75;
+</script>
 
 ## Bonus: 深度的插值
 

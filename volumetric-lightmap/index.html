@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>Volumetric LightMap - Praise the Sun!</title><meta name="Description" content="A Graphics Programmer&#39;s Log"><meta property="og:title" content="Volumetric LightMap" />
+<meta property="og:description" content="Volumetric LightMap（简称VLM）是 UE 中存储静态场景在空间中产生的间接光照的一种数据结构，类似其他引擎或文献中的 irradiance volume 或 light probe。 VLM的官" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cache-tlb.github.io/volumetric-lightmap/" /><meta property="og:image" content="https://cache-tlb.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-12-12T23:19:55&#43;08:00" />
+<meta property="article:modified_time" content="2023-12-12T23:19:55&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cache-tlb.github.io/logo.png"/>
+
+<meta name="twitter:title" content="Volumetric LightMap"/>
+<meta name="twitter:description" content="Volumetric LightMap（简称VLM）是 UE 中存储静态场景在空间中产生的间接光照的一种数据结构，类似其他引擎或文献中的 irradiance volume 或 light probe。 VLM的官"/>
+<meta name="application-name" content="Praise the Sun!">
+<meta name="apple-mobile-web-app-title" content="Praise the Sun!"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://cache-tlb.github.io/volumetric-lightmap/" /><link rel="prev" href="https://cache-tlb.github.io/can-sisyphus-be-saved/" /><link rel="next" href="https://cache-tlb.github.io/laplacian-smoothing-of-a-polygon/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Volumetric LightMap",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/cache-tlb.github.io\/volumetric-lightmap\/"
+        },"genre": "posts","wordcount":  5965 ,
+        "url": "https:\/\/cache-tlb.github.io\/volumetric-lightmap\/","datePublished": "2023-12-12T23:19:55+08:00","dateModified": "2023-12-12T23:19:55+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Mister Bin"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="/links/"> 链接 </a><a class="menu-item" href="/misc/"> 杂 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Praise the Sun!">Praise the Sun!</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="/links/" title="">链接</a><a class="menu-item" href="/misc/" title="">杂</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><article class="page single"><h1 class="single-title animated flipInX">Volumetric LightMap</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>Mister Bin</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%BC%80%E5%8F%91/"><i class="far fa-folder fa-fw"></i>开发</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-12-12">2023-12-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 5965 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 12 分钟&nbsp;</div>
+        </div><div class="content" id="content"><p>Volumetric LightMap（简称VLM）是 UE 中存储静态场景在空间中产生的间接光照的一种数据结构，类似其他引擎或文献中的 irradiance volume 或 light probe。</p>
+<h2 id="vlm的官方文档">VLM的官方文档</h2>
+<p>VLM的<a href="https://docs.unrealengine.com/4.27/en-US/RenderingAndGraphics/Lightmass/VolumetricLightmaps/" target="_blank" rel="noopener noreffer">官方文档在此</a>，
+本文摘录一些重点。</p>
+<h3 id="如何使用">如何使用</h3>
+<p>默认设置下，点 Build Light Only 就会自动构建 VLM，probe的覆盖范围是场景的 <strong>static mesh</strong>，如果场景中有 Lightmass Importance Volume，则probe只在 Lightmass Importance Volume 标识的范围内生成，如果有多个 Lightmass Importance Volume，则相当于有一个大的 bounding box包住了所有的Lightmass Importance Volume，probe会在这个大的 bounding box 范围内生成。此时如果有 static mesh（整个mesh或其中一部分）未被Lightmass Importance Volume覆盖，则没被覆盖的地方不一定会生成 probe。</p>
+<p><strong>probe的排列总是对齐世界空间的xyz轴的。</strong> 在主视口的visualize里选 <code>Volumetric LightMap</code> 即可预览 probe的位置。需要Build Light之后才会刷新 probe的位置。</p>
+<h3 id="配置项">配置项</h3>
+<p>在 World Settings 里，LightMass-&gt;LightMass Settings-&gt;Volume Light Method，选择Volumetric Lightmap即可，它也是默认选项。此外还有</p>
+<ul>
+<li>Volumetric Lightmap Detail Cell Size：最精细一级的 Brick 在世界空间的长度（两个probe之间的最近距离）</li>
+<li>Volumetric Lightmap Maximum Brick Memory Mb：VLM 总共最多耗多少 M内存，如果超过预算，优先丢掉离static mesh远的 Brick。</li>
+<li>Volumetric Lightmap Spherical Harmonic Smoothing：Spherical Harmonic de-ringing时用到的参数。</li>
+</ul>
+<h3 id="补充">补充</h3>
+<p>Volumetric Lightmap 的组成单元为 4x4x4 的 cell，称为一个 <code>Brick</code>。</p>
+<p>Brick覆盖范围有大有小，精细的 Brick 覆盖于模型表面，粗的 Brick 覆盖更大的范围。他们之间是包含关系，精细的 Brick 总是会被一个粗一级的 Brick所包含。形成树形结构。</p>
+<p>不管 Brick 是粗还是细，都是4x4x4个probe，包含的数据量相同。</p>
+<h2 id="代码逻辑">代码逻辑</h2>
+<h3 id="swam-导出代码">Swam 导出代码</h3>
+<p>UnrealLightmass 烘焙完 VLM后需要通过Swam导回UE4，导出数据的代码在 <code>Engine\Source\Programs\UnrealLightmass\Private\ImportExport\Exporter.cpp</code>，函数是<code>FLightmassSolverExporter::ExportResults</code>。</p>
+<p>导出了 Bricks 数量个结构体，每个 Brick 结构体包含下面的数据：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">struct</span> <span class="nc">FIrradianceBrickData</span>
+<span class="p">{</span>
+	<span class="n">FGuid</span> <span class="n">IntersectingLevelGuid</span><span class="p">;</span>
+	<span class="cm">/** Position in the global indirection texture.  Used for mapping brick positions back to world space. */</span>
+	<span class="n">FIntVector</span> <span class="n">IndirectionTexturePosition</span><span class="p">;</span>
+	<span class="cm">/** Depth in the refinement tree, where 0 is the root. */</span>
+	<span class="n">int32</span> <span class="n">TreeDepth</span><span class="p">;</span>
+	<span class="kt">float</span> <span class="n">AverageClosestGeometryDistance</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FFloat3Packed</span><span class="o">&gt;</span> <span class="n">AmbientVector</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">SHCoefficients</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">SkyBentNormal</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">uint8</span><span class="o">&gt;</span> <span class="n">DirectionalLightShadowing</span><span class="p">;</span>
+	<span class="cm">/** direct lighting from stationary lights for low quality light maps. */</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FFloat3Packed</span><span class="o">&gt;</span> <span class="n">LQLightColor</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">LQLightDirection</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FIrradianceVoxelImportProcessingData</span><span class="o">&gt;</span> <span class="n">VoxelImportProcessingData</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>跟渲染相关的是 AmbientVector，SHCoefficients，SkyBentNormal，DirectionalLightShadowing。</p>
+<p>LQLightDirection 和 LQLightColor 是为低配渲染准备的，用方向+颜色近似表示probe上的间接光信息，渲染每个物体时，根据其位置在CPU端插值出间接光数据，把插值后的方向和颜色作为 uniform 传给 shader。因此低配模式下，同一个模型的每个三角形的间接光是一样的。</p>
+<p>IndirectionTexturePosition 指定了该 Brick 的位置，为一个 Int3，表示网格的xyz index，网格的按照最精细的Brick大小为宽度，例如，<code>Volumetric Lightmap Detail Cell Size</code> 设置为200，则相邻 probe 最近距离是200，Brick包含4x4x4的probe，最小边长是800，IndirectionTexturePosition 的一个单位对应世界坐标长度是800。</p>
+<p>最精细一级的Brick 的 IndirectionTexturePosition 为整数，再粗糙一级的IndirectionTexturePosition 是4的倍数，再往上是16的倍数，等等。</p>
+<p><code>FIrradianceVoxelImportProcessingData</code>类里存了辅助信息，包括bInsideGeometry，bBorderVoxel，ClosestGeometryDistance，用于导入时做处理。</p>
+<h3 id="ue4-导入代码">UE4 导入代码</h3>
+<p>Swam 对应 UE4 里导入数据的代码在 <code>Engine\Source\Editor\UnrealEd\Private\Lightmass\ImportVolumetricLightmap.cpp</code>，函数是<code>FLightmassProcessor::ImportVolumetricLightmap()</code>，约有600行。</p>
+<p>函数中也会先调用 <code>ImportIrradianceTasks</code> 函数读入一个元素为结构体的二维数组，跟导出时的结构体是对应的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">struct</span> <span class="nc">FImportedVolumetricLightmapBrick</span>
+<span class="p">{</span>
+	<span class="n">FGuid</span> <span class="n">IntersectingLevelGuid</span><span class="p">;</span>
+	<span class="n">FIntVector</span> <span class="n">IndirectionTexturePosition</span><span class="p">;</span>
+	<span class="n">int32</span> <span class="n">TreeDepth</span><span class="p">;</span>
+	<span class="kt">float</span> <span class="n">AverageClosestGeometryDistance</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FFloat3Packed</span><span class="o">&gt;</span> <span class="n">AmbientVector</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">SHCoefficients</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FFloat3Packed</span><span class="o">&gt;</span> <span class="n">LQLightColor</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">LQLightDirection</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">SkyBentNormal</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">uint8</span><span class="o">&gt;</span> <span class="n">DirectionalLightShadowing</span><span class="p">;</span>
+	<span class="n">TArray</span><span class="o">&lt;</span><span class="n">Lightmass</span><span class="o">::</span><span class="n">FIrradianceVoxelImportProcessingData</span><span class="o">&gt;</span> <span class="n">TaskVoxelImportProcessingData</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>导入后续的处理的结果保存到了 MapBuildData 里的 LevelPrecomputedVolumetricLightmapBuildData 成员，所以这里不必关心导入时具体做了哪些处理也可以。</p>
+<p>游戏启动加载 MapBuildData 的数据时会一并加载VLM，见 <code>UMapBuildDataRegistry::Serialize</code> 函数（文件为<code>Engine\Source\Runtime\Engine\Private\MapBuildData.cpp</code>），它将调用 <code>FArchive&amp; operator&lt;&lt;(FArchive&amp; Ar,FPrecomputedVolumetricLightmapData&amp; Volume)</code>，如果要基于Build好的光照数据单独导出VLM给其他应用，可以考虑从 Level 调用<code>ULevel::GetOrCreateMapBuildData()</code>获得MapBuildData，再访问 <code>UMapBuildDataRegistry::GetLevelPrecomputedVolumetricLightmapBuildData</code>拿到<code>FPrecomputedVolumetricLightmapData</code>指针，就可以导出给外部APP使用了。</p>
+<p>FPrecomputedVolumetricLightmapData 类的成员如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">class FPrecomputedVolumetricLightmapData
+{
+	FBox Bounds;
+	FIntVector IndirectionTextureDimensions;
+	FVolumetricLightmapDataLayer IndirectionTexture;
+	int32 BrickSize;
+	FIntVector BrickDataDimensions;
+	FVolumetricLightmapBrickData BrickData;
+
+        //...
+};
+</code></pre></td></tr></table>
+</div>
+</div><p><code>Bounds</code> 表示其中 Bricks 覆盖的世界坐标的空间范围。</p>
+<p><code>BrickDataDimensions</code> 表示 BrickData 成员每个纹理占用的 Texture3D 大小（见 <code>Shader</code> 一节）。</p>
+<p><code>FVolumetricLightmapBrickData</code>类里包含了上述的 AmbientVector，SHCoefficients，SkyBentNormal，SkyBentNormal，DirectionalLightShadowing，LQLightColor，LQLightDirection 数据。
+而原来的 IndirectionTexturePosition，TreeDepth这些数据经过导入后已经不需要保存了。</p>
+<p><code>FImportedVolumetricLightmapBrick</code>是每个 Brick 的原始数据，经过处理后，MapBuildData 里存的是 Map里的所有 Brick 整合在一起的数据，很难从中再提取单个 Brick 的数据。</p>
+<h3 id="shader">Shader</h3>
+<p>VLM在shader里对应的资源定义在 <code>\Engine\Source\Runtime\Engine\Public\SceneView.h</code>，如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="o">&lt;</span><span class="n">uint4</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">VolumetricLightmapIndirectionTexture</span><span class="p">)</span> <span class="c1">// 3维世界坐标到线性brick数组下标映射表
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickAmbientVector</span><span class="p">)</span> <span class="c1">// Ambient 和 SH0-5 存了 3 bands RGB，总共 3*9=27 个float
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickSHCoefficients0</span><span class="p">)</span> <span class="c1">// Ambient 的 RGB 有效，SH0-5的RGBA有效，总共也是 6*4+3=27 个float 
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickSHCoefficients1</span><span class="p">)</span> <span class="c1">// 
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickSHCoefficients2</span><span class="p">)</span> <span class="c1">// 
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickSHCoefficients3</span><span class="p">)</span> <span class="c1">// 
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickSHCoefficients4</span><span class="p">)</span> <span class="c1">// 
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">VolumetricLightmapBrickSHCoefficients5</span><span class="p">)</span> <span class="c1">// 
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">SkyBentNormalBrickTexture</span><span class="p">)</span>     <span class="c1">// Sky Bent Normal
+</span><span class="c1"></span><span class="n">SHADER_PARAMETER_TEXTURE</span><span class="p">(</span><span class="n">Texture3D</span><span class="p">,</span> <span class="n">DirectionalLightShadowingBrickTexture</span><span class="p">)</span> <span class="c1">// 方向光阴影
+</span></code></pre></td></tr></table>
+</div>
+</div><p>以上的纹理是渲染时所需的VLM的全部纹理。这些纹理需要配合一组全局 uniform 使用：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">struct</span> <span class="nc">ViewState</span> <span class="p">{</span>
+	<span class="n">float3</span> <span class="n">VolumetricLightmapWorldToUVScale</span><span class="p">;</span>
+	<span class="n">float3</span> <span class="n">VolumetricLightmapWorldToUVAdd</span><span class="p">;</span>
+	<span class="n">float3</span> <span class="n">VolumetricLightmapIndirectionTextureSize</span><span class="p">;</span>
+	<span class="kt">float</span> <span class="n">VolumetricLightmapBrickSize</span><span class="p">;</span>
+	<span class="n">float3</span> <span class="n">VolumetricLightmapBrickTexelSize</span><span class="p">;</span>
+<span class="c1">//...
+</span><span class="c1"></span><span class="p">};</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>使用这些纹理是在<code>Shaders\Private\VolumetricLightmapShared.ush</code>，比如，BasePassPixelShader.usf 等渲染物体的 shader 会调用 <code>ComputeVolumetricLightmapBrickTextureUVs</code> 函数，将像素的world坐标转成后面几个 Brick 数据纹理的坐标，后面还将间接采样VolumetricLightmapBrickSHCoefficients0 等纹理。</p>
+<p>在 Shaders 目录下搜索这些纹理，可以查看各自的用法。简单分析一下。</p>
+<ul>
+<li>BentNormal：因为物体法线方向的半球范围内有可能被遮挡而受不到环境光，Bent Normal表示了看得到环境光的方向的平均，只要按照 bent normal 方向采样环境贴图就行了（而不是取法线方向）。</li>
+<li>Ambient + SHCoefficients：提供了3个频带的 SH系数，结合物体世界坐标法线方向，计算diffuse的间接光。如何从这些纹理里获得正确的SH系数，可以参考 <code>GetVolumetricLightmapSH3()</code> 函数。</li>
+<li>Directional Light Shadowing：作为阴影系数，直接乘在方向光上。</li>
+<li>IndirectionTexture：是一个3D查找表，表中的每个数字为一个（index_x, index_y, index_z，brick width）的组合，index 指向 AmbientVector、SHCoefficients等纹理的位置。像素的world坐标会换算成在查找表中的整数位置，由此查到所使用的 brick 的 index。这里的 index 是三维的，但本质上brick数据是线性排列的，每一维最多放 256 个，（理论上）最多可以有 256x256x256 个 brick，受纹理宽高长度限制，不能直接分配这么长的纹理，所以就用三维纹理存线性数组。因为不同尺度的brick存储时不加区分，所以需要结合 brick 的尺度确定其中各个 probe 的插值系数。</li>
+</ul>
+<h3 id="streaming">Streaming</h3>
+<p>Brick 的散布范围可能很广，场景过大时可以用 streaming的方式动态加载或卸载 VLM。事实上，MapBuildData 里的 <code>FPrecomputedVolumetricLightmapData</code>指针是放在一个 Map里的，其Key 是一个GUID，表示所属的SubLevel。Swam导入的<code>FImportedVolumetricLightmapBrick</code>类的成员 <code>IntersectingLevelGuid</code> 正是描述了当前 Brick 所属的 SubLevel。</p>
+<p>SubLevel 只包含最精细一级的 Bricks。</p>
+<p>SubLevel的 Bricks 数据不跟 Map 的 Bricks 重复。 或者说，一个 Brick 如果属于 SubLevel，那么它就不属于 Map。</p>
+<p>SubLevel 的 Bricks 数据也是存在 <code>FPrecomputedVolumetricLightmapData</code> 类的 <code>FVolumetricLightmapBrickData</code> 成员中。区别在于，SubLevel 没有 IndirectionTexture，因为 IndirectionTexture 描述的是整个场景的位置到 Brick的索引关系，而 SubLevel 只覆盖一小部分场景，它记录的是对全局 IndirectionTexture 的补充内容。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">FPrecomputedVolumetricLightmapData</span>
+<span class="p">{</span>
+        <span class="c1">//...
+</span><span class="c1"></span>        <span class="n">TResourceArray</span><span class="o">&lt;</span><span class="n">FIntVector</span><span class="o">&gt;</span> <span class="n">SubLevelBrickPositions</span><span class="p">;</span>
+        <span class="n">TResourceArray</span><span class="o">&lt;</span><span class="n">FColor</span><span class="o">&gt;</span> <span class="n">IndirectionTextureOriginalValues</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述两个成员为 SubLevel 特有的数据（Persistent Level下这两个成员都是空的）。</p>
+<p><code>SubLevelBrickPositions</code> 指的是 SubLevel 里每个 Brick 在 IndirectionTexture 中的位置，被加载时，需要将 IndirectionTexture 中这些位置上的索引值换成 SubLevel 的 Brick 索引。每个元素是 byte 3 类型，假设第 i 个元素是 (px,py,pz)，则我们需要将 i 换算成新的 Brick 数据的位置 (bx, by, bz)，并把新的 Brick 挪到这个位置上，然后找到 IndirectionTexture 的 (px,py,pz) 位置，将其值换成 (bx, by, bz, 1)，这里 1 值的是 Brick 的层级。</p>
+<p><code>IndirectionTextureOriginalValues</code> 是卸载 SubLevel 时使用，需要将 IndirectionTexture 中被修改过的地方恢复成 IndirectionTextureOriginalValues 记录的原数据。每个元素类型是 byte 4，假设第 i 个元素是 (ox,oy,oz,ow)，我们需要访问 SubLevelBrickPositions 的第 i 个元素 (px,py,pz)，找到 IndirectionTexture 的 (px,py,pz) 位置，将其值换成 (ox, oy, oz, ow)。</p>
+<p>为了加载和卸载 SubLevel 的 VLM 数据，UE4 运行时维护了两个全局变量：</p>
+<ul>
+<li><code>FPrecomputedVolumetricLightmapData</code>类型的变量 <code>GlobalVolumetricLightmapData</code>，存放 IndirectionTexture，和所用到的 Bricks。这里的 Bricks 用来做 CPU 端低配数据的插值。在某些时候也会用它的GPU数据作为VLM渲染。</li>
+<li><code>FVolumetricLightmapBrickAtlas</code>类型的变量 <code>GVolumetricLightmapBrickAtlas</code>，存放当前渲染用到的 bricks 数据。</li>
+</ul>
+<p>当有SubLevel加载或卸载时，会动态调整上述两个变量，使得在渲染时总能正确获得所需数据。</p>
+<p>VLM streaming的相关代码：</p>
+<ul>
+<li><code>Engine\Source\Runtime\Engine\Private\PrecomputedVolumetricLightmap.cpp</code>的<code>AddToSceneData</code>，<code>RemoveFromSceneData</code>，<code>HandleDataMovementInAtlas</code> 函数，主要调用了compute shader，调整IndirectionTexture内容，见<code>Engine\Shaders\Private\VolumetricLightmapStreaming.usf</code>文件。如果是低配，则不调用compute shader，只修改 IndirectionTexture 的CPU部分。</li>
+<li><code>FVolumetricLightmapBrickAtlas::Insert</code>，<code>FVolumetricLightmapBrickAtlas::Remove</code>函数，通过操作 GVolumetricLightmapBrickAtlas 来调整 GPU中的 brick 的数据。</li>
+</ul>
+<p>渲染物体时，设置 VLM 相关 shader 资源的代码在 <code>Engine\Source\Runtime\Renderer\Private\SceneRendering.cpp</code>文件的 <code>SetupPrecomputedVolumetricLightmapUniformBufferParameters</code> 函数。
+这里根据设置有可能选 GlobalVolumetricLightmapData 或 GVolumetricLightmapBrickAtlas 的 Brick 数据（纹理），但不管哪种情况，IndirectionTexture 总是在 GlobalVolumetricLightmapData 里获取的。</p>
+<h2 id="其他">其他</h2>
+<h3 id="注意事项">注意事项</h3>
+<p>VLM 中的数据，包括 Indirection Texture、各种SH系数、LQLightDirecion、SkyBentNormal，凡是跟位置和方向有关的数据，均是按 UE4 的坐标系（左手系，up=z+，foward=y-，right=x+）。如果使用的地方不是这样的坐标系，需要在 shader 里做相应调整。</p>
+<h3 id="如何调试-unreallightmass">如何调试 UnrealLightmass</h3>
+<p>Lightmass 烘焙是单独的程序里运行，可能是分布式的。</p>
+<p>UE4编辑器发起烘焙后需要连接到 Swarm，将烘焙任务发给Swarm，最终会启动 UnrealLightmass.exe，在没有启动编辑器的时候，UnrealLightmass.exe并不能获得正确的烘焙任务，所以不能直接调试UnrealLightmass。</p>
+<p>正常启动 UE4 编辑器，console里输入 <code>lightmassdebug</code>命令，然后再点 Build Light Only，此时 Swarm 会等待UnrealLightmass.exe启动，而不是像以前那样自动启动。</p>
+<p>然后在 Visual Studio里把启动项设成 <code>UnrealLightmass</code>（条件允许的话也可以把配置改成 Debug Program），再按 F5 启动就可以正常调试 UnrealLightmass 了。</p>
+<h3 id="ue4-shader-中使用-sh-的相关代码">UE4 shader 中使用 SH 的相关代码</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">FThreeBandSHVector</span> <span class="nf">SHBasisFunction3</span><span class="p">(</span><span class="n">half3</span> <span class="n">InputVector</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">FThreeBandSHVector</span> <span class="n">Result</span><span class="p">;</span>
+	<span class="c1">// These are derived from simplifying SHBasisFunction in C++
+</span><span class="c1"></span>	<span class="n">Result</span><span class="p">.</span><span class="n">V0</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.282095f</span><span class="p">;</span> 
+	<span class="n">Result</span><span class="p">.</span><span class="n">V0</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.488603f</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V0</span><span class="p">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.488603f</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">z</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V0</span><span class="p">.</span><span class="n">w</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.488603f</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+
+	<span class="n">half3</span> <span class="n">VectorSquared</span> <span class="o">=</span> <span class="n">InputVector</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V1</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">1.092548f</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V1</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.092548f</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">z</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V1</span><span class="p">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.315392f</span> <span class="o">*</span> <span class="p">(</span><span class="mf">3.0f</span> <span class="o">*</span> <span class="n">VectorSquared</span><span class="p">.</span><span class="n">z</span> <span class="o">-</span> <span class="mf">1.0f</span><span class="p">);</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V1</span><span class="p">.</span><span class="n">w</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.092548f</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">InputVector</span><span class="p">.</span><span class="n">z</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V2</span> <span class="o">=</span> <span class="mf">0.546274f</span> <span class="o">*</span> <span class="p">(</span><span class="n">VectorSquared</span><span class="p">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">VectorSquared</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+
+	<span class="k">return</span> <span class="n">Result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">FThreeBandSHVector</span> <span class="nf">CalcDiffuseTransferSH3</span><span class="p">(</span><span class="n">half3</span> <span class="n">Normal</span><span class="p">,</span><span class="n">half</span> <span class="n">Exponent</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">FThreeBandSHVector</span> <span class="n">Result</span> <span class="o">=</span> <span class="n">SHBasisFunction3</span><span class="p">(</span><span class="n">Normal</span><span class="p">);</span>
+
+	<span class="c1">// These formula are scaling factors for each SH band that convolve a SH with the circularly symmetric function
+</span><span class="c1"></span>	<span class="c1">// max(0,cos(theta))^Exponent
+</span><span class="c1"></span>	<span class="n">half</span> <span class="n">L0</span> <span class="o">=</span>					<span class="mi">2</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">Exponent</span>						<span class="p">);</span>
+	<span class="n">half</span> <span class="n">L1</span> <span class="o">=</span>					<span class="mi">2</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">Exponent</span>						<span class="p">);</span>
+	<span class="n">half</span> <span class="n">L2</span> <span class="o">=</span> <span class="n">Exponent</span> <span class="o">*</span>		<span class="mi">2</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">Exponent</span> <span class="o">+</span> <span class="n">Exponent</span> <span class="o">*</span> <span class="n">Exponent</span><span class="p">);</span>
+	<span class="n">half</span> <span class="n">L3</span> <span class="o">=</span> <span class="p">(</span><span class="n">Exponent</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span>	<span class="mi">2</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">/</span> <span class="p">(</span><span class="mi">8</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">Exponent</span> <span class="o">+</span> <span class="n">Exponent</span> <span class="o">*</span> <span class="n">Exponent</span><span class="p">);</span>
+
+	<span class="c1">// Multiply the coefficients in each band with the appropriate band scaling factor.
+</span><span class="c1"></span>	<span class="n">Result</span><span class="p">.</span><span class="n">V0</span><span class="p">.</span><span class="n">x</span> <span class="o">*=</span> <span class="n">L0</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V0</span><span class="p">.</span><span class="n">yzw</span> <span class="o">*=</span> <span class="n">L1</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V1</span><span class="p">.</span><span class="n">xyzw</span> <span class="o">*=</span> <span class="n">L2</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">V2</span> <span class="o">*=</span> <span class="n">L2</span><span class="p">;</span>
+
+	<span class="k">return</span> <span class="n">Result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">half</span> <span class="nf">DotSH3</span><span class="p">(</span><span class="n">FThreeBandSHVector</span> <span class="n">A</span><span class="p">,</span><span class="n">FThreeBandSHVector</span> <span class="n">B</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">half</span> <span class="n">Result</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">V0</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">V0</span><span class="p">);</span>
+	<span class="n">Result</span> <span class="o">+=</span> <span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">V1</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">V1</span><span class="p">);</span>
+	<span class="n">Result</span> <span class="o">+=</span> <span class="n">A</span><span class="p">.</span><span class="n">V2</span> <span class="o">*</span> <span class="n">B</span><span class="p">.</span><span class="n">V2</span><span class="p">;</span>
+	<span class="k">return</span> <span class="n">Result</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">half3</span> <span class="nf">DotSH3</span><span class="p">(</span><span class="n">FThreeBandSHVectorRGB</span> <span class="n">A</span><span class="p">,</span><span class="n">FThreeBandSHVector</span> <span class="n">B</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">half3</span> <span class="n">Result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">DotSH3</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">R</span><span class="p">,</span><span class="n">B</span><span class="p">);</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">DotSH3</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">G</span><span class="p">,</span><span class="n">B</span><span class="p">);</span>
+	<span class="n">Result</span><span class="p">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">DotSH3</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">B</span><span class="p">,</span><span class="n">B</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">Result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="nf">GetVolumetricLightmapSHCoefficients0</span><span class="p">(</span><span class="n">float3</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="n">out</span> <span class="n">float3</span> <span class="n">AmbientVector</span><span class="p">,</span> <span class="n">out</span> <span class="n">float4</span> <span class="n">SHCoefficients0Red</span><span class="p">,</span> <span class="n">out</span> <span class="n">float4</span> <span class="n">SHCoefficients0Green</span><span class="p">,</span> <span class="n">out</span> <span class="n">float4</span> <span class="n">SHCoefficients0Blue</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">AmbientVector</span> <span class="o">=</span> <span class="n">GetVolumetricLightmapAmbient</span><span class="p">(</span><span class="n">BrickTextureUVs</span><span class="p">);</span>
+	<span class="n">SHCoefficients0Red</span> <span class="o">=</span> <span class="n">Texture3DSampleLevel</span><span class="p">(</span><span class="n">View</span><span class="p">.</span><span class="n">VolumetricLightmapBrickSHCoefficients0</span><span class="p">,</span> <span class="n">PIVSharedSampler0</span><span class="p">,</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="n">SHCoefficients0Green</span> <span class="o">=</span> <span class="n">Texture3DSampleLevel</span><span class="p">(</span><span class="n">View</span><span class="p">.</span><span class="n">VolumetricLightmapBrickSHCoefficients2</span><span class="p">,</span> <span class="n">PIVSharedSampler2</span><span class="p">,</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="n">SHCoefficients0Blue</span> <span class="o">=</span> <span class="n">Texture3DSampleLevel</span><span class="p">(</span><span class="n">View</span><span class="p">.</span><span class="n">VolumetricLightmapBrickSHCoefficients4</span><span class="p">,</span> <span class="n">PIVSharedSampler4</span><span class="p">,</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+
+	<span class="c1">// Undo normalization done in FIrradianceBrickData::SetFromVolumeLightingSample
+</span><span class="c1"></span>	<span class="n">float4</span> <span class="n">SHDenormalizationScales0</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span>
+		<span class="mf">0.488603f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">,</span> 
+		<span class="mf">0.488603f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">,</span> 
+		<span class="mf">0.488603f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">,</span> 
+		<span class="mf">1.092548f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">);</span>
+
+	<span class="n">SHCoefficients0Red</span> <span class="o">=</span> <span class="n">SHCoefficients0Red</span> <span class="o">*</span> <span class="n">AmbientVector</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">SHDenormalizationScales0</span><span class="p">;</span>
+	<span class="n">SHCoefficients0Green</span> <span class="o">=</span> <span class="n">SHCoefficients0Green</span> <span class="o">*</span> <span class="n">AmbientVector</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">SHDenormalizationScales0</span><span class="p">;</span>
+	<span class="n">SHCoefficients0Blue</span> <span class="o">=</span> <span class="n">SHCoefficients0Blue</span> <span class="o">*</span> <span class="n">AmbientVector</span><span class="p">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">SHDenormalizationScales0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">FThreeBandSHVectorRGB</span> <span class="nf">GetVolumetricLightmapSH3</span><span class="p">(</span><span class="n">float3</span> <span class="n">BrickTextureUVs</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">float3</span> <span class="n">AmbientVector</span><span class="p">;</span>
+	<span class="n">float4</span> <span class="n">SHCoefficients0Red</span><span class="p">;</span>
+	<span class="n">float4</span> <span class="n">SHCoefficients0Green</span><span class="p">;</span>
+	<span class="n">float4</span> <span class="n">SHCoefficients0Blue</span><span class="p">;</span>
+	<span class="n">GetVolumetricLightmapSHCoefficients0</span><span class="p">(</span><span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="n">AmbientVector</span><span class="p">,</span> <span class="n">SHCoefficients0Red</span><span class="p">,</span> <span class="n">SHCoefficients0Green</span><span class="p">,</span> <span class="n">SHCoefficients0Blue</span><span class="p">);</span>
+
+	<span class="n">float4</span> <span class="n">SHCoefficients1Red</span> <span class="o">=</span> <span class="n">Texture3DSampleLevel</span><span class="p">(</span><span class="n">View</span><span class="p">.</span><span class="n">VolumetricLightmapBrickSHCoefficients1</span><span class="p">,</span> <span class="n">PIVSharedSampler1</span><span class="p">,</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="n">float4</span> <span class="n">SHCoefficients1Green</span> <span class="o">=</span> <span class="n">Texture3DSampleLevel</span><span class="p">(</span><span class="n">View</span><span class="p">.</span><span class="n">VolumetricLightmapBrickSHCoefficients3</span><span class="p">,</span> <span class="n">PIVSharedSampler3</span><span class="p">,</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="n">float4</span> <span class="n">SHCoefficients1Blue</span> <span class="o">=</span> <span class="n">Texture3DSampleLevel</span><span class="p">(</span><span class="n">View</span><span class="p">.</span><span class="n">VolumetricLightmapBrickSHCoefficients5</span><span class="p">,</span> <span class="n">PIVSharedSampler5</span><span class="p">,</span> <span class="n">BrickTextureUVs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+
+	<span class="n">float4</span> <span class="n">SHDenormalizationScales1</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span>
+		<span class="mf">1.092548f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">,</span>
+		<span class="mf">4.0f</span> <span class="o">*</span> <span class="mf">0.315392f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">,</span>
+		<span class="mf">1.092548f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">,</span>
+		<span class="mf">2.0f</span> <span class="o">*</span> <span class="mf">0.546274f</span> <span class="o">/</span> <span class="mf">0.282095f</span><span class="p">);</span>
+
+	<span class="n">SHCoefficients1Red</span> <span class="o">=</span> <span class="n">SHCoefficients1Red</span> <span class="o">*</span> <span class="n">AmbientVector</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">SHDenormalizationScales1</span><span class="p">;</span>
+	<span class="n">SHCoefficients1Green</span> <span class="o">=</span> <span class="n">SHCoefficients1Green</span> <span class="o">*</span> <span class="n">AmbientVector</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">SHDenormalizationScales1</span><span class="p">;</span>
+	<span class="n">SHCoefficients1Blue</span> <span class="o">=</span> <span class="n">SHCoefficients1Blue</span> <span class="o">*</span> <span class="n">AmbientVector</span><span class="p">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">SHDenormalizationScales1</span><span class="p">;</span>
+
+	<span class="n">FThreeBandSHVectorRGB</span> <span class="n">IrradianceSH</span><span class="p">;</span>
+	<span class="c1">// Construct the SH environment
+</span><span class="c1"></span>	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">R</span><span class="p">.</span><span class="n">V0</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span><span class="n">AmbientVector</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">SHCoefficients0Red</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">R</span><span class="p">.</span><span class="n">V1</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span><span class="n">SHCoefficients0Red</span><span class="p">.</span><span class="n">w</span><span class="p">,</span> <span class="n">SHCoefficients1Red</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">R</span><span class="p">.</span><span class="n">V2</span> <span class="o">=</span> <span class="n">SHCoefficients1Red</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">G</span><span class="p">.</span><span class="n">V0</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span><span class="n">AmbientVector</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">SHCoefficients0Green</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">G</span><span class="p">.</span><span class="n">V1</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span><span class="n">SHCoefficients0Green</span><span class="p">.</span><span class="n">w</span><span class="p">,</span> <span class="n">SHCoefficients1Green</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">G</span><span class="p">.</span><span class="n">V2</span> <span class="o">=</span> <span class="n">SHCoefficients1Green</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">B</span><span class="p">.</span><span class="n">V0</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span><span class="n">AmbientVector</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="n">SHCoefficients0Blue</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">B</span><span class="p">.</span><span class="n">V1</span> <span class="o">=</span> <span class="n">float4</span><span class="p">(</span><span class="n">SHCoefficients0Blue</span><span class="p">.</span><span class="n">w</span><span class="p">,</span> <span class="n">SHCoefficients1Blue</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+	<span class="n">IrradianceSH</span><span class="p">.</span><span class="n">B</span><span class="p">.</span><span class="n">V2</span> <span class="o">=</span> <span class="n">SHCoefficients1Blue</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+
+	<span class="k">return</span> <span class="n">IrradianceSH</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2023-12-12</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/can-sisyphus-be-saved/" class="prev" rel="prev" title="能否拯救西西弗斯"><i class="fas fa-angle-left fa-fw"></i>能否拯救西西弗斯</a>
+            <a href="/laplacian-smoothing-of-a-polygon/" class="next" rel="next" title="多边形的Laplacian平滑">多边形的Laplacian平滑<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Mister Bin</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":100},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

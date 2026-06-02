@@ -4,40 +4,75 @@
         <link>https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/</link>
         <description>图形 - 分类 - Praise the Sun!</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>liub91(at)gmail(dot)com (Mister Bin)</managingEditor>
-            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Fri, 26 May 2023 21:22:20 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>liub91(at)gmail(dot)com (Mister Bin)</webMaster><lastBuildDate>Tue, 28 Oct 2025 19:59:42 &#43;0800</lastBuildDate><atom:link href="https://cache-tlb.github.io/categories/%E5%9B%BE%E5%BD%A2/" rel="self" type="application/rss+xml" /><item>
+    <title>NVIDIA Flex 截帧分析</title>
+    <link>https://cache-tlb.github.io/rendering-analysis-nvidia-flex/</link>
+    <pubDate>Tue, 28 Oct 2025 19:59:42 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/rendering-analysis-nvidia-flex/</guid>
+    <description><![CDATA[前言 Flex 是 NVIDIA 推出的一个用于实时物理模拟的库。它的优势在于使用统一的基于粒子的模型处理刚体、软体、流体的解算。即使已经是十年前就能达到的效果，放]]></description>
+</item><item>
+    <title>4DGS笔记</title>
+    <link>https://cache-tlb.github.io/notes-on-4dgs/</link>
+    <pubDate>Mon, 30 Jun 2025 19:55:12 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/notes-on-4dgs/</guid>
+    <description><![CDATA[前言 3DGS的在静态场景重建的效果如此惊艳，人们自然而然就会想要它能动起来。naive的想法是为每一帧训练一个 3DGS，可想而知数据量巨大，]]></description>
+</item><item>
+    <title>二维向量场的可视化</title>
+    <link>https://cache-tlb.github.io/visualization-of-2d-vector-fields/</link>
+    <pubDate>Wed, 09 Oct 2024 22:37:49 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/visualization-of-2d-vector-fields/</guid>
+    <description><![CDATA[在图形渲染领域经常需要处理 2D 向量场，例如有些游戏会用 2D 流体模拟营造出 3D 流体效果，例如 fluid ninja。为了 debug 速度场，就需要合适的 2D 向量场的可视化]]></description>
+</item><item>
+    <title>双抛物面映射与球极投影等价</title>
+    <link>https://cache-tlb.github.io/dual-paraboloid-mapping-is-equivalent-to-stereographic-projection/</link>
+    <pubDate>Mon, 12 Aug 2024 20:24:08 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/dual-paraboloid-mapping-is-equivalent-to-stereographic-projection/</guid>
+    <description><![CDATA[双抛物面映射 在三维图形渲染中，经常需要用到球面数据。球面数据最常用的表示形式是cubemap。为了捕获cubemap，需要为它的每个面都渲染]]></description>
+</item><item>
+    <title>3D Gaussian Splatting笔记</title>
+    <link>https://cache-tlb.github.io/notes-on-3d-gaussian-splatting/</link>
+    <pubDate>Wed, 12 Jun 2024 22:12:09 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/notes-on-3d-gaussian-splatting/</guid>
+    <description><![CDATA[3D Gaussian Splatting（简称3DGS，中文通常翻译成3D高斯泼溅）在2023年横空出世，打破了新视角合成（novel view synthesis）问]]></description>
+</item><item>
+    <title>全景图的多视角拼接</title>
+    <link>https://cache-tlb.github.io/panorama-stitching/</link>
+    <pubDate>Sun, 28 Apr 2024 13:39:01 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/panorama-stitching/</guid>
+    <description><![CDATA[借助 UE5 进行虚拟拍摄已经越来越普及，UE官方提供的 MovieRenderQueue 插件可以满足大部分拍摄需求。然而对于全景图的拍摄需要进行额外的处理，因为全景图无法仅通过渲]]></description>
+</item><item>
+    <title>全景图渲染的常见问题</title>
+    <link>https://cache-tlb.github.io/caveats-of-rendering-panoramas/</link>
+    <pubDate>Tue, 27 Feb 2024 22:38:39 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/caveats-of-rendering-panoramas/</guid>
+    <description><![CDATA[全景图是用2D平面图像表示球面图像的一种形式，例如世界地图。渲染全景图只需要准备一个球体模型，算好顶点UV，将2D图像作为纹理贴在球体表面即]]></description>
+</item><item>
+    <title>Perfect Spatial Hashing</title>
+    <link>https://cache-tlb.github.io/perfect-spatial-hashing/</link>
+    <pubDate>Sun, 15 Oct 2023 19:55:01 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/perfect-spatial-hashing/</guid>
+    <description><![CDATA[最近在工作中接触到了 Perfect Spatial Hashing (PSH) 算法，想法比较巧妙，也很实用，故在此记录。论文地址: https://hhoppe.com/perfecthash.pdf. 本地存档. 在3D图形领域经常需要计算 voxel 数据，例如 irradiance cache 等，这]]></description>
+</item><item>
+    <title>漫谈Cubemap插值</title>
+    <link>https://cache-tlb.github.io/cubemap-interpolation/</link>
+    <pubDate>Sat, 12 Aug 2023 20:16:03 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://cache-tlb.github.io/cubemap-interpolation/</guid>
+    <description><![CDATA[Cubemap 是一种常见的表示球面信息的数据结构。因为球面和正方体表面是同胚的，所以用正方体的6个面存储球面上的数据也是自然而然的想法。Cube的每个面]]></description>
+</item><item>
     <title>Radiosity 辐射度方法</title>
     <link>https://cache-tlb.github.io/radiosity/</link>
     <pubDate>Fri, 26 May 2023 21:22:20 &#43;0800</pubDate>
     <author>作者</author>
     <guid>https://cache-tlb.github.io/radiosity/</guid>
     <description><![CDATA[谈及全局光照，绕不开一个重要的方程，即渲染方程（Render Equation），如下是其中一个简化版本： $$ L_o(x, \omega_o) = L_e(x, \omega_o) + \int_\Omega f_r(x,\omega_i\to\omega_o) L_i(x,\omega_i) (\omega_i\cdot n) \ \mathrm{d}\omega_i $$ $L_o$ 表示]]></description>
-</item><item>
-    <title>于 Alias 采样算法中领悟天之道</title>
-    <link>https://cache-tlb.github.io/alias-method/</link>
-    <pubDate>Thu, 15 Dec 2022 19:25:05 &#43;0800</pubDate>
-    <author>作者</author>
-    <guid>https://cache-tlb.github.io/alias-method/</guid>
-    <description><![CDATA[给定了一个离散概率分布，如何从中采样？这虽然是一个简单问题，但在许多领域都会涉及到。例如遗传算法中，给出种群每个个体的适应度，要从中筛选出一]]></description>
-</item><item>
-    <title>透视矫正插值公式的推导</title>
-    <link>https://cache-tlb.github.io/perspective-correct-interpolation/</link>
-    <pubDate>Fri, 11 Nov 2022 19:12:20 &#43;0800</pubDate>
-    <author>作者</author>
-    <guid>https://cache-tlb.github.io/perspective-correct-interpolation/</guid>
-    <description><![CDATA[前言 众所周知（？） vertex shader 里顶点属性转换成 pixel shader 里逐像素属性需要经过插值，具体来说，是根据像素所在三角形三个顶点的属性，以像素点的重心坐标为权重进]]></description>
-</item><item>
-    <title>Morton Code</title>
-    <link>https://cache-tlb.github.io/morton-code/</link>
-    <pubDate>Fri, 22 Apr 2022 18:05:50 &#43;0800</pubDate>
-    <author>作者</author>
-    <guid>https://cache-tlb.github.io/morton-code/</guid>
-    <description><![CDATA[Morton Code 编码算法 笔者在探索 UE4 源码时，发现一段有趣的代码，如下： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 uint MortonCode2(uint x) { x &amp;= 0x0000ffff; x = (x ^ (x &lt;&lt; 8)) &amp; 0x00ff00ff; // 0b0000000011111111 x = (x ^ (x &lt;&lt; 4)) &amp;]]></description>
-</item><item>
-    <title>How to Become an Advanced Graphics Programmer</title>
-    <link>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</link>
-    <pubDate>Thu, 13 May 2021 20:02:42 &#43;0800</pubDate>
-    <author>作者</author>
-    <guid>https://cache-tlb.github.io/how-to-become-an-advanced-graphics-programmer/</guid>
-    <description><![CDATA[本文翻译自 Eric Arnebäck 的一条 推文，作者提出了图形程序员进阶的一些中肯的建议。我觉得其中有不少值得借鉴的点。 如果你已经可以无碍地听懂 GDC 和]]></description>
 </item></channel>
 </rss>
